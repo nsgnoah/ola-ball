@@ -5,66 +5,84 @@ import Foundation
 enum TipDirector {
     struct Context {
         var situation: Situation
+        var defenseCall: DefenseCall
+        var userOnOffense: Bool
         var playsThisGame: Int
         var isFourthQuarter: Bool
         var scoreDiff: Int   // user minus opponent
     }
 
-    static func preCall(_ ctx: Context, seen: Set<String>) -> Concept? {
+    static func preSnap(_ ctx: Context, seen: Set<String>) -> Concept? {
         let s = ctx.situation
-        var candidates: [String] = []
-        if ctx.playsThisGame == 0 { candidates.append("downs") }
-        if ctx.playsThisGame >= 1 { candidates.append("runPlay") }
-        if s.down == 2 { candidates.append("notation") }
-        if s.down == 3 { candidates.append("thirdDown") }
-        if s.down == 4 { candidates.append("fourthDown") }
-        if s.down == 4 && s.inFieldGoalRange { candidates.append("fieldGoal") }
-        if ctx.isFourthQuarter {
-            switch ctx.scoreDiff {
-            case ..<(-8): candidates.append("twoScores")
-            case -8 ... -4: candidates.append("clutchTD")
-            case -3 ... -1: candidates.append("clutchFG")
-            case 1...: candidates.append("protectLead")
-            default: break
+        var c: [String] = []
+        if ctx.userOnOffense {
+            if ctx.playsThisGame == 0 { c.append("objective") }
+            c.append("drawThePlay")
+            if ctx.playsThisGame >= 1 { c.append("gaps") }
+            if s.down == 2 { c.append("notation") }
+            if s.down == 3 { c.append("thirdDown") }
+            if s.down == 4 { c.append("fourthDown") }
+            if s.down == 4 && s.inFieldGoalRange { c.append("fieldGoal") }
+            if s.down == 4 && !s.inFieldGoalRange { c.append("punt") }
+            switch ctx.defenseCall {
+            case .stackTheBox: c.append("theBox")
+            case .playThePass: c.append("safeties")
+            case .blitz: c.append("blitz")
+            case .balanced: break
             }
+            if ctx.isFourthQuarter {
+                switch ctx.scoreDiff {
+                case ..<(-8): c.append("twoScores")
+                case -8 ... -4: c.append("clutchTD")
+                case -3 ... -1: c.append("clutchFG")
+                case 1...: c.append("protectLead")
+                default: break
+                }
+            }
+            if s.isGoalToGo { c.append("goalToGo") }
+            if s.inRedZone && !s.isGoalToGo { c.append("redZone") }
+            if ctx.playsThisGame >= 3 { c.append("cornerbacks") }
+            if ctx.playsThisGame >= 5 { c.append("linemen") }
+        } else {
+            c.append("defenseCalls")
+            if s.down == 3 && s.yardsToGo >= 7 { c.append("safeties") }
+            if s.yardsToGo <= 2 { c.append("theBox") }
         }
-        if s.isGoalToGo { candidates.append("goalToGo") }
-        if s.inRedZone && !s.isGoalToGo { candidates.append("redZone") }
-        if s.isBackedUp { candidates.append("backedUp") }
-        if (50...59).contains(s.ballOn) { candidates.append("midfield") }
-        return first(candidates, notIn: seen)
+        return first(c, notIn: seen)
     }
 
-    static func postPlay(_ play: Play, seen: Set<String>) -> Concept? {
-        var candidates: [String] = []
+    static func postPlay(_ play: Play, events: [PlaySim.Event], userOnOffense: Bool, seen: Set<String>) -> Concept? {
+        var c: [String] = []
         if let ending = play.ending {
             switch ending {
-            case .touchdown: candidates.append("touchdown")
-            case .fieldGoal: candidates.append("fieldGoal")
-            case .missedFieldGoal: candidates.append("missedFG")
-            case .punt: candidates.append("punt")
-            case .turnoverOnDowns: candidates.append("turnoverOnDowns")
-            case .interception: candidates.append("interception")
-            case .fumble: candidates.append("fumble")
-            }
-        } else {
-            if play.gainedFirstDown { candidates.append("firstDown") }
-            switch play.result {
-            case .incomplete: candidates.append("incomplete")
-            case .sack: candidates.append("sack")
-            default: break
+            case .touchdown: c.append("touchdown")
+            case .fieldGoal: c.append("fieldGoal")
+            case .missedFieldGoal: c.append("missedFG")
+            case .punt: c.append("punt")
+            case .turnoverOnDowns: c.append("turnoverOnDowns")
+            case .interception: c.append("interception")
+            case .fumble: c.append("fumble")
             }
         }
-        return first(candidates, notIn: seen)
+        guard userOnOffense else { return first(c, notIn: seen) }
+        if play.gainedFirstDown && play.ending == nil { c.append("firstDown") }
+        if events.contains(.sack) { c.append("sack") }
+        if events.contains(.incomplete) { c.append("incomplete") }
+        if events.contains(.outOfBounds) { c.append("sideline") }
+        if events.contains(where: { if case .caught = $0 { return true } else { return false } }) { c.append("separation") }
+        if events.contains(.handoff) { c.append("runPlay") }
+        if events.contains(.throwStart) { c.append("passPlay") }
+        if play.call == .run && !events.contains(.handoff) && events.contains(.snap) { c.append("keeper") }
+        return first(c, notIn: seen)
     }
 
     static func driveStart(userHasBall: Bool, afterScore: Bool, quarter: Int, isOvertime: Bool, seen: Set<String>) -> Concept? {
-        var candidates: [String] = []
-        if !userHasBall { candidates.append("defense") }
-        if isOvertime { candidates.append("overtime") }
-        if afterScore { candidates.append("kickoff") }
-        if quarter == 2 { candidates.append("quarters") }
-        return first(candidates, notIn: seen)
+        var c: [String] = []
+        if !userHasBall { c.append("defense") }
+        if isOvertime { c.append("overtime") }
+        if afterScore { c.append("kickoff") }
+        if quarter == 2 { c.append("quarters") }
+        return first(c, notIn: seen)
     }
 
     private static func first(_ ids: [String], notIn seen: Set<String>) -> Concept? {

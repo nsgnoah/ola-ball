@@ -1,23 +1,31 @@
 # Ola Ball — Status / Handoff
 
-_Updated: 2026-09-18 23:25 CDT_
+_Updated: 2026-09-19 03:30 CDT_
+
+## What this is now
+"Draw the Play": a 3D (SceneKit) football game. Pre-snap you see the defense and a callout ("Defense shows 8 in the box"); you drag from a glowing offensive player to draw the ball carrier's path or receiver's route; the play simulates live (blocking, pursuit, man coverage with reaction lag, passes resolved by separation, tackles). On defense you pick a call (Stack the Box / Balanced / Play the Pass / Blitz) and watch. Kicks use a tap-timing meter. Coach's Tips (max 8 new per game) fill the Playbook. The old menu-driven prototype is tagged `v0-menu-prototype`; do not go back to it.
 
 ## Done
-- Full SwiftUI app scaffolded and **building** for the iPhone 16 Pro simulator (iOS 18.0).
-- Game engine (`Engine/`), Playbook content (`Content/`), game flow (`Game/GameSession.swift`), persistence (`Store/`), and all screens (`Views/`).
-- Privacy manifest, 1024px app icon (no alpha), README with App Store readiness notes, `docs/privacy-policy.md`, CLAUDE.md.
-- Team-pick screen verified visually in the simulator (looks good).
-- Unit tests written in `OlaBallTests/EngineTests.swift` (Swift Testing). UI play-through test written in `OlaBallUITests/PlayThroughUITests.swift`.
+- Builds for iPhone 16 Pro (iOS 18.0) simulator. A full game plays end to end via the autoplay UI test (`-ui-testing-autoplay`) in ~3 minutes.
+- `OlaBall/Sim/`: FieldGeometry, Formations (offense lineup, 4 defensive looks + goal line), PlayPlan/SimPlayer, PlaySim (tick-based, seeded), AIPlaycaller (AI offense vs the user's defensive call; AI defensive look vs the user), PlayAnalyst ("why" lines).
+- `OlaBall/Scene/`: FieldScene (SceneKit scene) and FieldSceneView (SCNView host, pan-to-draw gesture, per-frame sim clock).
+- `OlaBall/Game/GameSession.swift`: presnap → live → result → driveOver → next possession, kicks, opponent 4th-down logic, tips, XP.
+- `OlaBall/Views/GameView.swift` (HUD over the 3D scene), KickMeterView, DefenseCallView; Home/TeamPick/Playbook/GameOver kept.
+- Rewritten Playbook (`Content/Concepts.swift`, 37 entries) and TipDirector for the new mechanics.
+- `docs/BAR.md` (the quality bar) and `docs/PROGRESS.md` (round log) for the Gauntlet Loop.
+- A command-line balance harness: `build/simlab/main.swift` compiled with `swiftc` against the Sim files (see the swiftc command in PROGRESS.md) prints average yards / completions / sacks per play type. Use it to tune `PlaySim` fast without Xcode.
 
 ## In progress
-- `xcodebuild test` currently **fails**. First failure was a missing Info.plist on the test targets (fixed by `GENERATE_INFOPLIST_FILE: YES` in project.yml). After regenerating, the run still failed; the log with `-quiet` only showed an `IDELaunchParametersSnapshot` line, so the real error is not yet identified. Next step: rerun without `-quiet`, grep for `error:` / `Test Case` / `failed`.
-- No screenshots beyond the team-pick screen have been captured yet.
+- **Play balance** (`OlaBall/Sim/PlaySim.swift`): after fixing pass leading (receiver now runs to the ball) and pursuit (defenders aim straight at the carrier when close), runs are now over-stuffed (~0 yd avg) and passes complete ~35%. Targets from docs/BAR.md: runs into a gap ≥ 5 yd, into a crowd < 3 yd; open receiver (3+ yd separation) ≥ 85% caught; covered (< 1 yd) < 35%. Knobs: pursuit speedScale (1.1), tackle radius (1.5), LB run reaction (0.35 s), coverage lag (12 frames) and cushion, throw trigger (60% route progress).
+- **Graphics**: a builder is rebuilding `OlaBall/Scene/` to shippable quality (articulated players, stadium, grass texture, framing fix so the QB/RB are not under the HUD). Owner's verdict on the capsule version: "slop".
+- **Drag gesture UI test** (`testDrawGestureStartsAPlay`) fails: the pre-snap camera puts the QB/RB at the bottom edge under the HUD panels, so the test's drag misses. Fix comes with the camera framing; the HUD's non-interactive panels should also pass touches through.
 
 ## Not started
-- GitHub repo `nsgnoah/ola-ball` not created yet; nothing committed yet.
-- Visual QA of game screen, opponent drive, game over, playbook.
-- Play-quality tuning after seeing a full game.
+- Gauntlet Loop rounds (builder/critic per piece) against docs/BAR.md.
+- Game-over screen and Home still show the old prototype's stat names; fine but unpolished.
+- Confetti/haptics on touchdowns exist; camera hold on the end zone does not.
 
 ## Environment notes
-- Disk was 100% full; freed ~8 GB by deleting the unused iOS 26.1 and 26.2 simulator runtimes (re-downloadable in Xcode > Settings > Components). Noah should be told this. 14 GB of root-owned simulator caches at /Library/Developer/CoreSimulator/Caches/dyld could be cleared with sudo if more space is needed.
-- The Claude iOS Simulator MCP tool misreports "Xcode not selected"; use `xcodebuild` and `xcrun simctl` directly.
+- Build/test commands and simulator UDID are in CLAUDE.md. The Claude iOS Simulator MCP tool misreports "Xcode not selected"; use xcodebuild/simctl directly. Xcode 27 has no Simulator.app; the simulator window app is `/Applications/Xcode.app/Contents/Applications/DeviceHub.app`.
+- Disk: ~28 GB free after deleting the unused iOS 26.1 and 26.2 simulator runtimes (re-downloadable in Xcode > Settings > Components). Tell Noah.
+- GitHub: https://github.com/nsgnoah/ola-ball (private).

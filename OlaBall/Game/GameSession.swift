@@ -1,49 +1,42 @@
 import Foundation
 import Observation
+import UIKit
 
-/// Drives one game: alternating possessions, scoring, tips, and XP. UI reads from this; engine does the math.
+/// One game, start to finish. Owns the 3D scene, the live simulation, scoring, tips and XP.
 @Observable
 final class GameSession {
     enum Possessor: Equatable { case user, opponent }
-
-    enum Phase: Equatable {
-        case choosing        // user picks a play
-        case result          // showing the last play's outcome
-        case driveOver       // user's drive summary
-        case opponentDrive   // watching the other team
-        case gameOver
-    }
-
+    enum Phase: Equatable { case presnap, live, result, kicking(PlayCall), driveOver, gameOver }
     enum Outcome: Equatable { case win, loss, tie }
-
-    struct FieldState: Equatable {
-        var ballX: Int          // absolute: 0 = user's goal line, 100 = opponent's goal line
-        var firstDownX: Int?
-        var possessor: Possessor
-    }
 
     let userTeam: Team
     let opponentTeam: Team
+    let fieldScene: FieldScene
     private let store: ProgressStore
-    private var rng: any RandomNumberGenerator
+    private var rng: SeededRNG
+    let autoplay: Bool
 
+    // Game state
     private(set) var userScore = 0
     private(set) var opponentScore = 0
     private(set) var possessions: [Possessor] = [.user, .opponent, .opponent, .user, .user, .opponent, .opponent, .user]
     private(set) var possessionIndex = 0
-    private(set) var phase: Phase = .choosing
+    private(set) var phase: Phase = .presnap
     private(set) var situation: Situation = .kickoff
+    private(set) var defenseCall: DefenseCall = .balanced
+    private(set) var presnapPlayers: [SimPlayer] = []
+    private(set) var sim: PlaySim?
     private(set) var drivePlays: [Play] = []
     private(set) var lastPlay: Play?
+    private(set) var lastVerdict: PlayAnalyst.Verdict?
     private(set) var driveEnding: DriveEnding?
-    private(set) var opponentDrive: DriveSummary?
-    private(set) var opponentRevealed = 0
     private(set) var tip: Concept?
     private(set) var newlyLearned: [Concept] = []
     private(set) var outcome: Outcome?
-    private(set) var lastScorer: Possessor?
+    private(set) var pathPreviewLength: Float = 0
+    private(set) var kickInProgress = false
 
-    // Stats & rewards
+    // Stats
     private(set) var xpEarned = 0
     private(set) var touchdowns = 0
     private(set) var fieldGoals = 0
@@ -51,127 +44,292 @@ final class GameSession {
     private(set) var playsRun = 0
     private(set) var longestPlay = 0
     private(set) var bestDriveYards = 0
-    private(set) var driveStartBallOn = 25
+    private(set) var defensiveStops = 0
 
     private var nextStartBallOn = 25
     private var lastDriveWasScore = false
+    private var holdTimer: Float = 0
+    private var presnapDelay: Float = 0
 
-    init(userTeam: Team, opponentTeam: Team, store: ProgressStore, rng: any RandomNumberGenerator = SystemRandomNumberGenerator()) {
+    static let maxNewTipsPerGame = 8
+    static let resultHold: Float = 2.8
+    static let driveOverHold: Float = 3.0
+
+    init(userTeam: Team, opponentTeam: Team, store: ProgressStore, seed: UInt64 = UInt64.random(in: 0...UInt64.max), autoplay: Bool = false) {
         self.userTeam = userTeam
         self.opponentTeam = opponentTeam
         self.store = store
-        self.rng = rng
+        self.rng = SeededRNG(seed: seed)
+        self.autoplay = autoplay
+        self.fieldScene = FieldScene(userTeam: userTeam, opponentTeam: opponentTeam)
         beginPossession()
     }
 
-    // MARK: - Derived state
+    // MARK: Derived
 
     var quarter: Int { min(4, possessionIndex / 2 + 1) }
     var isOvertime: Bool { possessionIndex >= 8 }
     var periodLabel: String { isOvertime ? "OT" : "Q\(quarter)" }
     var currentPossessor: Possessor { possessions[min(possessionIndex, possessions.count - 1)] }
+    var userOnOffense: Bool { currentPossessor == .user }
     var scoreDiff: Int { userScore - opponentScore }
     var seenConcepts: Set<String> { store.progress.seen }
-
-    var availableCalls: [PlayCall] {
-        if situation.down == 4 {
-            var calls: [PlayCall] = [.run, .shortPass, .punt]
-            if situation.canAttemptFieldGoal { calls.append(.fieldGoal) }
-            return calls
-        }
-        return [.run, .shortPass, .deepPass]
-    }
-
-    var revealedOpponentPlays: [Play] {
-        guard let opponentDrive else { return [] }
-        return Array(opponentDrive.plays.prefix(opponentRevealed))
-    }
-
-    var opponentDriveFullyRevealed: Bool {
-        guard let opponentDrive else { return true }
-        return opponentRevealed >= opponentDrive.plays.count
-    }
-
-    var opponentSituation: Situation? {
-        guard let opponentDrive else { return nil }
-        if opponentRevealed == 0 { return .firstDown(at: opponentDrive.startBallOn) }
-        return opponentDrive.plays[opponentRevealed - 1].after
-    }
-
-    var fieldState: FieldState {
-        if phase == .opponentDrive, let opponentDrive {
-            let last = revealedOpponentPlays.last
-            let theirBall = last?.ballAfter ?? opponentDrive.startBallOn
-            let marker: Int? = (last?.after).flatMap { $0.isGoalToGo ? nil : $0.firstDownMarker }
-                ?? (last == nil ? Situation.firstDown(at: opponentDrive.startBallOn).firstDownMarker : nil)
-            return FieldState(ballX: 100 - theirBall, firstDownX: marker.map { 100 - $0 }, possessor: .opponent)
-        }
-        if (phase == .result || phase == .driveOver), let lastPlay {
-            let marker = lastPlay.after.flatMap { $0.isGoalToGo ? nil : $0.firstDownMarker }
-            return FieldState(ballX: lastPlay.ballAfter, firstDownX: marker, possessor: .user)
-        }
-        return FieldState(ballX: situation.ballOn, firstDownX: situation.isGoalToGo ? nil : situation.firstDownMarker, possessor: .user)
-    }
+    var canDraw: Bool { phase == .presnap && userOnOffense && !autoplay }
+    var needsDefenseCall: Bool { phase == .presnap && !userOnOffense && !autoplay }
+    var isFourthDown: Bool { situation.down == 4 }
+    var offenseTeam: Team { userOnOffense ? userTeam : opponentTeam }
+    var defenseTeam: Team { userOnOffense ? opponentTeam : userTeam }
 
     var situationText: String {
         switch phase {
-        case .opponentDrive:
-            guard let s = opponentSituation else { return "Their drive is over" }
-            return "\(s.downAndDistance) · Ball on \(s.spotText(own: "their", their: "your"))"
-        case .gameOver:
-            return "Final"
+        case .gameOver: return "Final"
         default:
-            if driveEnding != nil, phase != .choosing { return "Drive over" }
-            return "\(situation.downAndDistance) · Ball on \(situation.spotText()) · \(situation.yardsToEndZone) to the end zone"
+            let own = userOnOffense ? "your" : "their"
+            let their = userOnOffense ? "their" : "your"
+            return "\(situation.downAndDistance) · Ball on \(situation.spotText(own: own, their: their))"
         }
     }
 
-    // MARK: - Actions
+    var drawHint: String {
+        if pathPreviewLength > 0 { return "Release to snap the ball" }
+        if situation.down == 4 { return "Drag from a glowing player to go for it, or kick" }
+        return "Drag from a glowing player to draw the play"
+    }
 
-    func call(_ call: PlayCall) {
-        guard phase == .choosing else { return }
-        let play = DriveEngine.runPlay(call, from: situation, voice: .you, using: &rng)
-        drivePlays.append(play)
+    // MARK: Frame loop
+
+    /// Called every frame by the scene view.
+    func advance(dt: Float) {
+        switch phase {
+        case .presnap:
+            guard autoplay else { return }
+            presnapDelay += dt
+            if presnapDelay > 0.6 {
+                presnapDelay = 0
+                if userOnOffense {
+                    if situation.down == 4 && !situation.inFieldGoalRange && situation.ballOn < 60 { beginKick(.punt); userKick(.punt, accuracy: 0.2) }
+                    else if situation.down == 4 && situation.inFieldGoalRange && situation.yardsToGo > 2 { beginKick(.fieldGoal); userKick(.fieldGoal, accuracy: 0.1) }
+                    else { startUserPlay(AIPlaycaller.offensePlan(for: situation, against: defenseCall, using: &rng)) }
+                } else {
+                    chooseDefense(DefenseCall.allCases[Int.random(in: 0..<4, using: &rng)])
+                }
+            }
+        case .live:
+            guard var live = sim, !kickInProgress else { return }
+            if !live.isOver {
+                live.tick(dt)
+                sim = live
+                fieldScene.apply(live)
+                fieldScene.aimCamera(at: live.ballPos, presnap: false, animated: false)
+                if live.isOver {
+                    holdTimer = 0
+                    onSimFinished(live)
+                }
+            } else {
+                holdTimer += dt
+                if holdTimer > 0.9 { showResult() }
+            }
+        case .result:
+            guard tip == nil || autoplay else { return }   // wait for a tap when a tip is up
+            holdTimer += dt
+            if holdTimer > (autoplay ? 0.4 : GameSession.resultHold) { continueFromResult() }
+        case .driveOver:
+            holdTimer += dt
+            if holdTimer > (autoplay ? 0.4 : GameSession.driveOverHold) { continueAfterDrive() }
+        default:
+            break
+        }
+    }
+
+    // MARK: User actions
+
+    func previewPath(_ points: [FieldPoint]) {
+        pathPreviewLength = PlayPlan(ballHandlerTag: "RB", path: points).pathLength
+    }
+
+    func startUserPlay(_ plan: PlayPlan) {
+        guard phase == .presnap, userOnOffense else { return }
+        startPlay(plan)
+    }
+
+    func chooseDefense(_ call: DefenseCall) {
+        guard phase == .presnap, !userOnOffense else { return }
+        defenseCall = call
+        presnapPlayers = PlaySim.presnapPlayers(los: Float(situation.ballOn), defenseCall: call)
+        fieldScene.layOut(players: presnapPlayers, los: Float(situation.ballOn), firstDownAt: situation.isGoalToGo ? nil : Float(situation.firstDownMarker), offenseIsUser: false)
+        let plan = AIPlaycaller.offensePlan(for: situation, against: call, using: &rng)
+        startPlay(plan)
+    }
+
+    func beginKick(_ kind: PlayCall) {
+        guard phase == .presnap, userOnOffense, kind.isKick else { return }
+        tip = nil
+        phase = .kicking(kind)
+    }
+
+    func userKick(_ kind: PlayCall, accuracy: Double) {
+        guard case .kicking = phase else { return }
+        let result: PlayResultKind
+        if kind == .fieldGoal {
+            let d = situation.fieldGoalDistance
+            result = accuracy <= Kicking.meterTargetWidth(distance: d) ? .fieldGoalMade(d) : .fieldGoalMissed(d)
+        } else {
+            result = .punt(Kicking.puntDistance(accuracy: accuracy))
+        }
+        performKick(kind, result: result)
+    }
+
+    func skipResult() {
+        switch phase {
+        case .result: continueFromResult()
+        case .driveOver: continueAfterDrive()
+        default: break
+        }
+    }
+
+    func dismissTip() {
+        tip = nil
+        holdTimer = 0
+    }
+
+    // MARK: Play flow
+
+    private func startPlay(_ plan: PlayPlan) {
+        tip = nil
+        pathPreviewLength = 0
+        var live = PlaySim(los: Float(situation.ballOn), plan: plan, defenseCall: defenseCall, seed: rng.next())
+        live.snap()
+        sim = live
+        fieldScene.showPath(plan.path, color: userOnOffense ? UIColor(red: 0.96, green: 0.77, blue: 0.26, alpha: 0.9) : UIColor.white.withAlphaComponent(0.5))
+        phase = .live
+        holdTimer = 0
+        Haptics.tap()
+    }
+
+    private func performKick(_ kind: PlayCall, result: PlayResultKind) {
+        kickInProgress = true
+        phase = .live
+        let los = Float(situation.ballOn)
+        let made: Bool
+        let distance: Float
+        switch result {
+        case .fieldGoalMade(let d): made = true; distance = Float(d)
+        case .fieldGoalMissed(let d): made = false; distance = Float(d)
+        case .punt(let n): made = true; distance = Float(n)
+        default: made = false; distance = 0
+        }
+        fieldScene.clearPath()
+        fieldScene.animateKick(from: los, distanceYards: distance, made: made, punt: kind == .punt) { [weak self] in
+            guard let self else { return }
+            self.kickInProgress = false
+            self.finishPlay(result: result, call: kind, sim: nil)
+            self.showResult()
+        }
+        if autoplay {
+            // Don't wait on SceneKit in tests
+            kickInProgress = false
+            fieldScene.clearPath()
+            finishPlay(result: result, call: kind, sim: nil)
+            showResult()
+        }
+    }
+
+    private func onSimFinished(_ live: PlaySim) {
+        let call: PlayCall
+        switch live.plan.kind {
+        case .run, .keeper: call = .run
+        case .pass: call = live.plan.pathLength > 18 ? .deepPass : .shortPass
+        }
+        finishPlay(result: live.result ?? .incomplete, call: call, sim: live)
+    }
+
+    private func finishPlay(result: PlayResultKind, call: PlayCall, sim: PlaySim?) {
+        guard lastPlayResolved == false else { return }
+        lastPlayResolved = true
+        let outcome = RulesEngine.apply(result, call: call, to: situation)
+        let voice: PlayAnalyst.Voice = userOnOffense ? .you : .them
+        let verdict: PlayAnalyst.Verdict
+        if let sim {
+            verdict = PlayAnalyst.verdict(for: sim, result: result, gainedFirstDown: outcome.firstDown, ending: outcome.ending, perspective: voice)
+        } else {
+            verdict = kickVerdict(result: result, ending: outcome.ending)
+        }
+        let play = Play(before: situation, call: call, result: result, after: outcome.after, ending: outcome.ending, gainedFirstDown: outcome.firstDown, narration: verdict.why)
         lastPlay = play
+        lastVerdict = verdict
+        drivePlays.append(play)
         playsRun += 1
-        longestPlay = max(longestPlay, play.yards)
-        xpEarned += 2
-        if play.gainedFirstDown, play.ending == nil {
-            firstDowns += 1
-            xpEarned += 10
+
+        if userOnOffense {
+            xpEarned += 2
+            longestPlay = max(longestPlay, play.yards)
+            if play.gainedFirstDown, play.ending == nil { firstDowns += 1; xpEarned += 10 }
         }
         if let ending = play.ending {
             driveEnding = ending
             if ending.isScore {
-                userScore += ending.points
-                lastScorer = .user
-                if ending == .touchdown { touchdowns += 1; xpEarned += 100 }
-                if ending == .fieldGoal { fieldGoals += 1; xpEarned += 50 }
+                if userOnOffense {
+                    userScore += ending.points
+                    if ending == .touchdown { touchdowns += 1; xpEarned += 100 }
+                    if ending == .fieldGoal { fieldGoals += 1; xpEarned += 50 }
+                } else {
+                    opponentScore += ending.points
+                }
+            } else if !userOnOffense {
+                defensiveStops += 1
+                xpEarned += 25
             }
             nextStartBallOn = RulesEngine.nextStart(after: play)
             lastDriveWasScore = ending.isScore
-            let driveYards = drivePlays.reduce(0) { $0 + $1.yards }
-            bestDriveYards = max(bestDriveYards, driveYards)
+            if userOnOffense { bestDriveYards = max(bestDriveYards, drivePlays.reduce(0) { $0 + $1.yards }) }
         } else if let after = play.after {
             situation = after
         }
-        phase = .result
-        setTip(TipDirector.postPlay(play, seen: seenConcepts))
+        if userOnOffense || play.ending != nil {
+            let events = sim?.events ?? []
+            setTip(TipDirector.postPlay(play, events: events, userOnOffense: userOnOffense, seen: seenConcepts))
+        }
     }
 
-    func next() {
+    private var lastPlayResolved = false
+
+    private func kickVerdict(result: PlayResultKind, ending: DriveEnding?) -> PlayAnalyst.Verdict {
+        switch result {
+        case .fieldGoalMade(let d): return .init(headline: "It's good! +3", why: "Nailed the timing from \(d) yards. Three points on the board.", good: true, bad: false)
+        case .fieldGoalMissed(let d): return .init(headline: "No good", why: "The \(d)-yard kick drifted wide. Hit the green zone next time.", good: false, bad: true)
+        case .punt(let n):
+            let touchback = situation.ballOn + n >= 100
+            return .init(headline: "Punt", why: touchback ? "Into the end zone: a touchback. They start at their 20." : "\(n) yards of field flipped. They have a long way to go.", good: false, bad: false)
+        default: return .init(headline: "", why: "", good: false, bad: false)
+        }
+    }
+
+    private func showResult() {
+        guard phase == .live else { return }
+        phase = .result
+        holdTimer = 0
+        if let play = lastPlay {
+            if play.ending == .touchdown { Haptics.success() }
+            else if play.isBadForOffense == userOnOffense { Haptics.failure() }
+            else if play.isGoodForOffense == userOnOffense { Haptics.success() }
+        }
+    }
+
+    func continueFromResult() {
         guard phase == .result else { return }
+        lastPlayResolved = false
+        sim = nil
         if driveEnding != nil {
             phase = .driveOver
+            holdTimer = 0
             tip = nil
         } else {
-            phase = .choosing
-            setTip(preCallTip())
+            setUpPresnap()
         }
     }
 
     func continueAfterDrive() {
-        guard phase == .driveOver || (phase == .opponentDrive && opponentDriveFullyRevealed) else { return }
+        guard phase == .driveOver else { return }
         possessionIndex += 1
         if possessionIndex >= possessions.count {
             if userScore == opponentScore && possessions.count < 12 {
@@ -184,74 +342,61 @@ final class GameSession {
         beginPossession()
     }
 
-    func revealNextOpponentPlay() {
-        guard phase == .opponentDrive, let opponentDrive, opponentRevealed < opponentDrive.plays.count else { return }
-        opponentRevealed += 1
-        tip = nil
-        if opponentRevealed == opponentDrive.plays.count { applyOpponentEnding() }
-    }
-
-    func skipOpponentDrive() {
-        guard phase == .opponentDrive, let opponentDrive else { return }
-        opponentRevealed = opponentDrive.plays.count
-        tip = nil
-        applyOpponentEnding()
-    }
-
-    func dismissTip() { tip = nil }
-
-    // MARK: - Internals
-
     private func beginPossession() {
         driveEnding = nil
         drivePlays = []
         lastPlay = nil
-        let afterScore = lastDriveWasScore
-        let userHasBall = currentPossessor == .user
-        if userHasBall {
-            situation = .firstDown(at: nextStartBallOn)
-            driveStartBallOn = situation.ballOn
-            phase = .choosing
-            let startTip = TipDirector.driveStart(userHasBall: true, afterScore: afterScore, quarter: quarter, isOvertime: isOvertime, seen: seenConcepts)
-            setTip(startTip ?? preCallTip())
+        lastVerdict = nil
+        lastPlayResolved = false
+        situation = .firstDown(at: nextStartBallOn)
+        let startTip = TipDirector.driveStart(userHasBall: userOnOffense, afterScore: lastDriveWasScore, quarter: quarter, isOvertime: isOvertime, seen: seenConcepts)
+        setUpPresnap(startTip: startTip)
+    }
+
+    private func setUpPresnap(startTip: Concept? = nil) {
+        phase = .presnap
+        holdTimer = 0
+        presnapDelay = 0
+        pathPreviewLength = 0
+        lastPlayResolved = false
+        sim = nil
+        if userOnOffense {
+            defenseCall = AIPlaycaller.defenseCall(for: situation, using: &rng)
         } else {
-            let start = Situation.firstDown(at: nextStartBallOn)
-            opponentDrive = OpponentCoach.simulateDrive(from: start, using: &rng)
-            opponentRevealed = 0
-            phase = .opponentDrive
-            setTip(TipDirector.driveStart(userHasBall: false, afterScore: afterScore, quarter: quarter, isOvertime: isOvertime, seen: seenConcepts))
+            defenseCall = .balanced
         }
-    }
+        presnapPlayers = PlaySim.presnapPlayers(los: Float(situation.ballOn), defenseCall: defenseCall)
+        fieldScene.layOut(players: presnapPlayers, los: Float(situation.ballOn), firstDownAt: situation.isGoalToGo ? nil : Float(situation.firstDownMarker), offenseIsUser: userOnOffense)
+        fieldScene.aimCamera(at: FieldPoint(0, Float(situation.ballOn)), presnap: true, animated: true)
 
-    private func applyOpponentEnding() {
-        guard let opponentDrive, let last = opponentDrive.plays.last else { return }
-        if opponentDrive.ending.isScore {
-            opponentScore += opponentDrive.ending.points
-            lastScorer = .opponent
+        // Opponent 4th-down decisions are automatic.
+        if !userOnOffense && situation.down == 4 {
+            let goForIt = situation.yardsToGo <= 2 && situation.ballOn >= 50 && !situation.inFieldGoalRange
+            if situation.inFieldGoalRange {
+                let d = situation.fieldGoalDistance
+                let made = Double.random(in: 0..<1, using: &rng) < Kicking.fieldGoalProbability(distance: d)
+                tip = nil
+                performKick(.fieldGoal, result: made ? .fieldGoalMade(d) : .fieldGoalMissed(d))
+                return
+            } else if !goForIt {
+                tip = nil
+                performKick(.punt, result: .punt(Int.random(in: 36...50, using: &rng)))
+                return
+            }
         }
-        lastDriveWasScore = opponentDrive.ending.isScore
-        nextStartBallOn = RulesEngine.nextStart(after: last)
+        let ctx = TipDirector.Context(situation: situation, defenseCall: defenseCall, userOnOffense: userOnOffense, playsThisGame: playsRun, isFourthQuarter: quarter == 4 || isOvertime, scoreDiff: scoreDiff)
+        setTip(startTip ?? TipDirector.preSnap(ctx, seen: seenConcepts))
     }
-
-    private func preCallTip() -> Concept? {
-        let ctx = TipDirector.Context(situation: situation, playsThisGame: playsRun, isFourthQuarter: quarter == 4 || isOvertime, scoreDiff: scoreDiff)
-        return TipDirector.preCall(ctx, seen: seenConcepts)
-    }
-
-    /// Spread learning across games: after this many new tips, unseen tips wait for the next game.
-    static let maxNewTipsPerGame = 8
 
     private func setTip(_ concept: Concept?) {
         guard let concept else { tip = nil; return }
-        if seenConcepts.contains(concept.id) {
-            tip = concept
-            return
-        }
-        guard newlyLearned.count < Self.maxNewTipsPerGame else { tip = nil; return }
+        if seenConcepts.contains(concept.id) { tip = nil; return }   // tips only fire the first time
+        guard newlyLearned.count < GameSession.maxNewTipsPerGame else { tip = nil; return }
         store.markSeen(concept.id)
         newlyLearned.append(concept)
         xpEarned += 15
         tip = concept
+        holdTimer = 0
     }
 
     private func finishGame() {

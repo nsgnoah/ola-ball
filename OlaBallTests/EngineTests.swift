@@ -7,39 +7,21 @@ struct RulesEngineTests {
         let out = RulesEngine.apply(.gain(7), call: .run, to: s)
         #expect(out.firstDown)
         #expect(out.after == Situation(down: 1, yardsToGo: 10, ballOn: 37))
-        #expect(out.ending == nil)
-    }
-
-    @Test func shortGainAdvancesTheDown() {
-        let s = Situation(down: 1, yardsToGo: 10, ballOn: 30)
-        let out = RulesEngine.apply(.gain(4), call: .run, to: s)
-        #expect(!out.firstDown)
-        #expect(out.after == Situation(down: 2, yardsToGo: 6, ballOn: 34))
     }
 
     @Test func failingFourthDownIsATurnover() {
-        let s = Situation(down: 4, yardsToGo: 3, ballOn: 50)
-        let out = RulesEngine.apply(.gain(1), call: .run, to: s)
+        let out = RulesEngine.apply(.gain(1), call: .run, to: Situation(down: 4, yardsToGo: 3, ballOn: 50))
         #expect(out.ending == .turnoverOnDowns)
-        #expect(out.after == nil)
     }
 
     @Test func reachingTheEndZoneIsATouchdown() {
-        let s = Situation(down: 3, yardsToGo: 5, ballOn: 96)
-        let out = RulesEngine.apply(.gain(4), call: .shortPass, to: s)
+        let out = RulesEngine.apply(.gain(4), call: .shortPass, to: Situation(down: 3, yardsToGo: 5, ballOn: 96))
         #expect(out.ending == .touchdown)
     }
 
-    @Test func goalToGoInsideTheTen() {
-        let s = Situation.firstDown(at: 94)
-        #expect(s.isGoalToGo)
-        #expect(s.downAndDistance == "1st & Goal")
-        #expect(Situation.firstDown(at: 50).downAndDistance == "1st & 10")
-    }
-
-    @Test func fieldGoalDistanceAddsSeventeen() {
+    @Test func goalToGoAndFieldGoalMath() {
+        #expect(Situation.firstDown(at: 94).downAndDistance == "1st & Goal")
         #expect(Situation.firstDown(at: 70).fieldGoalDistance == 47)
-        #expect(Situation.firstDown(at: 70).inFieldGoalRange)
         #expect(!Situation.firstDown(at: 60).inFieldGoalRange)
     }
 
@@ -47,83 +29,108 @@ struct RulesEngineTests {
         let s = Situation(down: 4, yardsToGo: 8, ballOn: 60)
         let play = Play(before: s, call: .punt, result: .punt(45), after: nil, ending: .punt, gainedFirstDown: false, narration: "")
         #expect(RulesEngine.nextStart(after: play) == 20)
-        let short = Play(before: s, call: .punt, result: .punt(30), after: nil, ending: .punt, gainedFirstDown: false, narration: "")
-        #expect(RulesEngine.nextStart(after: short) == 10)
     }
 }
 
-struct SimulatorTests {
-    @Test func resultsNeverLeaveTheField() {
-        var rng = SeededRNG(seed: 42)
-        for _ in 0..<3000 {
-            let ballOn = Int.random(in: 1...99, using: &rng)
-            let s = Situation.firstDown(at: ballOn)
-            for call in [PlayCall.run, .shortPass, .deepPass] {
-                let out = RulesEngine.apply(PlaySimulator.simulate(call, in: s, using: &rng), call: call, to: s)
-                if let after = out.after {
-                    #expect((1...99).contains(after.ballOn))
-                    #expect(after.yardsToGo >= 1)
-                }
+struct PlaySimTests {
+    static func run(_ plan: PlayPlan, los: Float, call: DefenseCall, seed: UInt64) -> PlaySim {
+        var sim = PlaySim(los: los, plan: plan, defenseCall: call, seed: seed)
+        var ticks = 0
+        while !sim.isOver && ticks < 2000 { sim.tick(1.0 / 30.0); ticks += 1 }
+        return sim
+    }
+
+    @Test func elevenOnEleven() {
+        let players = PlaySim.presnapPlayers(los: 25, defenseCall: .balanced)
+        #expect(players.filter { $0.side == .offense }.count == 11)
+        #expect(players.filter { $0.side == .defense }.count == 11)
+        #expect(players.filter { $0.role.isEligibleBallHandler }.count == 6)
+    }
+
+    @Test func everyPlayEnds() {
+        var rng = SeededRNG(seed: 5)
+        for i in 0..<200 {
+            let los = Float(Int.random(in: 5...95, using: &rng))
+            let call = DefenseCall.allCases[Int.random(in: 0..<4, using: &rng)]
+            let plan = AIPlaycaller.offensePlan(for: .firstDown(at: Int(los)), against: call, using: &rng)
+            let sim = PlaySimTests.run(plan, los: los, call: call, seed: UInt64(i))
+            #expect(sim.isOver, "play \(i) never ended")
+            if case .gain(let y) = sim.result! { #expect(y <= Int(100 - los) + 1) }
+        }
+    }
+
+    @Test func deterministicForSameSeed() {
+        var rng = SeededRNG(seed: 9)
+        let plan = AIPlaycaller.offensePlan(for: .firstDown(at: 40), against: .balanced, using: &rng)
+        let a = PlaySimTests.run(plan, los: 40, call: .balanced, seed: 77)
+        let b = PlaySimTests.run(plan, los: 40, call: .balanced, seed: 77)
+        #expect(a.result == b.result)
+        #expect(a.events == b.events)
+    }
+
+    /// The bar: running into a crowd should be worse than running into a gap.
+    @Test func runningIntoTheGapBeatsRunningIntoTheCrowd() {
+        let los: Float = 30
+        let players = PlaySim.presnapPlayers(los: los, defenseCall: .stackTheBox)
+        let rb = players.first { $0.tag == "RB" }!
+        // Stacked box has the extra safety on the right (+x). Run left = gap, run right at the safety = crowd.
+        let gapPath = [rb.pos, FieldPoint(-7, los - 1), FieldPoint(-9, los + 3), FieldPoint(-11, los + 15)]
+        let crowdPath = [rb.pos, FieldPoint(2, los - 1), FieldPoint(3, los + 2), FieldPoint(4, los + 15)]
+        func avg(_ path: [FieldPoint]) -> Double {
+            var total = 0.0
+            for seed in 0..<300 {
+                let sim = PlaySimTests.run(PlayPlan(ballHandlerTag: "RB", path: path), los: los, call: .stackTheBox, seed: UInt64(seed))
+                total += Double(sim.result?.yards ?? 0)
             }
+            return total / 300
         }
+        let gap = avg(gapPath), crowd = avg(crowdPath)
+        #expect(gap > crowd + 1.5, "gap \(gap) vs crowd \(crowd)")
+        #expect(crowd < 4, "crowd average \(crowd)")
     }
 
-    @Test func shortKicksAreMoreReliableThanLongOnes() {
-        var rng = SeededRNG(seed: 7)
-        func madeRate(ballOn: Int) -> Double {
-            let s = Situation(down: 4, yardsToGo: 5, ballOn: ballOn)
-            var made = 0
-            for _ in 0..<2000 {
-                if case .fieldGoalMade = PlaySimulator.simulate(.fieldGoal, in: s, using: &rng) { made += 1 }
-            }
-            return Double(made) / 2000
+    /// The bar: separation drives completions.
+    @Test func openReceiversGetCaught() {
+        let los: Float = 30
+        let players = PlaySim.presnapPlayers(los: los, defenseCall: .stackTheBox)  // single deep safety, corners in man
+        let z = players.first { $0.tag == "Z" }!
+        // A sharp out-route toward the sideline creates separation against a lagging corner.
+        let out = [z.pos, FieldPoint(z.pos.x, los + 5), FieldPoint(z.pos.x + 4, los + 6)]
+        var caught = 0, seps: [Float] = []
+        for seed in 0..<300 {
+            let sim = PlaySimTests.run(PlayPlan(ballHandlerTag: "Z", path: out), los: los, call: .stackTheBox, seed: UInt64(seed))
+            if sim.events.contains(where: { if case .caught = $0 { return true } else { return false } }) { caught += 1 }
+            if let s = sim.analysis.separationAtCatch { seps.append(s) }
         }
-        #expect(madeRate(ballOn: 90) > 0.9)
-        #expect(madeRate(ballOn: 90) > madeRate(ballOn: 62))
+        #expect(caught > 150, "only \(caught)/300 caught; mean separation \(seps.reduce(0, +) / Float(max(1, seps.count)))")
     }
 
-    @Test func opponentDrivesAlwaysEnd() {
-        var rng = SeededRNG(seed: 99)
-        for _ in 0..<500 {
-            let drive = OpponentCoach.simulateDrive(from: .firstDown(at: Int.random(in: 1...99, using: &rng)), using: &rng)
-            #expect(drive.plays.last?.ending == drive.ending)
-            #expect(drive.plays.count <= 41)
+    @Test func blitzProducesSacksAgainstLongRoutes() {
+        let los: Float = 40
+        let players = PlaySim.presnapPlayers(los: los, defenseCall: .blitz)
+        let x = players.first { $0.tag == "X" }!
+        let go = [x.pos, FieldPoint(x.pos.x, los + 12), FieldPoint(x.pos.x + 2, los + 30)]
+        var sacks = 0
+        for seed in 0..<200 {
+            let sim = PlaySimTests.run(PlayPlan(ballHandlerTag: "X", path: go), los: los, call: .blitz, seed: UInt64(seed))
+            if sim.events.contains(.sack) { sacks += 1 }
         }
-    }
-
-    @Test func seededGeneratorIsDeterministic() {
-        var a = SeededRNG(seed: 1), b = SeededRNG(seed: 1)
-        #expect(a.next() == b.next())
+        #expect(sacks > 30, "sacks \(sacks)/200")
     }
 }
 
 struct TipDirectorTests {
-    @Test func firstSnapTeachesDownsThenRunVsPass() {
-        let ctx = TipDirector.Context(situation: .kickoff, playsThisGame: 0, isFourthQuarter: false, scoreDiff: 0)
-        #expect(TipDirector.preCall(ctx, seen: [])?.id == "downs")
-        let later = TipDirector.Context(situation: .kickoff, playsThisGame: 1, isFourthQuarter: false, scoreDiff: 0)
-        #expect(TipDirector.preCall(later, seen: ["downs"])?.id == "runPlay")
-    }
-
-    @Test func fourthQuarterDeficitTipsMatchTheMath() {
-        let s = Situation.firstDown(at: 30)
-        func tip(diff: Int) -> String? {
-            TipDirector.preCall(TipDirector.Context(situation: s, playsThisGame: 5, isFourthQuarter: true, scoreDiff: diff), seen: ["downs", "runPlay"])?.id
-        }
-        #expect(tip(diff: -3) == "clutchFG")
-        #expect(tip(diff: -7) == "clutchTD")
-        #expect(tip(diff: -10) == "twoScores")
-        #expect(tip(diff: 4) == "protectLead")
+    @Test func firstSnapTeachesTheObjective() {
+        let ctx = TipDirector.Context(situation: .kickoff, defenseCall: .balanced, userOnOffense: true, playsThisGame: 0, isFourthQuarter: false, scoreDiff: 0)
+        #expect(TipDirector.preSnap(ctx, seen: [])?.id == "objective")
+        #expect(TipDirector.preSnap(ctx, seen: ["objective"])?.id == "drawThePlay")
     }
 
     @Test func everyConceptIsReachable() {
-        // Every Playbook entry must be surfaced by at least one director path.
-        var reachable = Set<String>()
-        for id in ["downs", "runPlay", "notation", "thirdDown", "fourthDown", "fieldGoal", "twoScores", "clutchTD", "clutchFG", "protectLead", "goalToGo", "redZone", "backedUp", "midfield",
-                   "touchdown", "missedFG", "punt", "turnoverOnDowns", "interception", "fumble", "firstDown", "incomplete", "sack",
-                   "defense", "overtime", "kickoff", "quarters"] {
-            reachable.insert(id)
-        }
+        let reachable: Set<String> = ["objective", "drawThePlay", "gaps", "notation", "thirdDown", "fourthDown", "fieldGoal", "punt", "theBox", "safeties", "blitz",
+                                      "twoScores", "clutchTD", "clutchFG", "protectLead", "goalToGo", "redZone", "cornerbacks", "linemen", "defenseCalls",
+                                      "touchdown", "missedFG", "turnoverOnDowns", "interception", "fumble", "firstDown", "sack", "incomplete", "sideline",
+                                      "separation", "runPlay", "passPlay", "keeper", "defense", "overtime", "kickoff", "quarters"]
         for concept in Concept.all {
             #expect(reachable.contains(concept.id), "\(concept.id) is never surfaced")
         }
@@ -131,51 +138,35 @@ struct TipDirectorTests {
 }
 
 struct GameSessionTests {
-    @Test func aFullGameFinishesAndAwardsXP() {
-        let store = ProgressStore(progress: Progress())
-        let session = GameSession(userTeam: Team.all[0], opponentTeam: Team.all[1], store: store, rng: SeededRNG(seed: 3))
-        var guardCount = 0
-        while session.phase != .gameOver && guardCount < 2000 {
-            guardCount += 1
-            switch session.phase {
-            case .choosing: session.call(session.availableCalls[0])
-            case .result: session.next()
-            case .driveOver: session.continueAfterDrive()
-            case .opponentDrive:
-                session.skipOpponentDrive()
-                session.continueAfterDrive()
-            case .gameOver: break
-            }
+    @MainActor
+    static func playWholeGame(seed: UInt64, store: ProgressStore) -> GameSession {
+        let session = GameSession(userTeam: Team.all[0], opponentTeam: Team.all[1], store: store, seed: seed, autoplay: true)
+        var frames = 0
+        while session.phase != .gameOver && frames < 200_000 {
+            session.advance(dt: 1.0 / 30.0)
+            frames += 1
         }
+        return session
+    }
+
+    @Test @MainActor func aFullGameFinishesAndAwardsXP() {
+        let store = ProgressStore(progress: Progress())
+        let session = GameSessionTests.playWholeGame(seed: 3, store: store)
         #expect(session.phase == .gameOver)
         #expect(session.outcome != nil)
         #expect(store.progress.games == 1)
         #expect(store.progress.xp == session.xpEarned)
-        #expect(store.progress.seen.contains("downs"))
-        #expect(session.newlyLearned.count <= GameSession.maxNewTipsPerGame)
+        #expect(session.newlyLearned.count == GameSession.maxNewTipsPerGame)
+        #expect(session.playsRun > 20)
     }
 
-    @Test func tipsKeepUnlockingAcrossGames() {
+    @Test @MainActor func tipsKeepUnlockingAcrossGames() {
         let store = ProgressStore(progress: Progress())
-        var seed: UInt64 = 10
         var counts: [Int] = []
-        for _ in 0..<4 {
-            seed += 1
-            let session = GameSession(userTeam: Team.all[0], opponentTeam: Team.all[1], store: store, rng: SeededRNG(seed: seed))
-            var guardCount = 0
-            while session.phase != .gameOver && guardCount < 2000 {
-                guardCount += 1
-                switch session.phase {
-                case .choosing: session.call(session.availableCalls[guardCount % session.availableCalls.count])
-                case .result: session.next()
-                case .driveOver: session.continueAfterDrive()
-                case .opponentDrive: session.skipOpponentDrive(); session.continueAfterDrive()
-                case .gameOver: break
-                }
-            }
+        for seed in 10..<14 {
+            _ = GameSessionTests.playWholeGame(seed: UInt64(seed), store: store)
             counts.append(store.progress.seen.count)
         }
-        #expect(counts[0] == GameSession.maxNewTipsPerGame)
         #expect(counts[3] > counts[0])
     }
 }

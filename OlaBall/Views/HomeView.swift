@@ -40,7 +40,7 @@ struct HomeView: View {
                 if let team = store.team {
                     var rng = SystemRandomNumberGenerator()
                     let opponent = Team.randomOpponent(for: team, using: &rng)
-                    GameView(session: GameSession(userTeam: team, opponentTeam: opponent, store: store))
+                    GameView(session: GameSession(userTeam: team, opponentTeam: opponent, store: store, autoplay: CommandLine.arguments.contains("-ui-testing-autoplay")))
                         .environment(store)
                 }
             }

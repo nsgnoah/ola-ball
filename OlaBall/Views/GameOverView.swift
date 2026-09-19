@@ -21,7 +21,7 @@ struct GameOverView: View {
                 HStack(spacing: 10) {
                     stat("\(session.touchdowns)", "TDs")
                     stat("\(session.firstDowns)", "1st downs")
-                    stat("\(session.longestPlay)", "longest")
+                    stat("\(session.defensiveStops)", "stops")
                     stat("+\(session.xpEarned)", "XP")
                 }
 
