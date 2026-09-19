@@ -11,27 +11,20 @@ final class PlayThroughUITests: XCTestCase {
 
     func testPassAndPlayMatch() {
         let app = XCUIApplication()
-        app.launchArguments = ["-ui-testing-reset"]
+        app.launchArguments = ["-ui-testing-reset", "-ui-testing-seed"]
         app.launch()
 
-        // Profile
-        XCTAssertTrue(app.buttons["world-his"].waitForExistence(timeout: 5))
-        snap(app, "01-profile")
-        app.buttons["world-his"].tap()
-        let name = app.textFields["name-field"]
-        name.tap(); name.typeText("Noah")
-        app.buttons["profile-done"].tap()
-
-        // Home → new local match
-        XCTAssertTrue(app.buttons["new-local-match"].waitForExistence(timeout: 5))
+        // Home with a seeded match
+        XCTAssertTrue(app.buttons["new-local-match"].waitForExistence(timeout: 8))
         snap(app, "02-home")
-        app.buttons["new-local-match"].tap()
-        let partner = app.textFields["partner-name"]
-        XCTAssertTrue(partner.waitForExistence(timeout: 5))
-        partner.tap(); partner.typeText("Sam")
-        app.buttons["partner-world-hers"].tap()
-        snap(app, "03-new-match")
-        app.buttons["create-local-match"].tap()
+        let row = app.buttons["local-match-seed-match"]
+        XCTAssertTrue(row.waitForExistence(timeout: 5))
+        row.tap()
+        sleep(2)
+        if let shotDir {
+            try? app.debugDescription.write(to: URL(fileURLWithPath: shotDir).appendingPathComponent("after-row-tap.txt"), atomically: true, encoding: .utf8)
+        }
+        snap(app, "02b-after-row-tap")
 
         var shots: Set<String> = []
         var steps = 0

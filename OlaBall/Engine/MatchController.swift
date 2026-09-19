@@ -62,9 +62,14 @@ final class MatchController {
     // MARK: Entry
 
     /// Work out what this player should be doing right now.
-    func start() {
+    /// `announce`: for pass-and-play, first show whose phone it should be, so nobody sees the wrong questions.
+    func start(announce: Bool = false) {
         stopTimer()
         error = nil
+        if announce, transport.isPassAndPlay, state.status == .active, state.isReady {
+            stage = .handoff(to: transport.activePlayerName)
+            return
+        }
         // Join on first contact.
         if state.player(me) == nil, state.players.count < 2 {
             state.join(MatchPlayer(id: me, name: transport.activePlayerName, world: transport.activePlayerWorld))
@@ -85,8 +90,10 @@ final class MatchController {
     }
 
     /// A completed round this player hasn't seen the results of yet.
-    private func unrevealedRound() -> Int? {
-        let seen = state.revealed[me] ?? 0
+    private func unrevealedRound() -> Int? { unrevealedRoundFor(me) }
+
+    private func unrevealedRoundFor(_ player: String) -> Int? {
+        let seen = state.revealed[player] ?? 0
         return state.completedRounds.map(\.number).filter { $0 > seen }.min()
     }
 
@@ -204,13 +211,16 @@ final class MatchController {
     private func finishTurn() async {
         isSubmitting = true
         defer { isSubmitting = false }
-        state.endTurn(from: me)
+        // Capture before submitting: for pass-and-play the transport's active player flips on submit.
+        let mover = me
+        let nextName = partner?.name ?? "your partner"
+        state.endTurn(from: mover)
         do {
             try await transport.submitTurn(state)
             if state.status == .finished {
-                stage = unrevealedRound().map { .roundReveal(round: $0) } ?? .finished
+                stage = unrevealedRoundFor(mover).map { .roundReveal(round: $0) } ?? .finished
             } else if transport.isPassAndPlay {
-                stage = .handoff(to: partner?.name ?? "your partner")
+                stage = .handoff(to: nextName)
             } else {
                 stage = .waiting
             }

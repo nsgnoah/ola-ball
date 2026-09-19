@@ -9,6 +9,7 @@ struct ProfileSetupView: View {
     var body: some View {
         ZStack {
             Theme.paper.ignoresSafeArea()
+            ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 0) {
                 HStack(spacing: 8) {
                     Text("OLA").font(.condensed(13)).tracking(3).foregroundStyle(Theme.ink)
@@ -52,17 +53,16 @@ struct ProfileSetupView: View {
                         .frame(height: 50)
                         .background(Theme.paperCard, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                         .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(Theme.rule, lineWidth: 1))
+                        .submitLabel(.done)
+                        .onSubmit { commit() }
                         .accessibilityIdentifier("name-field")
                 }
                 .padding(.top, 20)
 
-                Spacer(minLength: 12)
+                Spacer(minLength: 24)
 
                 Button {
-                    guard let world, !name.trimmingCharacters(in: .whitespaces).isEmpty else { return }
-                    Haptics.success()
-                    SoundKit.shared.play(.crown)
-                    profiles.profile = Profile(name: name.trimmingCharacters(in: .whitespaces), world: world)
+                    commit()
                 } label: {
                     HStack(spacing: 10) {
                         Text("Let's play")
@@ -77,8 +77,20 @@ struct ProfileSetupView: View {
             }
             .padding(.horizontal, 20)
             .padding(.top, 8)
+            .frame(minHeight: UIScreen.main.bounds.height - 120)
+            }
+            .scrollDismissesKeyboard(.interactively)
         }
         .preferredColorScheme(.light)
+    }
+
+    private var canCommit: Bool { world != nil && !name.trimmingCharacters(in: .whitespaces).isEmpty }
+
+    private func commit() {
+        guard let world, canCommit else { return }
+        Haptics.success()
+        SoundKit.shared.play(.crown)
+        profiles.profile = Profile(name: name.trimmingCharacters(in: .whitespaces), world: world)
     }
 
     private func worldCard(_ w: World, selected: Bool) -> some View {

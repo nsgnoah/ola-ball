@@ -126,3 +126,7 @@ extension Haptics {
         else { UINotificationFeedbackGenerator().notificationOccurred(.error) }
     }
 }
+
+extension String: @retroactive Identifiable {
+    public var id: String { self }
+}

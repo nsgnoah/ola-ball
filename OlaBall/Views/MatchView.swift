@@ -32,7 +32,7 @@ struct MatchView: View {
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)
         .preferredColorScheme(.light)
-        .onAppear { controller.start() }
+        .onAppear { controller.start(announce: true) }
         .animation(.easeOut(duration: 0.2), value: controller.stage)
     }
 }

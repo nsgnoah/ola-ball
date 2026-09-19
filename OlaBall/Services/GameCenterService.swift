@@ -39,7 +39,8 @@ final class GameCenterService: NSObject, GKLocalPlayerListener {
                     await self.reload()
                 } else {
                     self.isAuthenticated = false
-                    self.authError = error?.localizedDescription ?? "Game Center isn't signed in on this device."
+                    // GameKit's own error text is developer-speak; say what to do instead.
+                    self.authError = "Game Center isn't signed in on this phone. Open Settings, tap Game Center, sign in with your Apple ID, then come back."
                 }
             }
         }
@@ -183,4 +184,8 @@ struct MatchmakerView: UIViewControllerRepresentable {
         func turnBasedMatchmakerViewControllerWasCancelled(_ viewController: GKTurnBasedMatchmakerViewController) { onDismiss() }
         func turnBasedMatchmakerViewController(_ viewController: GKTurnBasedMatchmakerViewController, didFailWithError error: Error) { onDismiss() }
     }
+}
+
+extension GKTurnBasedMatch: @retroactive Identifiable {
+    public var id: String { matchID }
 }

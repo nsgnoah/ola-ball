@@ -30,15 +30,19 @@ struct HomeView: View {
             }
             .toolbar(.hidden, for: .navigationBar)
             .preferredColorScheme(.light)
-            .navigationDestination(item: $openLocalID) { id in
+            .fullScreenCover(item: $openLocalID) { id in
                 if let state = localMatches.matches[id] {
                     MatchView(controller: MatchController(state: state, transport: PassAndPlayTransport(id: id, state: state, store: localMatches)))
+                        .environment(localMatches)
+                        .environment(profiles)
                 }
             }
-            .navigationDestination(item: $openGCMatch) { match in
+            .fullScreenCover(item: $openGCMatch) { match in
                 if let p = profiles.profile {
                     let state = gc.state(for: match) ?? MatchState(seed: UInt64.random(in: 0...UInt64.max), creator: MatchPlayer(id: gc.localPlayerID, name: p.name, world: p.world))
                     MatchView(controller: MatchController(state: state, transport: GameCenterTransport(match: match, profile: p)))
+                        .environment(localMatches)
+                        .environment(profiles)
                 }
             }
             .sheet(isPresented: $showMatchmaker) {
@@ -110,7 +114,7 @@ struct HomeView: View {
     private var gameCenterSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 8) {
-                Kicker("ONLINE · GAME CENTER", color: Theme.ink)
+                Kicker("ONLINE · GAME CENTER", color: Theme.ink).lineLimit(1).fixedSize()
                 Rectangle().fill(Theme.rule).frame(height: 1)
             }
             if gc.isAuthenticated {
@@ -139,8 +143,10 @@ struct HomeView: View {
                     Text(gc.authError ?? "Uses the Apple ID already on this phone. No new account, no password.")
                         .font(.body(13)).foregroundStyle(Theme.ink2)
                         .fixedSize(horizontal: false, vertical: true)
-                    Button("Sign in") {
-                        if gc.pendingAuthController == nil { gc.authenticate() }
+                    Button(gc.authError == nil ? "Sign in" : "Open Settings") {
+                        if gc.pendingAuthController != nil { return }
+                        if gc.authError == nil { gc.authenticate() }
+                        else if let url = URL(string: UIApplication.openSettingsURLString) { UIApplication.shared.open(url) }
                     }
                     .buttonStyle(InkButtonStyle(outlined: true))
                 }
@@ -152,15 +158,27 @@ struct HomeView: View {
     private var passAndPlaySection: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 8) {
-                Kicker("ON THIS PHONE · PASS & PLAY", color: Theme.ink)
+                Kicker("PASS & PLAY · ONE PHONE", color: Theme.ink).lineLimit(1).fixedSize()
                 Rectangle().fill(Theme.rule).frame(height: 1)
             }
             let sorted = localMatches.matches.sorted { $0.value.updatedAt > $1.value.updatedAt }
             ForEach(sorted, id: \.key) { id, state in
-                Button { openLocalID = id } label: { matchRow(local: state) }
-                    .buttonStyle(.plain)
-                    .accessibilityIdentifier("local-match-\(id)")
-                    .contextMenu { Button("Delete", role: .destructive) { localMatches.delete(id) } }
+                HStack(spacing: 8) {
+                    Button { openLocalID = id } label: { matchRow(local: state) }
+                        .buttonStyle(.plain)
+                        .accessibilityIdentifier("local-match-\(id)")
+                    if state.status == .finished {
+                        Button {
+                            localMatches.delete(id)
+                        } label: {
+                            Image(systemName: "trash").font(.system(size: 14, weight: .bold)).foregroundStyle(Theme.ink2)
+                                .frame(width: 40, height: 40)
+                                .background(Theme.paperCard, in: Circle())
+                                .overlay(Circle().stroke(Theme.rule, lineWidth: 1))
+                        }
+                        .accessibilityLabel("Delete match")
+                    }
+                }
             }
             Button {
                 Haptics.tap()

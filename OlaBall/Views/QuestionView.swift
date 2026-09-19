@@ -40,7 +40,7 @@ struct QuestionView: View {
                             optionRow(i, option, q: q)
                         }
                         .buttonStyle(.plain)
-                        .disabled(controller.revealed)
+                        .allowsHitTesting(!controller.revealed)
                         .accessibilityIdentifier("option-\(i)")
                     }
                 }
@@ -108,7 +108,7 @@ struct QuestionView: View {
             VStack(alignment: .leading, spacing: 3) {
                 Text(timedOut ? "Time!" : (correct ? ["Nailed it.", "Yes.", "Look at you.", "Correct, obviously."].randomElement()! : ["Nope.", "Not that one.", "Close. Not really."].randomElement()!))
                     .font(.headline(20)).foregroundStyle(correct ? Theme.goodInk : Theme.badInk)
-                if !correct { Text("It's \(q.correct).").font(.bodyBold(14)).foregroundStyle(Theme.ink) }
+                if !correct { Text("Answer: \(q.correct)").font(.bodyBold(14)).foregroundStyle(Theme.ink) }
                 if let fact = q.fact { Text(fact).font(.body(13)).foregroundStyle(Theme.ink2).fixedSize(horizontal: false, vertical: true) }
                 if correct && controller.streak >= 2 { Kicker("STREAK ×\(controller.streak)", color: Theme.goodInk, size: 11) }
             }

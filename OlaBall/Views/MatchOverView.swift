@@ -54,9 +54,11 @@ struct MatchOverView: View {
         }
         .padding(20)
         .onAppear { SoundKit.shared.play(iWon ? .fanfare : (winner == nil ? .swoosh : .lose)) }
-        .navigationDestination(item: $rematchID) { id in
+        .fullScreenCover(item: $rematchID) { id in
             if let state = localMatches.matches[id] {
                 MatchView(controller: MatchController(state: state, transport: PassAndPlayTransport(id: id, state: state, store: localMatches)))
+                    .environment(localMatches)
+                    .environment(profiles)
             }
         }
     }
