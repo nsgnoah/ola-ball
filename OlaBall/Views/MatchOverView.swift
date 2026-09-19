@@ -16,7 +16,7 @@ struct MatchOverView: View {
             MatchHeader(controller: controller, onClose: onClose)
             Spacer()
             Kicker("FINAL", color: Theme.ink3)
-            Text(winner == nil ? "IT'S A TIE" : (iWon ? "YOU WIN" : "\(s.player(winner!)?.name.uppercased() ?? "THEY") WIN"))
+            Text(winner == nil ? "IT'S A TIE" : (iWon ? "YOU WIN" : "\(s.player(winner!)?.name.uppercased() ?? "THEY") WINS"))
                 .font(.headline(72)).foregroundStyle(winner.flatMap { s.player($0)?.world.color } ?? Theme.ink)
                 .lineLimit(1).minimumScaleFactor(0.5).padding(.top, -10)
                 .accessibilityIdentifier("match-over")
