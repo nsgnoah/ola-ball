@@ -2,7 +2,7 @@ import Foundation
 
 /// His World: the decks a partner who "knows her world" gets quizzed on.
 enum HisWorld {
-    static let decks: [Deck] = [football, ballsports, cars, grill, nerd, gear]
+    static let decks: [Deck] = [football, ballsports, cars, grill, nerd, gear, actionmovies, tech, fightnight]
 
     static let football = Deck(id: "football", world: .his, title: "Football 101", tagline: "Downs, the red zone, and why everyone's yelling.", symbol: "football.fill", colorHex: "2FA562", specs: [
         Q(1, "How many points is a touchdown worth (before the extra point)?", "6", ["7", "3", "1"]),

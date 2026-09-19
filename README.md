@@ -2,7 +2,7 @@
 
 A trivia game for two people who share a couch and not a knowledge base.
 
-Each of you declares the world you know. His World: football, ball sports, cars, grilling and whiskey, games and superheroes, tools and the outdoors. Her World: skincare, fashion, rom-coms, reality TV, pop divas, wedding season. Every round you pick the deck your partner gets quizzed on. They pick yours. Seven questions, fifteen seconds each, difficulty climbing from Rookie to Legend over five rounds. First to three crowns wins, then you run it back.
+Each of you declares the world you know. His World: football, ball sports, cars, grilling and whiskey, games and superheroes, tools and the outdoors, action movies and dad TV, tech and gadgets, fight night. Her World: skincare, fashion, rom-coms, reality TV, pop divas, wedding season, book club, wellness, celebrity gossip. Every round you pick the deck your partner gets quizzed on. They pick yours. Seven questions, fifteen seconds each, difficulty climbing from Rookie to Legend over five rounds. First to three crowns wins, then you run it back.
 
 Play from two phones with Game Center turn-based matches (Apple ID only, no accounts of ours, no server), or pass one phone back and forth.
 

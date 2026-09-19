@@ -11,7 +11,7 @@ Native SwiftUI iOS trivia game for couples (iOS 17+). Two "worlds": His World an
 ## Architecture
 - **Android is coming later.** Keep rules and match state in plain Swift with no UI imports; keep `MatchState` JSON stable (it is the cross-platform contract); question content should move to a JSON file shared by both apps before the Android build.
 - `Models/`: `Deck`/`Question` (content), `MatchState` (the JSON both phones agree on: `MatchPlayer` sides with `Member`s, picks and results keyed by member id), `Profile`.
-- `Content/HerWorld.swift`, `Content/HisWorld.swift`: 12 decks × 36 questions (12 per tier). Author with `Q(tier, prompt, correct, [wrong×3], fact?)`. Option order is shuffled deterministically per question id.
+- `Content/HerWorld.swift`, `Content/HisWorld.swift` (+ `*More.swift`): 18 decks × 36 questions (12 per tier). Author with `Q(tier, prompt, correct, [wrong×3], fact?)`. Option order is shuffled deterministically per question id.
 - `Engine/MatchEngine.swift`: pure rules (question draw, tiers per round, scoring). `Engine/MatchController.swift`: one match's UI state machine (`route()` is the single source of what's next; hand-offs between members of a couple on one phone); it talks to a `MatchTransport`. Never leave an async submit in flight without first setting a stage the views can render.
 - `Services/GameCenterService.swift` (+ `GameCenterTransport`), `Services/LocalMatchStore.swift` (+ `PassAndPlayTransport`).
 - `Views/`: `HomeView` (match lists), `MatchView` (stage switch), `DeckPickView`, `QuestionView`, `RoundRevealView`, `MatchOverView`, `ProfileSetupView`.

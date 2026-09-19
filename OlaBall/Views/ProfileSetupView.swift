@@ -94,7 +94,7 @@ struct ProfileSetupView: View {
                 Spacer(minLength: 6)
                 StickerText(w == .hers ? "HER" : "HIS", size: 44, alignment: .leading).padding(.bottom, -8)
                 Text("WORLD").font(.headline(22)).foregroundStyle(.white.opacity(0.9))
-                Text(w == .hers ? "Beauty, fashion, rom-coms, reality TV, divas, weddings" : "Football, ball sports, cars, grilling, games, gear")
+                Text(w == .hers ? "Beauty, fashion, rom-coms, reality TV, divas, weddings, books, wellness, gossip" : "Football, ball sports, cars, grilling, games, gear, movies, tech, fights")
                     .font(.bodyRegular(11)).foregroundStyle(.white.opacity(0.85)).fixedSize(horizontal: false, vertical: true)
                     .padding(.top, 4)
             }

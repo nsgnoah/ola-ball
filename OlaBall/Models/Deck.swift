@@ -22,8 +22,8 @@ enum World: String, Codable, CaseIterable, Identifiable {
 
     var blurb: String {
         switch self {
-        case .hers: return "Skincare, fashion, rom-coms, reality TV, pop divas, weddings. Your partner gets quizzed on these."
-        case .his: return "Football, ball sports, cars, grilling, games, gear. Your partner gets quizzed on these."
+        case .hers: return "Skincare, fashion, rom-coms, reality TV, pop divas, weddings, book club, wellness, celebrity gossip. Your partner gets quizzed on these."
+        case .his: return "Football, ball sports, cars, grilling, games, gear, action movies, tech, fight night. Your partner gets quizzed on these."
         }
     }
 

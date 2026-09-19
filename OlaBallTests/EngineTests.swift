@@ -4,7 +4,7 @@ import Foundation
 
 struct ContentTests {
     @Test func everyDeckIsWellFormed() {
-        #expect(Decks.all.count == 12)
+        #expect(Decks.all.count == 18)
         for deck in Decks.all {
             #expect(deck.questions.count == 36, "\(deck.id) has \(deck.questions.count) questions")
             for t in 1...3 {

@@ -2,7 +2,7 @@ import Foundation
 
 /// Her World: the decks a partner who "knows his world" gets quizzed on.
 enum HerWorld {
-    static let decks: [Deck] = [skincare, fashion, romcoms, reality, divas, weddings]
+    static let decks: [Deck] = [skincare, fashion, romcoms, reality, divas, weddings, bookclub, wellness, gossip]
 
     static let skincare = Deck(id: "skincare", world: .hers, title: "Skincare & Beauty", tagline: "Serums, SPF, and why the order matters.", symbol: "drop.fill", colorHex: "FF6FA5", specs: [
         Q(1, "What does SPF stand for?", "Sun Protection Factor", ["Skin Protection Formula", "Solar Prevention Filter", "Sun Proof Finish"]),
