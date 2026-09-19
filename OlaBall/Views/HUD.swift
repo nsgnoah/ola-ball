@@ -149,7 +149,7 @@ struct ScoreBug: View {
         HStack(spacing: 6) {
             if leading {
                 Rectangle().fill(team.color).frame(width: 5)
-                Text(team.emoji).font(.system(size: 18))
+                Monogram(team: team, size: 24).padding(.leading, 4)
                 Text(team.abbreviation).font(.system(size: 13, weight: .black)).tracking(1.5).foregroundStyle(.white)
                 if hasBall { possession }
                 Spacer(minLength: 2)
@@ -159,7 +159,7 @@ struct ScoreBug: View {
                 Spacer(minLength: 2)
                 if hasBall { possession }
                 Text(team.abbreviation).font(.system(size: 13, weight: .black)).tracking(1.5).foregroundStyle(.white)
-                Text(team.emoji).font(.system(size: 18))
+                Monogram(team: team, size: 24).padding(.trailing, 4)
                 Rectangle().fill(team.color).frame(width: 5)
             }
         }
@@ -176,5 +176,24 @@ struct ScoreBug: View {
             .foregroundStyle(.white)
             .contentTransition(.numericText())
             .animation(.spring(duration: 0.5), value: score)
+    }
+}
+
+/// A club crest: the monogram letter on a team-color disc with a fine ring. Replaces emoji everywhere.
+struct Monogram: View {
+    let team: Team
+    var size: CGFloat = 40
+
+    var body: some View {
+        ZStack {
+            Circle().fill(LinearGradient(colors: [Art.swiftUI(team.color, brightness: 0.08), Art.swiftUI(team.color, brightness: -0.14)], startPoint: .top, endPoint: .bottom))
+            Circle().stroke(.white.opacity(0.35), lineWidth: max(1, size * 0.035))
+            Circle().stroke(.black.opacity(0.25), lineWidth: max(1, size * 0.02)).padding(size * 0.1)
+            Text(team.monogram)
+                .font(.system(size: size * 0.5, weight: .black, design: .rounded))
+                .foregroundStyle(.white)
+                .shadow(color: .black.opacity(0.35), radius: size * 0.04, y: size * 0.03)
+        }
+        .frame(width: size, height: size)
     }
 }

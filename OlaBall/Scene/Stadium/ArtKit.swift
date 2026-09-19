@@ -277,11 +277,11 @@ enum Art {
                 c.setStrokeColor(UIColor.white.withAlphaComponent(0.85).cgColor)
                 c.setLineWidth(0.35 * ppy)
                 c.strokeEllipse(in: CGRect(x: cx - 5 * ppy, y: cy - 5 * ppy, width: 10 * ppy, height: 10 * ppy))
-                let emoji = NSAttributedString(string: team.emoji, attributes: [.font: UIFont.systemFont(ofSize: 5.5 * ppy)])
+                let mark = NSAttributedString(string: team.monogram, attributes: [.font: UIFont.systemFont(ofSize: 6.5 * ppy, weight: .black), .foregroundColor: UIColor.white.withAlphaComponent(0.92)])
                 c.saveGState()
                 c.translateBy(x: cx, y: cy)
                 c.rotate(by: .pi)
-                emoji.draw(at: CGPoint(x: -emoji.size().width / 2, y: -emoji.size().height / 2))
+                mark.draw(at: CGPoint(x: -mark.size().width / 2, y: -mark.size().height / 2))
                 c.restoreGState()
             }
         }
@@ -310,10 +310,10 @@ enum Art {
                         let w = CGFloat(Float.random(in: 18...26, using: &rng))
                         if Float.random(in: 0..<1, using: &rng) < 0.12 { x += w; continue }   // empty seat
                         // Muted fan colors: mostly dark clothes with the occasional bright jersey
-                        let bright = Float.random(in: 0..<1, using: &rng) < 0.22
+                        let bright = Float.random(in: 0..<1, using: &rng) < 0.10
                         let hue = CGFloat(Float.random(in: 0..<1, using: &rng))
-                        let sat = bright ? CGFloat(Float.random(in: 0.5...0.85, using: &rng)) : CGFloat(Float.random(in: 0.05...0.3, using: &rng))
-                        let bri = (bright ? CGFloat(Float.random(in: 0.55...0.85, using: &rng)) : CGFloat(Float.random(in: 0.18...0.45, using: &rng))) * light
+                        let sat = bright ? CGFloat(Float.random(in: 0.35...0.6, using: &rng)) : CGFloat(Float.random(in: 0.05...0.25, using: &rng))
+                        let bri = (bright ? CGFloat(Float.random(in: 0.45...0.7, using: &rng)) : CGFloat(Float.random(in: 0.14...0.38, using: &rng))) * light
                         c.setFillColor(UIColor(hue: hue, saturation: sat, brightness: bri, alpha: 1).cgColor)
                         c.addPath(UIBezierPath(roundedRect: CGRect(x: x, y: y + 12, width: w, height: rowH - 16), cornerRadius: w * 0.3).cgPath)
                         c.fillPath()

@@ -16,6 +16,8 @@ final class SoundKit {
     private var players: [AVAudioPlayerNode] = []
     private var nextPlayer = 0
     private let crowdNode = AVAudioPlayerNode()
+    private let musicNode = AVAudioPlayerNode()
+    private var musicOn = false
     private var started = false
     private var ready = false
 
@@ -42,12 +44,15 @@ final class SoundKit {
         }
         engine.attach(crowdNode)
         engine.connect(crowdNode, to: engine.mainMixerNode, format: format)
+        engine.attach(musicNode)
+        engine.connect(musicNode, to: engine.mainMixerNode, format: format)
         engine.mainMixerNode.outputVolume = 0.9
 
         let format = self.format
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             let rendered = Synth.renderAll(format: format)
             let crowd = Synth.crowdLoop(format: format)
+            let drums = Synth.drumline(format: format)
             DispatchQueue.main.async {
                 guard let self else { return }
                 self.buffers = rendered
@@ -56,7 +61,11 @@ final class SoundKit {
                 self.crowdNode.volume = 0
                 self.crowdNode.scheduleBuffer(crowd, at: nil, options: [.loops])
                 self.crowdNode.play()
+                self.musicNode.volume = self.musicOn ? 0.3 : 0
+                self.musicNode.scheduleBuffer(drums, at: nil, options: [.loops])
+                self.musicNode.play()
                 self.ready = true
+                self.applyCrowd()
             }
         }
     }
@@ -73,6 +82,13 @@ final class SoundKit {
     func setScene(crowd level: Float) {
         crowdBase = level
         applyCrowd()
+    }
+
+    /// The drumline cadence: on for the home screen, off once a game starts.
+    func setMusic(_ on: Bool) {
+        musicOn = on
+        guard ready else { return }
+        musicNode.volume = (on && isEnabled) ? 0.3 : 0
     }
 
     /// Bump the crowd; it settles back over a couple of seconds.
@@ -328,6 +344,50 @@ enum Synth {
             return delayed(multiply(raw, env), by: at, total: n)
         }
         return normalized(mix([hit(392, at: 0, length: 0.25), hit(523.3, at: 0.2, length: 0.65), hit(261.6, at: 0.2, length: 0.65).map { $0 * 0.6 }]), peak: 0.7)
+    }
+
+    /// A four-bar drumline cadence (bass drums, snares with a roll, a crash on the one) that loops seamlessly.
+    static func drumline(format: AVAudioFormat) -> AVAudioPCMBuffer {
+        let bpm: Float = 108
+        let step = 60 / bpm / 4                      // a sixteenth
+        let steps = 64                               // four bars
+        let n = frames(step * Float(steps))
+        var out = [Float](repeating: 0, count: n)
+        func place(_ x: [Float], at s: Int, gain: Float) {
+            let start = frames(step * Float(s))
+            for i in 0..<x.count { out[(start + i) % n] += x[i] * gain }
+        }
+        // Voices
+        let bassLen = frames(0.25)
+        let bass = normalized(multiply(tone(bassLen, frequency: { i in max(42, 130 * exp(-Float(i) / sr / 0.08)) }), exponentialDecay(bassLen, tau: 0.11)), peak: 0.9)
+        let snareLen = frames(0.18)
+        let snareBody = multiply(tone(snareLen, frequency: { _ in 185 }, harmonics: [1, 0.3]), exponentialDecay(snareLen, tau: 0.03))
+        let snareWire = multiply(highpass(lowpass(noise(snareLen, seed: 21), cutoff: 6500), cutoff: 900), exponentialDecay(snareLen, tau: 0.055))
+        let snare = normalized(mix([snareBody.map { $0 * 0.6 }, snareWire]), peak: 0.8)
+        let tickLen = frames(0.05)
+        let tick = normalized(multiply(highpass(noise(tickLen, seed: 22), cutoff: 5000), exponentialDecay(tickLen, tau: 0.012)), peak: 0.35)
+        let crashLen = frames(1.4)
+        let crash = normalized(multiply(highpass(lowpass(noise(crashLen, seed: 23), cutoff: 9000), cutoff: 2500), exponentialDecay(crashLen, tau: 0.45)), peak: 0.5)
+
+        // Patterns per bar, in sixteenths: 0 = the downbeat.
+        let bassHits: [Int] = [0, 6, 8, 14]
+        let snareAccents: [Int] = [4, 12]
+        let snareGhosts: [Int] = [2, 6, 10, 14, 15]
+        for bar in 0..<4 {
+            let base = bar * 16
+            for h in bassHits { place(bass, at: base + h, gain: 0.95) }
+            for h in snareAccents { place(snare, at: base + h, gain: 1.0) }
+            if bar < 3 {
+                for h in snareGhosts { place(snare, at: base + h, gain: 0.35) }
+            } else {
+                // Bar four: a building sixteenth-note roll into the crash.
+                for h in 8..<16 { place(snare, at: base + h, gain: 0.3 + 0.08 * Float(h - 8)) }
+                for h in snareGhosts where h < 8 { place(snare, at: base + h, gain: 0.35) }
+            }
+            for h in stride(from: 0, to: 16, by: 2) { place(tick, at: base + h, gain: 0.5) }
+        }
+        place(crash, at: 0, gain: 0.8)
+        return buffer(normalized(out, peak: 0.7), format: format)
     }
 
     /// Eight seconds of stadium murmur that loops seamlessly.

@@ -23,8 +23,8 @@ struct HomeView: View {
                 }
             }
             .toolbar(.hidden, for: .navigationBar)
-            .onAppear { if !pickedOpponent { pickOpponent() }; SoundKit.shared.setScene(crowd: 0.14) }
-            .fullScreenCover(isPresented: $showGame, onDismiss: { pickOpponent() }) {
+            .onAppear { if !pickedOpponent { pickOpponent() }; SoundKit.shared.setScene(crowd: 0.14); SoundKit.shared.setMusic(true) }
+            .fullScreenCover(isPresented: $showGame, onDismiss: { pickOpponent(); SoundKit.shared.setScene(crowd: 0.14); SoundKit.shared.setMusic(true) }) {
                 if let team = store.team {
                     GameView(session: GameSession(userTeam: team, opponentTeam: opponent, store: store, autoplay: CommandLine.arguments.contains("-ui-testing-autoplay")))
                         .environment(store)
@@ -149,11 +149,7 @@ struct HomeView: View {
     }
 
     private func crest(_ team: Team, size: CGFloat) -> some View {
-        Text(team.emoji)
-            .font(.system(size: size * 0.55))
-            .frame(width: size, height: size)
-            .background(team.color.opacity(0.9), in: Circle())
-            .overlay(Circle().stroke(.white.opacity(0.35), lineWidth: 1.5))
+        Monogram(team: team, size: size)
     }
 
     private var kickoff: some View {
@@ -177,6 +173,7 @@ struct HomeView: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel("Play a Game")
+        .accessibilityIdentifier("kickoff")
     }
 
     private var seasonStrip: some View {

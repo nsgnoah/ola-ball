@@ -67,6 +67,7 @@ struct TeamPickView: View {
                 .disabled(selected == nil)
                 .opacity(selected == nil ? 0.45 : 1)
                 .accessibilityLabel("Let's go")
+                .accessibilityIdentifier("lets-go")
                 .padding(.horizontal, 18)
                 .padding(.bottom, 12)
             }
@@ -89,8 +90,7 @@ struct TeamPickView: View {
                 .fill(.white.opacity(0.07))
             }
             VStack(alignment: .leading, spacing: 0) {
-                Text(team.emoji).font(.system(size: 40))
-                    .shadow(color: .black.opacity(0.4), radius: 6, y: 3)
+                Monogram(team: team, size: 46)
                 Spacer(minLength: 8)
                 Text(team.city.uppercased()).font(.system(size: 10, weight: .black)).tracking(1.8).foregroundStyle(.white.opacity(0.85))
                 Text(team.name.uppercased()).font(.system(size: 20, weight: .black)).tracking(-0.5).foregroundStyle(.white)

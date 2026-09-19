@@ -53,15 +53,15 @@ final class PlayerRig {
         }
         let ink = Art.trim(for: jersey)
         let pants = Art.color(jersey, brightness: -0.15, saturation: -0.1)
-        let jerseyMat = Art.pbr(jersey, roughness: 0.75)
+        let jerseyMat = Art.pbr(jersey, roughness: 0.82)
         let skinMat = Art.pbr(skin, roughness: 0.6)
         let pantsMat = Art.pbr(pants, roughness: 0.7)
         let darkMat = Art.pbr(UIColor(white: 0.12, alpha: 1), roughness: 0.5)
-        let helmetMat = Art.pbr(Art.color(jersey, brightness: 0.05), roughness: 0.28, metalness: 0.15)
+        let helmetMat = Art.pbr(Art.color(jersey, brightness: -0.04), roughness: 0.22, metalness: 0.2)
         helmetMat.specular.contents = UIColor.white
 
         // Torso: rounded box with the number on the front and back faces.
-        let torsoGeo = SCNBox(width: CGFloat(0.95 * bulk), height: 0.80, length: CGFloat(0.52 * bulk), chamferRadius: 0.16)
+        let torsoGeo = SCNBox(width: CGFloat(0.78 * bulk), height: 0.82, length: CGFloat(0.42 * bulk), chamferRadius: 0.14)
         let numberFront = Art.textured(Art.numberImage(number, jersey: jersey, ink: ink), roughness: 0.75)
         let numberBack = Art.textured(Art.numberImage(number, jersey: jersey, ink: ink), roughness: 0.75)
         torsoGeo.materials = [numberFront, jerseyMat, numberBack, jerseyMat, jerseyMat, pantsMat]
@@ -69,24 +69,24 @@ final class PlayerRig {
         torsoNode.position = SCNVector3(0, 0.42, 0)
         torso.addChildNode(torsoNode)
         // Shoulder pads
-        let pads = SCNBox(width: CGFloat(1.22 * bulk), height: 0.22, length: CGFloat(0.62 * bulk), chamferRadius: 0.1)
+        let pads = SCNBox(width: CGFloat(1.02 * bulk), height: 0.18, length: CGFloat(0.50 * bulk), chamferRadius: 0.08)
         pads.materials = [jerseyMat]
         let padsNode = SCNNode(geometry: pads)
         padsNode.position = SCNVector3(0, 0.78, 0)
         torso.addChildNode(padsNode)
         // Hips
-        let hips = SCNBox(width: CGFloat(0.78 * bulk), height: 0.34, length: CGFloat(0.46 * bulk), chamferRadius: 0.12)
+        let hips = SCNBox(width: CGFloat(0.64 * bulk), height: 0.32, length: CGFloat(0.38 * bulk), chamferRadius: 0.1)
         hips.materials = [pantsMat]
         let hipsNode = SCNNode(geometry: hips)
         hipsNode.position = SCNVector3(0, -0.02, 0)
         torso.addChildNode(hipsNode)
         // Belt
-        let belt = SCNBox(width: CGFloat(0.80 * bulk), height: 0.06, length: CGFloat(0.48 * bulk), chamferRadius: 0.02)
+        let belt = SCNBox(width: CGFloat(0.66 * bulk), height: 0.05, length: CGFloat(0.40 * bulk), chamferRadius: 0.02)
         belt.materials = [darkMat]
         let beltNode = SCNNode(geometry: belt)
         beltNode.position = SCNVector3(0, 0.12, 0)
         torso.addChildNode(beltNode)
-        torso.position = SCNVector3(0, 1.05, 0)
+        torso.position = SCNVector3(0, 1.16, 0)
         body.addChildNode(torso)
 
         // Neck + helmet
@@ -97,56 +97,64 @@ final class PlayerRig {
         torso.addChildNode(neckNode)
         head.position = SCNVector3(0, 1.10, 0.02)
         torso.addChildNode(head)
-        let shell = SCNSphere(radius: 0.36)
+        let shell = SCNSphere(radius: 0.29)
         shell.segmentCount = 28
         shell.materials = [helmetMat]
         helmet.geometry = shell
-        helmet.scale = SCNVector3(1.0, 1.06, 1.12)
+        helmet.scale = SCNVector3(1.0, 1.08, 1.14)
         head.addChildNode(helmet)
         // Face cavity
-        let face = SCNSphere(radius: 0.22)
+        let face = SCNSphere(radius: 0.18)
         face.materials = [darkMat]
         let faceNode = SCNNode(geometry: face)
-        faceNode.position = SCNVector3(0, -0.05, 0.24)
+        faceNode.position = SCNVector3(0, -0.04, 0.19)
         head.addChildNode(faceNode)
         // Facemask bars
-        let barMat = Art.pbr(UIColor(white: 0.85, alpha: 1), roughness: 0.35, metalness: 0.6)
-        for (y, w) in [(Float(-0.02), Float(0.46)), (Float(-0.14), Float(0.42))] {
+        let barMat = Art.pbr(UIColor(white: 0.22, alpha: 1), roughness: 0.4, metalness: 0.5)
+        for (y, w) in [(Float(-0.06), Float(0.38)), (Float(-0.16), Float(0.34))] {
             let bar = SCNCylinder(radius: 0.022, height: CGFloat(w))
             bar.materials = [barMat]
             let barNode = SCNNode(geometry: bar)
             barNode.eulerAngles.z = .pi / 2
-            barNode.position = SCNVector3(0, y, 0.40)
+            barNode.position = SCNVector3(0, y, 0.33)
             head.addChildNode(barNode)
         }
-        let vbar = SCNCylinder(radius: 0.02, height: 0.22)
+        // Tinted visor
+        let visor = SCNBox(width: 0.40, height: 0.13, length: 0.06, chamferRadius: 0.03)
+        let visorMat = Art.pbr(UIColor(white: 0.05, alpha: 1), roughness: 0.15, metalness: 0.4)
+        visorMat.specular.contents = UIColor.white
+        visor.materials = [visorMat]
+        let visorNode = SCNNode(geometry: visor)
+        visorNode.position = SCNVector3(0, 0.02, 0.29)
+        head.addChildNode(visorNode)
+        let vbar = SCNCylinder(radius: 0.018, height: 0.16)
         vbar.materials = [barMat]
         let vbarNode = SCNNode(geometry: vbar)
-        vbarNode.position = SCNVector3(0, -0.08, 0.41)
+        vbarNode.position = SCNVector3(0, -0.11, 0.34)
         head.addChildNode(vbarNode)
         // Helmet stripe
-        let stripe = SCNBox(width: 0.09, height: 0.05, length: 0.62, chamferRadius: 0.02)
+        let stripe = SCNBox(width: 0.07, height: 0.04, length: 0.52, chamferRadius: 0.02)
         stripe.materials = [Art.pbr(ink, roughness: 0.4)]
         let stripeNode = SCNNode(geometry: stripe)
-        stripeNode.position = SCNVector3(0, 0.36, 0)
+        stripeNode.position = SCNVector3(0, 0.30, 0)
         head.addChildNode(stripeNode)
 
         // Arms: shoulder pivot -> upper arm -> elbow pivot -> forearm -> hand
         func buildArm(_ shoulder: SCNNode, _ elbow: SCNNode, side: Float) {
-            shoulder.position = SCNVector3(side * 0.60 * bulk, 0.72, 0)
-            let upper = SCNCapsule(capRadius: CGFloat(0.13 * bulk), height: 0.46)
+            shoulder.position = SCNVector3(side * 0.52 * bulk, 0.74, 0)
+            let upper = SCNCapsule(capRadius: CGFloat(0.11 * bulk), height: 0.48)
             upper.materials = [jerseyMat]
             let upperNode = SCNNode(geometry: upper)
             upperNode.position = SCNVector3(0, -0.20, 0)
             shoulder.addChildNode(upperNode)
             elbow.position = SCNVector3(0, -0.40, 0)
             shoulder.addChildNode(elbow)
-            let fore = SCNCapsule(capRadius: CGFloat(0.11 * bulk), height: 0.42)
+            let fore = SCNCapsule(capRadius: CGFloat(0.095 * bulk), height: 0.44)
             fore.materials = [skinMat]
             let foreNode = SCNNode(geometry: fore)
             foreNode.position = SCNVector3(0, -0.18, 0)
             elbow.addChildNode(foreNode)
-            let hand = SCNSphere(radius: 0.12)
+            let hand = SCNSphere(radius: 0.10)
             hand.materials = [darkMat]   // gloves
             let handNode = SCNNode(geometry: hand)
             handNode.position = SCNVector3(0, -0.40, 0)
@@ -158,23 +166,23 @@ final class PlayerRig {
 
         // Legs: hip pivot -> thigh -> knee pivot -> shin -> cleat
         func buildLeg(_ hip: SCNNode, _ knee: SCNNode, side: Float) {
-            hip.position = SCNVector3(side * 0.20 * bulk, 1.0, 0)
-            let thigh = SCNCapsule(capRadius: CGFloat(0.17 * bulk), height: 0.55)
+            hip.position = SCNVector3(side * 0.18 * bulk, 1.12, 0)
+            let thigh = SCNCapsule(capRadius: CGFloat(0.145 * bulk), height: 0.62)
             thigh.materials = [pantsMat]
             let thighNode = SCNNode(geometry: thigh)
-            thighNode.position = SCNVector3(0, -0.24, 0)
+            thighNode.position = SCNVector3(0, -0.27, 0)
             hip.addChildNode(thighNode)
-            knee.position = SCNVector3(0, -0.48, 0)
+            knee.position = SCNVector3(0, -0.55, 0)
             hip.addChildNode(knee)
-            let shin = SCNCapsule(capRadius: CGFloat(0.13 * bulk), height: 0.50)
+            let shin = SCNCapsule(capRadius: CGFloat(0.11 * bulk), height: 0.55)
             shin.materials = [Art.pbr(UIColor(white: 0.92, alpha: 1), roughness: 0.8)]  // socks
             let shinNode = SCNNode(geometry: shin)
-            shinNode.position = SCNVector3(0, -0.22, 0)
+            shinNode.position = SCNVector3(0, -0.25, 0)
             knee.addChildNode(shinNode)
             let cleat = SCNBox(width: 0.2, height: 0.12, length: 0.36, chamferRadius: 0.05)
             cleat.materials = [darkMat]
             let cleatNode = SCNNode(geometry: cleat)
-            cleatNode.position = SCNVector3(0, -0.50, 0.06)
+            cleatNode.position = SCNVector3(0, -0.55, 0.06)
             knee.addChildNode(cleatNode)
             body.addChildNode(hip)
         }
@@ -208,7 +216,7 @@ final class PlayerRig {
         let tagPlane = SCNPlane(width: 0.9, height: 0.36)
         tagPlane.materials = [Art.sprite(Art.tagImage(role.shortName, tint: jersey), additive: false)]
         tag.geometry = tagPlane
-        tag.position = SCNVector3(0, 2.75, 0)
+        tag.position = SCNVector3(0, 2.85, 0)
         tag.constraints = [SCNBillboardConstraint()]
         tag.castsShadow = false
         node.addChildNode(tag)

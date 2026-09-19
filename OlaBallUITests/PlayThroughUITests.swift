@@ -15,20 +15,20 @@ final class PlayThroughUITests: XCTestCase {
         app.launchArguments = ["-ui-testing-reset", "-ui-testing-autoplay"]
         app.launch()
 
-        XCTAssertTrue(app.staticTexts["Ola Ball"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["CLUB"].waitForExistence(timeout: 5))
         app.buttons.matching(NSPredicate(format: "label CONTAINS 'Mallards'")).firstMatch.tap()
         snap(app, "01-teampick")
-        app.buttons["Let's go"].tap()
-        XCTAssertTrue(app.buttons["Play a Game"].waitForExistence(timeout: 5))
+        app.buttons["lets-go"].tap()
+        XCTAssertTrue(app.buttons["kickoff"].waitForExistence(timeout: 8))
         snap(app, "02-home")
-        app.buttons["Play a Game"].tap()
+        app.buttons["kickoff"].tap()
 
         let start = Date()
         var shots: Set<String> = []
         var ticks = 0
         while ticks < 900 {   // up to ~7.5 minutes
             ticks += 1
-            if app.buttons["Play again"].exists { snap(app, "09-game-over"); break }
+            if app.buttons["play-again"].exists { snap(app, "09-game-over"); break }
             if !shots.contains("presnap") && app.staticTexts["draw-hint"].exists { snap(app, "03-presnap"); shots.insert("presnap") }
             if !shots.contains("live") && app.staticTexts["LIVE"].exists { snap(app, "04-live"); shots.insert("live") }
             if !shots.contains("result") && app.staticTexts["result-headline"].exists { snap(app, "05-result"); shots.insert("result") }
@@ -39,9 +39,9 @@ final class PlayThroughUITests: XCTestCase {
         }
         let elapsed = Date().timeIntervalSince(start)
         print("OLABALL game length: \(Int(elapsed)) s")
-        XCTAssertTrue(app.buttons["Play again"].waitForExistence(timeout: 5), "Game never reached the final screen")
-        app.buttons["Back to home"].tap()
-        XCTAssertTrue(app.buttons["Play a Game"].waitForExistence(timeout: 15))
+        XCTAssertTrue(app.buttons["play-again"].waitForExistence(timeout: 5), "Game never reached the final screen")
+        app.buttons["back-to-home"].tap()
+        XCTAssertTrue(app.buttons["kickoff"].waitForExistence(timeout: 15))
         snap(app, "08-home-after-game")
         app.buttons.matching(NSPredicate(format: "label CONTAINS 'Playbook'")).firstMatch.tap()
         XCTAssertTrue(app.staticTexts["The Goal & Four Tries"].waitForExistence(timeout: 5))
@@ -53,8 +53,8 @@ final class PlayThroughUITests: XCTestCase {
         app.launchArguments = ["-ui-testing-reset"]
         app.launch()
         app.buttons.matching(NSPredicate(format: "label CONTAINS 'Dragons'")).firstMatch.tap()
-        app.buttons["Let's go"].tap()
-        app.buttons["Play a Game"].tap()
+        app.buttons["lets-go"].tap()
+        app.buttons["kickoff"].tap()
         XCTAssertTrue(app.staticTexts["draw-hint"].waitForExistence(timeout: 8))
         snap(app, "11-presnap-manual")
         // Dismiss any tip so the field is unobstructed, then drag from the backfield straight upfield.

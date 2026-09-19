@@ -63,6 +63,7 @@ final class GameSession {
         self.autoplay = autoplay
         self.fieldScene = StadiumScene(userTeam: userTeam, opponentTeam: opponentTeam)
         SoundKit.shared.setScene(crowd: 0.2)
+        SoundKit.shared.setMusic(false)
         beginPossession()
     }
 

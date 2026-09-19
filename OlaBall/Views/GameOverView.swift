@@ -81,9 +81,11 @@ struct GameOverView: View {
                 }
                 .buttonStyle(BroadcastButtonStyle())
                 .accessibilityLabel("Play again")
+                .accessibilityIdentifier("play-again")
                 Button("Back to home") { onHome() }
                     .buttonStyle(BroadcastButtonStyle(fill: Color.black.opacity(0.55), ink: .white, prominent: false))
                     .accessibilityLabel("Back to home")
+                    .accessibilityIdentifier("back-to-home")
             }
         }
     }
@@ -100,13 +102,13 @@ struct GameOverView: View {
     private func scoreSide(_ team: Team, score: Int, leading: Bool) -> some View {
         HStack(spacing: 8) {
             if leading {
-                Text(team.emoji).font(.system(size: 20))
+                Monogram(team: team, size: 26)
                 Text(team.abbreviation).font(.system(size: 13, weight: .black)).tracking(1.5).foregroundStyle(.white.opacity(0.85))
                 Text("\(score)").font(.system(size: 30, weight: .black)).foregroundStyle(.white)
             } else {
                 Text("\(score)").font(.system(size: 30, weight: .black)).foregroundStyle(.white)
                 Text(team.abbreviation).font(.system(size: 13, weight: .black)).tracking(1.5).foregroundStyle(.white.opacity(0.85))
-                Text(team.emoji).font(.system(size: 20))
+                Monogram(team: team, size: 26)
             }
         }
     }
