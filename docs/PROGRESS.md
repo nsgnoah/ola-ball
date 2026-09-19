@@ -2,6 +2,12 @@
 
 Live log of build rounds, newest first. One entry per round: what was built, what the critic said, what changed.
 
+## 2026-09-19 09:50–10:00 (lead session, live with Noah)
+- Noah: the audience is adult women getting into football with a partner, not kids. Art direction moved to "prestige broadcast": deeper, desaturated uniform colors; typographic monogram crests replace emoji everywhere (bug, home, club pick, midfield crest, game over); player rigs re-proportioned (smaller helmet, narrower pads, longer legs, dark facemask, tinted visor); crowd darker and less candy-colored.
+- Audio: synthesized drumline cadence (bass, snares with a roll, crash) loops under the crowd on the home screen; silent during games.
+- Tests: 17/17 unit; both UI tests pass (drag test drags from the running back; a full autoplay game runs in 133 s). Navigation buttons carry accessibility identifiers because the broadcast button style uppercases labels.
+- Polish: tackle burst is a low dust puff; lineman tags hide once the ball is live; result hold camera framed above the HUD; follow camera swings less side to side.
+
 ## 2026-09-19 09:05–09:50 (lead session, live with Noah)
 - Noah's verdict on the first 3D pass: "AI slop." New bar: a game you'd show a friend (his reference: Tiger Woods PGA on an iPod Touch).
 - Replaced the renderer with `OlaBall/Scene/Stadium/`: procedural night stadium (turf with mow stripes and painted numbers, crowd bowl, sponsor wall, light towers with bloom, starfield sky used as the lighting environment), articulated players (helmet + facemask, pads, numbered jerseys, run cycle, role stances, tackle pose), glowing drawn-path ribbon with flowing dashes, confetti and turf-burst particles, cinematic camera (pre-snap framing that fits all 22 on a portrait screen, adaptive follow that keeps the receiver in frame, bullet time near contact, result hold framed above the HUD).
