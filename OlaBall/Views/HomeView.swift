@@ -7,6 +7,7 @@ struct HomeView: View {
     @State private var showResetConfirm = false
     @State private var opponent: Team = Team.all[1]
     @State private var pickedOpponent = false
+    @State private var session: GameSession?
 
     var body: some View {
         NavigationStack {
@@ -33,9 +34,11 @@ struct HomeView: View {
             .toolbar(.hidden, for: .navigationBar)
             .preferredColorScheme(.dark)
             .onAppear { if !pickedOpponent { pickOpponent() }; SoundKit.shared.setScene(crowd: 0.14); SoundKit.shared.setMusic(true) }
-            .fullScreenCover(isPresented: $showGame, onDismiss: { pickOpponent(); SoundKit.shared.setScene(crowd: 0.14); SoundKit.shared.setMusic(true) }) {
-                if let team = store.team {
-                    GameView(session: GameSession(userTeam: team, opponentTeam: opponent, store: store, autoplay: CommandLine.arguments.contains("-ui-testing-autoplay")))
+            .fullScreenCover(isPresented: $showGame, onDismiss: { session = nil; pickOpponent(); SoundKit.shared.setScene(crowd: 0.14); SoundKit.shared.setMusic(true) }) {
+                // The session is created once, at kickoff. Creating it inside this closure would build a new
+                // game on every re-evaluation, and each copy would consume Coach Ola's opening notes.
+                if let session {
+                    GameView(session: session)
                         .environment(store)
                 }
             }
@@ -167,8 +170,10 @@ struct HomeView: View {
 
     private var kickoff: some View {
         Button {
+            guard let team = store.team else { return }
             Haptics.heavy()
             SoundKit.shared.play(.stinger, volume: 0.8)
+            session = GameSession(userTeam: team, opponentTeam: opponent, store: store, autoplay: CommandLine.arguments.contains("-ui-testing-autoplay"))
             showGame = true
         } label: {
             HStack(spacing: 12) {

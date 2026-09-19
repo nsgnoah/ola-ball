@@ -81,6 +81,27 @@ final class CameraDirector {
         node.look(at: currentLook)
     }
 
+    /// Replay: a low cable-cam on the sideline, gliding with the ball in slow motion.
+    func beginReplay(at focus: FieldPoint) {
+        presnap = false
+        timeScale = 1
+        node.camera?.wantsDepthOfField = false
+        node.camera?.motionBlurIntensity = 0.2
+        currentPosition = SCNVector3(20, 4.5, focus.y - 8)
+        currentLook = SCNVector3(0, 1.2, focus.y)
+        node.position = currentPosition
+        node.look(at: currentLook)
+    }
+
+    func replayFollow(ball: FieldPoint, ballHeight: Float, dt: Float) {
+        desiredPosition = SCNVector3(19, 4.0 + ballHeight * 0.3, ball.y - 5)
+        desiredLook = SCNVector3(ball.x, 1.0 + ballHeight * 0.4, ball.y + 0.5)
+        currentPosition = lerp(currentPosition, desiredPosition, min(1, dt * 3))
+        currentLook = lerp(currentLook, desiredLook, min(1, dt * 5))
+        node.position = currentPosition
+        node.look(at: currentLook)
+    }
+
     /// Slow drift while waiting for the snap; keeps the frame alive.
     func idle(dt: Float) {
         guard presnap else { return }

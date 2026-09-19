@@ -18,6 +18,10 @@ final class SoundKit {
     private let crowdNode = AVAudioPlayerNode()
     private let musicNode = AVAudioPlayerNode()
     private var musicOn = false
+    private let paNode = AVAudioPlayerNode()
+    private let paEQ = AVAudioUnitEQ(numberOfBands: 2)
+    private let paReverb = AVAudioUnitReverb()
+    private var paFormat: AVAudioFormat?
     private var started = false
     private var ready = false
 
@@ -46,6 +50,18 @@ final class SoundKit {
         engine.connect(crowdNode, to: engine.mainMixerNode, format: format)
         engine.attach(musicNode)
         engine.connect(musicNode, to: engine.mainMixerNode, format: format)
+        // Stadium PA chain: tinny band-limited EQ into a big hall.
+        engine.attach(paNode)
+        engine.attach(paEQ)
+        engine.attach(paReverb)
+        paEQ.bands[0].filterType = .highPass
+        paEQ.bands[0].frequency = 380
+        paEQ.bands[0].bypass = false
+        paEQ.bands[1].filterType = .lowPass
+        paEQ.bands[1].frequency = 3600
+        paEQ.bands[1].bypass = false
+        paReverb.loadFactoryPreset(.largeHall2)
+        paReverb.wetDryMix = 48
         engine.mainMixerNode.outputVolume = 0.9
 
         let format = self.format
@@ -82,6 +98,23 @@ final class SoundKit {
     func setScene(crowd level: Float) {
         crowdBase = level
         applyCrowd()
+    }
+
+    /// Play synthesized speech through the PA chain. Buffers arrive in the synthesizer's own format.
+    func playPA(_ buffers: [AVAudioPCMBuffer], volume: Float = 1.0) {
+        guard isEnabled, ready, engine.isRunning, let first = buffers.first else { return }
+        if paFormat == nil || paFormat!.sampleRate != first.format.sampleRate || paFormat!.channelCount != first.format.channelCount {
+            paFormat = first.format
+            engine.disconnectNodeOutput(paNode)
+            engine.disconnectNodeOutput(paEQ)
+            engine.disconnectNodeOutput(paReverb)
+            engine.connect(paNode, to: paEQ, format: first.format)
+            engine.connect(paEQ, to: paReverb, format: first.format)
+            engine.connect(paReverb, to: engine.mainMixerNode, format: first.format)
+        }
+        paNode.volume = volume
+        for b in buffers { paNode.scheduleBuffer(b, at: nil) }
+        if !paNode.isPlaying { paNode.play() }
     }
 
     /// The drumline cadence: on for the home screen, off once a game starts.
@@ -408,4 +441,72 @@ enum Synth {
         }
         return buffer(normalized(x, peak: 0.6), format: format)
     }
+}
+
+
+// MARK: - PA announcer
+
+/// The stadium announcer. Lines are spoken by the system voice, rendered offline to buffers, and played
+/// through the PA chain so they echo around the bowl instead of sounding like a phone assistant.
+final class Announcer {
+    static let shared = Announcer()
+
+    private let synth = AVSpeechSynthesizer()
+    private var queue: [String] = []
+    private var busy = false
+    private lazy var voice: AVSpeechSynthesisVoice? = {
+        let voices = AVSpeechSynthesisVoice.speechVoices().filter { $0.language.hasPrefix("en") }
+        // Prefer a higher-quality voice; among equals, the deeper-sounding ones make a better PA.
+        let preferredNames = ["Aaron", "Daniel", "Evan", "Fred", "Tom", "Alex"]
+        for name in preferredNames {
+            if let v = voices.first(where: { $0.name.contains(name) && $0.quality != .default }) { return v }
+        }
+        for name in preferredNames {
+            if let v = voices.first(where: { $0.name.contains(name) }) { return v }
+        }
+        return voices.max(by: { $0.quality.rawValue < $1.quality.rawValue }) ?? AVSpeechSynthesisVoice(language: "en-US")
+    }()
+
+    private init() {}
+
+    func say(_ line: String) {
+        queue.append(line)
+        pump()
+    }
+
+    private func pump() {
+        guard !busy, !queue.isEmpty else { return }
+        let line = queue.removeFirst()
+        busy = true
+        let utterance = AVSpeechUtterance(string: line)
+        utterance.voice = voice
+        utterance.rate = 0.46
+        utterance.pitchMultiplier = 0.88
+        utterance.volume = 1
+        var chunks: [AVAudioPCMBuffer] = []
+        // Safety valve: if the synthesizer never finishes, don't jam the queue forever.
+        let token = UUID()
+        currentToken = token
+        DispatchQueue.main.asyncAfter(deadline: .now() + 8) { [weak self] in
+            guard let self, self.currentToken == token, self.busy else { return }
+            self.busy = false
+            self.pump()
+        }
+        synth.write(utterance) { [weak self] buffer in
+            guard let self else { return }
+            guard let pcm = buffer as? AVAudioPCMBuffer else { return }
+            if pcm.frameLength == 0 {
+                let done = chunks
+                DispatchQueue.main.async {
+                    SoundKit.shared.playPA(done, volume: 0.95)
+                    self.busy = false
+                    self.pump()
+                }
+            } else {
+                chunks.append(pcm)
+            }
+        }
+    }
+
+    private var currentToken = UUID()
 }

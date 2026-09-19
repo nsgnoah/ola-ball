@@ -24,6 +24,13 @@ struct GameView: View {
                 }
                 .padding(.horizontal, 12)
                 .padding(.top, 2)
+                if session.phase == .presnap, let tip = session.tip {
+                    // Before the snap the note sits over the far field so the formation stays clear for drawing.
+                    TipCardView(concept: tip, isNew: true) { session.dismissTip() }
+                        .padding(.horizontal, 12)
+                        .padding(.top, 10)
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                }
                 Spacer()
                 bottomPanel
                     .padding(.horizontal, 12)
@@ -76,9 +83,6 @@ struct GameView: View {
 
     private var presnapPanel: some View {
         VStack(spacing: 8) {
-            if let tip = session.tip {
-                TipCardView(concept: tip, isNew: true) { session.dismissTip() }
-            }
             if session.userOnOffense {
                 BroadcastPanel(accent: Theme.gold) {
                     VStack(alignment: .leading, spacing: 4) {
@@ -124,7 +128,33 @@ struct GameView: View {
 
     private var resultPanel: some View {
         VStack(spacing: 8) {
-            if let verdict = session.lastVerdict {
+            if session.isReplaying {
+                HStack(spacing: 8) {
+                    Circle().fill(Theme.bad).frame(width: 8, height: 8)
+                    Kicker("REPLAY · SLOW MOTION", color: .white, size: 12)
+                }
+                .padding(.horizontal, 12).padding(.vertical, 8)
+                .background(Color.black.opacity(0.5), in: Capsule())
+            } else if session.canReplay {
+                Button {
+                    Haptics.tap()
+                    session.replayLastPlay()
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "arrow.counterclockwise").font(.system(size: 12, weight: .black))
+                        Text("WATCH THAT AGAIN").font(.condensed(13)).tracking(1.5)
+                    }
+                    .foregroundStyle(Theme.ink)
+                    .padding(.horizontal, 14).padding(.vertical, 9)
+                    .background(Theme.paper, in: Capsule())
+                    .shadow(color: .black.opacity(0.3), radius: 8, y: 4)
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("replay")
+            }
+            if session.isReplaying {
+                EmptyView()
+            } else if let verdict = session.lastVerdict {
                 PaperPanel(accent: headlineColor(verdict)) {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(verdict.headline)
@@ -140,14 +170,17 @@ struct GameView: View {
                     .padding(.vertical, 12)
                 }
             }
-            if let tip = session.tip {
+            if !session.isReplaying, let tip = session.tip {
                 TipCardView(concept: tip, isNew: true) { session.dismissTip() }
             }
-            Kicker(session.tip == nil ? "TAP TO CONTINUE" : "TAP ✕ OR ANYWHERE TO CONTINUE", color: .white.opacity(0.75), size: 11)
-                .padding(.top, 2)
+            if !session.isReplaying {
+                Kicker(session.tip == nil ? "TAP TO CONTINUE" : "TAP ✕ OR ANYWHERE TO CONTINUE", color: .white.opacity(0.75), size: 11)
+                    .padding(.top, 2)
+            }
         }
         .contentShape(Rectangle())
         .onTapGesture {
+            guard !session.isReplaying else { return }
             if session.tip != nil { session.dismissTip() }
             session.skipResult()
         }

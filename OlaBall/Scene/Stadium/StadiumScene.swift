@@ -90,7 +90,7 @@ final class StadiumScene {
 
     // MARK: Live frames
 
-    func apply(_ sim: PlaySim) {
+    func apply(_ sim: PlaySim, replay: Bool = false) {
         let dt: Float = 1.0 / 60.0
         if !ringsHidden {
             ringsHidden = true
@@ -140,10 +140,15 @@ final class StadiumScene {
         } else if sim.ballInAir, let receiver = sim.players.first(where: { $0.tag == sim.plan.ballHandlerTag && $0.side == .offense }) {
             subjects.append(receiver.pos)
         }
-        director.follow(ball: bp, ballHeight: sim.ballHeight, subjects: subjects, contactDistance: sim.isOver ? nil : contact, ballInAir: sim.ballInAir, dt: dt)
+        if replay {
+            director.replayFollow(ball: bp, ballHeight: sim.ballHeight, dt: dt)
+        } else {
+            director.follow(ball: bp, ballHeight: sim.ballHeight, subjects: subjects, contactDistance: sim.isOver ? nil : contact, ballInAir: sim.ballInAir, dt: dt)
+        }
 
         if sim.isOver {
             let touchdown = sim.events.contains(.touchdown)
+            if replay { return }
             if touchdown && !celebrated {
                 celebrated = true
                 celebrate(at: bp)
@@ -168,6 +173,10 @@ final class StadiumScene {
         emitter.addParticleSystem(Effects.confetti(colors: colors))
         scene.rootNode.addChildNode(emitter)
         emitter.runAction(.sequence([.wait(duration: 5), .removeFromParentNode()]))
+    }
+
+    func beginReplayCamera(at focus: FieldPoint) {
+        director.beginReplay(at: focus)
     }
 
     /// Pre-snap tick: keep the camera drifting so the frame feels alive.

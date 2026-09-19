@@ -35,6 +35,15 @@ final class GameSession {
     private(set) var outcome: Outcome?
     private(set) var pathPreviewLength: Float = 0
     private(set) var kickInProgress = false
+    private(set) var isReplaying = false
+    private var replaySim: PlaySim?
+    private var replayHold: Float = 0
+    private var lastPlayPlan: PlayPlan?
+    private var lastPlaySeed: UInt64 = 0
+    private var lastPlayLOS: Float = 0
+    private var lastPlayDefense: DefenseCall = .balanced
+    private var lastPresnapPlayers: [SimPlayer] = []
+    private var lastPlayOffenseIsUser = true
 
     // Stats
     private(set) var xpEarned = 0
@@ -64,6 +73,9 @@ final class GameSession {
         self.fieldScene = StadiumScene(userTeam: userTeam, opponentTeam: opponentTeam)
         SoundKit.shared.setScene(crowd: 0.2)
         SoundKit.shared.setMusic(false)
+        if !autoplay {
+            Announcer.shared.say("Welcome to \(userTeam.city). Tonight, your \(userTeam.name) host the \(opponentTeam.city) \(opponentTeam.name).")
+        }
         beginPossession()
     }
 
@@ -101,9 +113,47 @@ final class GameSession {
 
     // MARK: Frame loop
 
+    /// A play worth watching again: a big gain, a score, a turnover, or a sack.
+    var canReplay: Bool {
+        guard phase == .result, !isReplaying, lastPlayPlan != nil, let play = lastPlay, !play.call.isKick else { return false }
+        if let ending = play.ending { return ending == .touchdown || ending.isTurnover }
+        if case .sack = play.result { return true }
+        return play.yards >= 12
+    }
+
+    func replayLastPlay() {
+        guard canReplay, let plan = lastPlayPlan else { return }
+        var sim = PlaySim(los: lastPlayLOS, plan: plan, defenseCall: lastPlayDefense, seed: lastPlaySeed)
+        sim.snap()
+        replaySim = sim
+        replayHold = 0
+        isReplaying = true
+        fieldScene.layOut(players: lastPresnapPlayers, los: lastPlayLOS, firstDownAt: nil, offenseIsUser: lastPlayOffenseIsUser)
+        fieldScene.showPath(plan.path, color: UIColor(red: 0.96, green: 0.77, blue: 0.26, alpha: 0.9))
+        fieldScene.beginReplayCamera(at: FieldPoint(0, lastPlayLOS))
+        SoundKit.shared.play(.snap, volume: 0.5)
+    }
+
+    private func tickReplay(dt: Float) {
+        guard var sim = replaySim else { isReplaying = false; return }
+        if !sim.isOver {
+            sim.tick(dt * 0.45)
+            replaySim = sim
+            fieldScene.apply(sim, replay: true)
+        } else {
+            replayHold += dt
+            if replayHold > 1.4 {
+                isReplaying = false
+                replaySim = nil
+                holdTimer = 0
+            }
+        }
+    }
+
     /// Called every frame by the scene view.
     func advance(dt: Float) {
         SoundKit.shared.update(dt: dt)
+        if isReplaying { tickReplay(dt: dt); return }
         switch phase {
         case .presnap:
             fieldScene.idle(dt: dt)
@@ -185,6 +235,7 @@ final class GameSession {
     }
 
     func skipResult() {
+        guard !isReplaying else { return }
         switch phase {
         case .result: continueFromResult()
         case .driveOver: continueAfterDrive()
@@ -202,7 +253,14 @@ final class GameSession {
     private func startPlay(_ plan: PlayPlan) {
         tip = nil
         pathPreviewLength = 0
-        var live = PlaySim(los: Float(situation.ballOn), plan: plan, defenseCall: defenseCall, seed: rng.next())
+        let seed = rng.next()
+        lastPlayPlan = plan
+        lastPlaySeed = seed
+        lastPlayLOS = Float(situation.ballOn)
+        lastPlayDefense = defenseCall
+        lastPresnapPlayers = presnapPlayers
+        lastPlayOffenseIsUser = userOnOffense
+        var live = PlaySim(los: Float(situation.ballOn), plan: plan, defenseCall: defenseCall, seed: seed)
         live.snap()
         sim = live
         fieldScene.showPath(plan.path, color: userOnOffense ? UIColor(red: 0.96, green: 0.77, blue: 0.26, alpha: 0.9) : UIColor.white.withAlphaComponent(0.5))
@@ -213,6 +271,7 @@ final class GameSession {
     }
 
     private func performKick(_ kind: PlayCall, result: PlayResultKind) {
+        lastPlayPlan = nil
         kickInProgress = true
         phase = .live
         SoundKit.shared.play(.kick, volume: 0.9)
@@ -329,25 +388,32 @@ final class GameSession {
         if caught { kit.play(.catchBall, volume: 0.8) }
         if events.contains(.sack) { kit.play(.bigHit, volume: 1.0) }
         else if tackled { kit.play(play.yards < 0 || play.yards >= 12 ? .bigHit : .thud, volume: 0.9) }
+        let pa = Announcer.shared
+        let scorer = mine ? userTeam : opponentTeam
         switch play.ending {
         case .touchdown:
             kit.play(.touchdown, volume: mine ? 0.9 : 0.35)
             kit.play(mine ? .cheer : .groan, volume: 1.0)
             kit.excite(mine ? 0.6 : 0.25)
+            if !autoplay { pa.say(mine ? "Touchdown, \(scorer.city)!" : "Touchdown, \(scorer.name).") }
         case .fieldGoal:
             kit.play(mine ? .cheer : .groan, volume: 0.8)
             kit.excite(mine ? 0.4 : 0.15)
+            if !autoplay { pa.say("The kick is good. \(scorer.name), three points.") }
         case .missedFieldGoal:
             kit.play(mine ? .groan : .cheer, volume: 0.8)
+            if !autoplay { pa.say("No good.") }
         case .interception, .fumble, .turnoverOnDowns:
             kit.play(mine ? .groan : .cheer, volume: 1.0)
             kit.excite(mine ? 0.15 : 0.5)
+            if !autoplay, !mine, play.ending == .interception { pa.say("Intercepted by the \(userTeam.name)!") }
         case .punt:
             break
         case nil:
             if play.gainedFirstDown {
                 kit.play(.firstDown, volume: mine ? 0.8 : 0.3)
                 if mine { kit.excite(0.25) }
+                if mine && !autoplay { pa.say("First down, \(userTeam.name)!") }
             } else if play.result == .incomplete {
                 kit.play(.incomplete, volume: mine ? 0.6 : 0.3)
             }
@@ -469,6 +535,10 @@ final class GameSession {
         tip = nil
         SoundKit.shared.play(.whistle, volume: 0.6)
         if userScore > opponentScore { SoundKit.shared.play(.cheer, volume: 1.0); SoundKit.shared.play(.touchdown, volume: 0.7); SoundKit.shared.excite(0.6) }
+        if !autoplay {
+            let (a, b) = userScore >= opponentScore ? (userTeam, opponentTeam) : (opponentTeam, userTeam)
+            Announcer.shared.say("That's the ballgame. Final score: \(a.name) \(max(userScore, opponentScore)), \(b.name) \(min(userScore, opponentScore)).")
+        }
         let result: Outcome
         if userScore > opponentScore { result = .win; xpEarned += 150 }
         else if userScore < opponentScore { result = .loss; xpEarned += 40 }
