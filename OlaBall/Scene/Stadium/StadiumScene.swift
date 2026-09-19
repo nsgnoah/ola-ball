@@ -56,12 +56,18 @@ final class StadiumScene {
         burstAt = nil
         let offenseColor = UIColor(offenseIsUser ? userTeam.color : opponentTeam.color)
         let defenseColor = UIColor(offenseIsUser ? opponentTeam.color : userTeam.color)
-        var used: Set<Int> = []
+        var ordinals: [Side: [Role: Int]] = [.offense: [:], .defense: [:]]
         for p in players {
             let jersey = p.side == .offense ? offenseColor : defenseColor
-            let number = Self.jerseyNumber(for: p.role, used: &used, rng: &rng)
+            let team = (p.side == .offense) == offenseIsUser ? userTeam : opponentTeam
+            let ordinal = ordinals[p.side]![p.role, default: 0]
+            ordinals[p.side]![p.role] = ordinal + 1
+            let entry = Roster.entry(team: team, role: p.role, ordinal: ordinal)
             let skin = Art.skinTones[Int(Float.random(in: 0..<Float(Art.skinTones.count), using: &rng))]
-            let rig = PlayerRig(player: p, jersey: jersey, number: number, skin: skin, showRing: p.side == .offense && p.role.isEligibleBallHandler && offenseIsUser)
+            let showName = p.role != .offensiveLine && p.role != .defensiveLine
+            let rig = PlayerRig(player: p, jersey: jersey, number: entry.number, skin: skin,
+                                showRing: p.side == .offense && p.role.isEligibleBallHandler && offenseIsUser,
+                                tagText: showName ? "\(p.role.shortName) · \(entry.name.uppercased())" : p.role.shortName)
             rigs[p.id] = rig
             playersRoot.addChildNode(rig.node)
         }
@@ -72,24 +78,6 @@ final class StadiumScene {
         ballNode.eulerAngles = SCNVector3(0, 0, 0)
         updateMarkers(los: los, firstDownAt: firstDownAt)
         clearPath()
-    }
-
-    private static func jerseyNumber(for role: Role, used: inout Set<Int>, rng: inout SeededRNG) -> Int {
-        let range: ClosedRange<Int>
-        switch role {
-        case .quarterback: range = 1...19
-        case .runningBack, .cornerback, .safety: range = 20...49
-        case .wideReceiver: range = 10...19
-        case .tightEnd: range = 80...89
-        case .offensiveLine: range = 60...79
-        case .defensiveLine: range = 90...99
-        case .linebacker: range = 50...59
-        }
-        for _ in 0..<30 {
-            let n = Int.random(in: range, using: &rng)
-            if !used.contains(n) { used.insert(n); return n }
-        }
-        return Int.random(in: 1...99, using: &rng)
     }
 
     func updateMarkers(los: Float, firstDownAt: Float?) {
@@ -203,6 +191,12 @@ final class StadiumScene {
         for (id, rig) in rigs { rig.setRingEmphasis(on && id == playerID) }
     }
 
+    /// Make one player's ring the obvious one (the first snap points at the running back).
+    func emphasize(tag: String, among players: [SimPlayer]) {
+        guard let p = players.first(where: { $0.tag == tag && $0.side == .offense }) else { return }
+        rigs[p.id]?.setRingEmphasis(true)
+    }
+
     // MARK: Camera
 
     func aimCamera(at focus: FieldPoint, presnap: Bool, animated: Bool) {
@@ -257,13 +251,15 @@ final class StadiumScene {
         markersRoot.childNodes.forEach { $0.removeFromParentNode() }
         ballNode.isHidden = true
         let jersey = UIColor(userTeam.color)
-        var used: Set<Int> = []
         let roles: [Role] = [.quarterback, .runningBack, .wideReceiver, .wideReceiver, .tightEnd, .offensiveLine, .linebacker, .cornerback, .safety, .defensiveLine]
+        var ordinals: [Role: Int] = [:]
         for (i, role) in roles.enumerated() {
             let player = SimPlayer(id: 100 + i, role: role, tag: role.shortName, pos: FieldPoint(0, 50))
-            let number = Self.jerseyNumber(for: role, used: &used, rng: &rng)
+            let ordinal = ordinals[role, default: 0]
+            ordinals[role] = ordinal + 1
+            let entry = Roster.entry(team: userTeam, role: role, ordinal: ordinal)
             let skin = Art.skinTones[Int(Float.random(in: 0..<Float(Art.skinTones.count), using: &rng))]
-            let rig = PlayerRig(player: player, jersey: jersey, number: number, skin: skin, showRing: false)
+            let rig = PlayerRig(player: player, jersey: jersey, number: entry.number, skin: skin, showRing: false, tagText: role.shortName)
             rig.setTagVisible(false)
             playersRoot.addChildNode(rig.node)
             let angle = Float(i) / Float(roles.count) * 2 * .pi + Float.random(in: -0.2...0.2, using: &rng)

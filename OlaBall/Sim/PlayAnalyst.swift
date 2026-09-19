@@ -7,7 +7,14 @@ enum PlayAnalyst {
 
     struct Verdict { let headline: String; let why: String; let good: Bool; let bad: Bool }
 
-    static func verdict(for sim: PlaySim, result: PlayResultKind, gainedFirstDown: Bool, ending: DriveEnding?, perspective: Voice) -> Verdict {
+    /// Who's who on this play, by name, so the line reads like a broadcast and not a manual.
+    struct Cast {
+        var runner = "your runner"
+        var receiver = "your receiver"
+        var qb = "your quarterback"
+    }
+
+    static func verdict(for sim: PlaySim, result: PlayResultKind, gainedFirstDown: Bool, ending: DriveEnding?, perspective: Voice, cast: Cast = Cast()) -> Verdict {
         let you = perspective == .you
         let a = sim.analysis
         let kind = sim.plan.kind
@@ -26,9 +33,9 @@ enum PlayAnalyst {
         }
 
         func why() -> String {
-            let subject = you ? "You" : "They"
-            let receiver = you ? "your receiver" : "their receiver"
-            let qb = you ? "your quarterback" : "their quarterback"
+            let subject = you ? cast.runner : "They"
+            let receiver = you ? cast.receiver : "their receiver"
+            let qb = you ? cast.qb : "their quarterback"
             let route = you ? "your route" : "their route"
             switch result {
             case .sack:

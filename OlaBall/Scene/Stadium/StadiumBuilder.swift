@@ -196,8 +196,8 @@ enum StadiumBuilder {
         let key = SCNNode()
         key.light = SCNLight()
         key.light?.type = .directional
-        key.light?.intensity = 1400
-        key.light?.color = UIColor(red: 1.0, green: 0.96, blue: 0.88, alpha: 1)
+        key.light?.intensity = 1500
+        key.light?.color = UIColor(red: 1.0, green: 0.93, blue: 0.80, alpha: 1)
         key.light?.castsShadow = true
         key.light?.shadowMode = .deferred
         key.light?.shadowMapSize = CGSize(width: 2048, height: 2048)
@@ -239,15 +239,19 @@ enum StadiumBuilder {
         camera.bloomIntensity = 0.55
         camera.bloomThreshold = 0.72
         camera.bloomBlurRadius = 10
-        camera.vignettingPower = 0.9
-        camera.vignettingIntensity = 0.55
-        camera.saturation = 1.02
-        camera.contrast = 0.08
-        camera.screenSpaceAmbientOcclusionIntensity = 0.7
+        camera.vignettingPower = 1.1
+        camera.vignettingIntensity = 0.75
+        camera.saturation = 0.98
+        camera.contrast = 0.12
+        camera.grainIntensity = 0.13
+        camera.grainScale = 1.6
+        camera.grainIsColored = false
+        camera.colorFringeStrength = 0.1
+        camera.screenSpaceAmbientOcclusionIntensity = 0.8
         camera.screenSpaceAmbientOcclusionRadius = 1.5
         camera.wantsDepthOfField = false
-        camera.fStop = 5.6
-        camera.focalBlurSampleCount = 12
+        camera.fStop = 2.4
+        camera.focalBlurSampleCount = 20
         return camera
     }
 }

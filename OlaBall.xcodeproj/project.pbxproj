@@ -30,6 +30,7 @@
 		665A76C4346EC80D06ADF75F /* ArtKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEA126B01A4793E336951628 /* ArtKit.swift */; };
 		6B3B9870D9D2030737972384 /* GameSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23DCEB0D42474F0C63EE6453 /* GameSession.swift */; };
 		6F68C78D975C20107B782A85 /* HUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = C73634D2584CBC365EF159CD /* HUD.swift */; };
+		711F9500CD5FDB6591D4166C /* Roster.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C7ECDC5898D8D3400F75AD5 /* Roster.swift */; };
 		74293DC35DED01E64B324EDE /* Team.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A869CE7218F143B9181A5EB /* Team.swift */; };
 		74A41DB1CAF3EFDB1684FD50 /* HomeSceneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC65CBC0F782D7CA64252B15 /* HomeSceneView.swift */; };
 		7A515E069867340FF2C84930 /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 799C8611EB2178437DFF7F28 /* GameView.swift */; };
@@ -92,6 +93,7 @@
 		82589CD9AD421AC5606FF8ED /* Formations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Formations.swift; sourceTree = "<group>"; };
 		84A5E07BD8B56E7E7A3EDA4B /* TipDirector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TipDirector.swift; sourceTree = "<group>"; };
 		861E3FC7724CF424E1B71FD9 /* RulesEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulesEngine.swift; sourceTree = "<group>"; };
+		8C7ECDC5898D8D3400F75AD5 /* Roster.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Roster.swift; sourceTree = "<group>"; };
 		99DA89790D4CF872BC6A86D2 /* Play.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Play.swift; sourceTree = "<group>"; };
 		A8A2AE37D0ED796CF90B7C8D /* SoundKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundKit.swift; sourceTree = "<group>"; };
 		AA774E78CE553708DD4C4BBF /* EngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineTests.swift; sourceTree = "<group>"; };
@@ -254,6 +256,7 @@
 			children = (
 				99DA89790D4CF872BC6A86D2 /* Play.swift */,
 				28443CBBDDAF63572FC5E0AC /* PlayCall.swift */,
+				8C7ECDC5898D8D3400F75AD5 /* Roster.swift */,
 				13CB6A90355982D9B2114889 /* Situation.swift */,
 				4A869CE7218F143B9181A5EB /* Team.swift */,
 			);
@@ -442,6 +445,7 @@
 				864C74D06D8F225D61AA35A8 /* PlaybookView.swift in Sources */,
 				36B99145CBAA7D80FB695306 /* PlayerRig.swift in Sources */,
 				7B7C73743F1BE1C0E54AF821 /* ProgressStore.swift in Sources */,
+				711F9500CD5FDB6591D4166C /* Roster.swift in Sources */,
 				3E1CCD2E39D10E1069F40B55 /* RulesEngine.swift in Sources */,
 				49D5F4FAE6E2900A71584780 /* SeededRNG.swift in Sources */,
 				43C960441B331674B04B9AFB /* Situation.swift in Sources */,

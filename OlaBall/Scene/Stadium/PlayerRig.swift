@@ -36,7 +36,7 @@ final class PlayerRig {
         let g = make(); shared[key] = g; return g
     }
 
-    init(player: SimPlayer, jersey: UIColor, number: Int, skin: UIColor, showRing: Bool) {
+    init(player: SimPlayer, jersey: UIColor, number: Int, skin: UIColor, showRing: Bool, tagText: String) {
         id = player.id
         role = player.role
         self.number = number
@@ -213,8 +213,10 @@ final class PlayerRig {
         node.addChildNode(ring)
 
         // Floating role tag
-        let tagPlane = SCNPlane(width: 0.9, height: 0.36)
-        tagPlane.materials = [Art.sprite(Art.tagImage(role.shortName, tint: jersey), additive: false)]
+        let tagImage = Art.tagImage(tagText, tint: jersey)
+        let tagHeight: CGFloat = tagText.contains("·") ? 0.42 : 0.34
+        let tagPlane = SCNPlane(width: tagHeight * tagImage.size.width / tagImage.size.height, height: tagHeight)
+        tagPlane.materials = [Art.sprite(tagImage, additive: false)]
         tag.geometry = tagPlane
         tag.position = SCNVector3(0, 2.85, 0)
         tag.constraints = [SCNBillboardConstraint()]
@@ -343,7 +345,16 @@ final class PlayerRig {
 
     func setRingVisible(_ visible: Bool) { ring.isHidden = !visible }
     func setRingEmphasis(_ on: Bool) {
-        ring.scale = on ? SCNVector3(1.35, 1.35, 1.35) : SCNVector3(1, 1, 1)
+        ring.removeAllActions()
+        if on {
+            ring.scale = SCNVector3(1.35, 1.35, 1.35)
+            ring.runAction(.repeatForever(.sequence([.scale(to: 1.6, duration: 0.55), .scale(to: 1.3, duration: 0.55)])))
+        } else {
+            ring.scale = SCNVector3(1, 1, 1)
+            if !ring.isHidden {
+                ring.runAction(.repeatForever(.sequence([.scale(to: 1.12, duration: 0.8), .scale(to: 1.0, duration: 0.8)])))
+            }
+        }
     }
     func setTagVisible(_ visible: Bool) { tag.isHidden = !visible }
 }

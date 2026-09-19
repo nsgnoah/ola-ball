@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Home is the stadium: your team warming up under the lights, and a broadcast-style pre-game package over it.
+/// Home: the stadium as the hero up top, a paper sheet with tonight's ticket below.
 struct HomeView: View {
     @Environment(ProgressStore.self) private var store
     @State private var showGame = false
@@ -10,19 +10,28 @@ struct HomeView: View {
 
     var body: some View {
         NavigationStack {
-            ZStack {
+            ZStack(alignment: .top) {
                 Theme.background.ignoresSafeArea()
                 if let team = store.team {
                     HomeSceneView(userTeam: team, opponentTeam: opponent, paused: showGame)
                         .ignoresSafeArea()
                         .id(opponent.id)
                 }
-                scrims
+                LinearGradient(colors: [Theme.background.opacity(0.85), .clear], startPoint: .top, endPoint: .bottom)
+                    .frame(height: 260)
+                    .ignoresSafeArea()
+                    .allowsHitTesting(false)
                 if let team = store.team {
-                    content(team: team)
+                    VStack(spacing: 0) {
+                        hero(team: team)
+                        Spacer(minLength: 0)
+                        sheet(team: team)
+                    }
+                    .ignoresSafeArea(edges: .bottom)
                 }
             }
             .toolbar(.hidden, for: .navigationBar)
+            .preferredColorScheme(.dark)
             .onAppear { if !pickedOpponent { pickOpponent() }; SoundKit.shared.setScene(crowd: 0.14); SoundKit.shared.setMusic(true) }
             .fullScreenCover(isPresented: $showGame, onDismiss: { pickOpponent(); SoundKit.shared.setScene(crowd: 0.14); SoundKit.shared.setMusic(true) }) {
                 if let team = store.team {
@@ -34,7 +43,7 @@ struct HomeView: View {
                 Button("Reset everything", role: .destructive) { store.reset() }
                 Button("Cancel", role: .cancel) {}
             } message: {
-                Text("This erases your team, XP, record, and Playbook on this device. Nothing is stored anywhere else.")
+                Text("This erases your club, XP, record, and Playbook on this device. Nothing is stored anywhere else.")
             }
         }
     }
@@ -46,110 +55,114 @@ struct HomeView: View {
         pickedOpponent = true
     }
 
-    // MARK: Layers
+    // MARK: Hero
 
-    private var scrims: some View {
-        VStack(spacing: 0) {
-            LinearGradient(colors: [Theme.background.opacity(0.95), Theme.background.opacity(0.55), .clear], startPoint: .top, endPoint: .bottom)
-                .frame(height: 300)
-            Spacer()
-            LinearGradient(colors: [.clear, Theme.background.opacity(0.75), Theme.background.opacity(0.97)], startPoint: .top, endPoint: .bottom)
-                .frame(height: 440)
-        }
-        .ignoresSafeArea()
-        .allowsHitTesting(false)
-    }
-
-    private func content(team: Team) -> some View {
-        VStack(spacing: 0) {
-            header(team: team)
-            Spacer()
-            matchup(team: team)
-            kickoff
-                .padding(.top, 12)
-            seasonStrip
-                .padding(.top, 12)
-            footer
-                .padding(.top, 8)
-        }
-        .padding(.horizontal, 18)
-        .padding(.top, 6)
-        .padding(.bottom, 10)
-    }
-
-    // MARK: Pieces
-
-    private func header(team: Team) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
-            HStack(spacing: 10) {
-                kicker("OLA BALL", color: Theme.gold)
-                Rectangle().fill(Theme.textSecondary.opacity(0.5)).frame(width: 1, height: 10)
-                kicker("NIGHT GAME", color: Theme.textSecondary)
-                Rectangle().fill(Theme.textSecondary.opacity(0.5)).frame(width: 1, height: 10)
-                kicker("WEEK \(store.progress.games + 1)", color: Theme.textSecondary)
+    private func hero(team: Team) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            HStack(spacing: 8) {
+                Text("OLA BALL").font(.condensed(13)).tracking(3).foregroundStyle(Theme.gold)
+                Circle().fill(.white.opacity(0.4)).frame(width: 3, height: 3)
+                Text("NIGHT GAME").font(.condensed(13)).tracking(3).foregroundStyle(.white.opacity(0.7))
+                Circle().fill(.white.opacity(0.4)).frame(width: 3, height: 3)
+                Text("WEEK \(store.progress.games + 1)").font(.condensed(13)).tracking(3).foregroundStyle(.white.opacity(0.7))
             }
-            .padding(.bottom, 10)
+            .padding(.bottom, 6)
             Text(team.city.uppercased())
-                .font(.system(size: 20, weight: .heavy))
-                .tracking(3)
-                .foregroundStyle(.white.opacity(0.8))
+                .font(.condensed(22)).tracking(4)
+                .foregroundStyle(.white.opacity(0.85))
             Text(team.name.uppercased())
-                .font(.system(size: 56, weight: .black))
-                .tracking(-1.5)
-                .lineLimit(1)
-                .minimumScaleFactor(0.6)
+                .font(.headline(74))
+                .lineLimit(1).minimumScaleFactor(0.55)
                 .foregroundStyle(.white)
-                .shadow(color: .black.opacity(0.7), radius: 14, y: 6)
-                .padding(.top, -6)
-            HStack(spacing: 6) {
-                Image(systemName: "person.fill").font(.system(size: 11, weight: .bold))
-                Text("Head coach: you")
-                Text("·")
-                Text(store.rank.title)
+                .shadow(color: .black.opacity(0.6), radius: 16, y: 8)
+                .padding(.top, -10)
+            HStack(spacing: 8) {
+                OlaBadge(size: 18)
+                Text("Head coach: you. Ola's on the headset.").font(.body(14)).foregroundStyle(.white.opacity(0.8))
             }
-            .font(.body(14))
-            .foregroundStyle(Theme.textSecondary)
             .padding(.top, 2)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 20)
+        .padding(.top, 6)
     }
 
-    private func kicker(_ text: String, color: Color) -> some View {
-        Text(text).font(.system(size: 11, weight: .black)).tracking(2.5).foregroundStyle(color)
-    }
+    // MARK: Sheet
 
-    private func matchup(team: Team) -> some View {
-        HStack(spacing: 0) {
-            Rectangle().fill(team.color).frame(width: 6)
-            HStack(spacing: 12) {
-                crest(team, size: 46)
-                VStack(alignment: .leading, spacing: 2) {
-                    kicker("KICKOFF", color: Theme.gold)
-                    Text("vs \(opponent.fullName)")
-                        .font(.system(size: 19, weight: .heavy))
-                        .foregroundStyle(.white)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-                    Text("Home field · 4 quarters · you call every play")
-                        .font(.body(12))
-                        .foregroundStyle(Theme.textSecondary)
-                        .lineLimit(2)
-                        .fixedSize(horizontal: false, vertical: true)
+    private func sheet(team: Team) -> some View {
+        VStack(spacing: 14) {
+            // Ticket
+            VStack(spacing: 10) {
+                HStack {
+                    Kicker("TONIGHT", color: Theme.ink2)
+                    Spacer()
+                    Kicker("HOME · 4 QUARTERS", color: Theme.ink3)
                 }
-                Spacer(minLength: 6)
-                crest(opponent, size: 38)
+                HStack(spacing: 12) {
+                    Monogram(team: team, size: 48)
+                    VStack(spacing: 0) {
+                        Text(team.name.uppercased()).font(.headline(30)).foregroundStyle(Theme.ink).lineLimit(1).minimumScaleFactor(0.6)
+                        Text("VS").font(.condensed(12)).tracking(3).foregroundStyle(Theme.ink3).padding(.vertical, 1)
+                        Text(opponent.name.uppercased()).font(.headline(30)).foregroundStyle(Theme.ink).lineLimit(1).minimumScaleFactor(0.6)
+                    }
+                    .frame(maxWidth: .infinity)
+                    Monogram(team: opponent, size: 48)
+                }
+                Rectangle().fill(Theme.rule).frame(height: 1)
+                Text("Draw every play. Ola explains the rules the moment they matter.")
+                    .font(.body(13)).foregroundStyle(Theme.ink2)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 10)
-            Rectangle().fill(opponent.color).frame(width: 6)
-        }
-        .fixedSize(horizontal: false, vertical: true)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-    }
+            .paperCard(padding: 14)
 
-    private func crest(_ team: Team, size: CGFloat) -> some View {
-        Monogram(team: team, size: size)
+            kickoff
+
+            HStack(spacing: 0) {
+                stat(value: recordText, label: "RECORD")
+                divider
+                stat(value: "\(store.progress.streak)", label: "DAY STREAK")
+                divider
+                stat(value: "\(store.progress.touchdowns)", label: "TOUCHDOWNS")
+                divider
+                stat(value: store.rank.title.uppercased(), label: "\(store.progress.xp) XP", small: true)
+            }
+
+            HStack {
+                NavigationLink {
+                    PlaybookView()
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "book.closed.fill").foregroundStyle(Theme.ink)
+                        Text("PLAYBOOK").font(.condensed(14)).tracking(2).foregroundStyle(Theme.ink)
+                        Text("\(store.learnedCount)/\(store.totalConcepts)").font(.condensed(14)).foregroundStyle(Theme.ink3)
+                        Image(systemName: "chevron.right").font(.system(size: 11, weight: .bold)).foregroundStyle(Theme.ink3)
+                    }
+                    .padding(.horizontal, 14)
+                    .frame(height: 42)
+                    .background(Theme.paperCard, in: Capsule())
+                    .overlay(Capsule().stroke(Theme.rule, lineWidth: 1))
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Playbook, \(store.learnedCount) of \(store.totalConcepts) concepts learned")
+                Spacer()
+                Menu {
+                    Button("Reset progress", role: .destructive) { showResetConfirm = true }
+                } label: {
+                    Image(systemName: "ellipsis")
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundStyle(Theme.ink)
+                        .frame(width: 42, height: 42)
+                        .background(Theme.paperCard, in: Circle())
+                        .overlay(Circle().stroke(Theme.rule, lineWidth: 1))
+                }
+                .accessibilityLabel("More")
+            }
+        }
+        .padding(.horizontal, 18)
+        .padding(.top, 18)
+        .padding(.bottom, 40)
+        .background(Theme.paper, in: UnevenRoundedRectangle(topLeadingRadius: 28, bottomLeadingRadius: 0, bottomTrailingRadius: 0, topTrailingRadius: 28, style: .continuous))
+        .shadow(color: .black.opacity(0.35), radius: 24, y: -8)
     }
 
     private var kickoff: some View {
@@ -159,37 +172,13 @@ struct HomeView: View {
             showGame = true
         } label: {
             HStack(spacing: 12) {
-                Image(systemName: "play.fill").font(.system(size: 18, weight: .black))
-                Text("KICKOFF").font(.system(size: 22, weight: .black)).tracking(3)
+                Image(systemName: "play.fill").font(.system(size: 16, weight: .black))
+                Text("Kickoff")
             }
-            .foregroundStyle(Color(hex: "0B1220"))
-            .frame(maxWidth: .infinity)
-            .frame(height: 60)
-            .background(
-                LinearGradient(colors: [Color(hex: "FFD65C"), Theme.gold, Color(hex: "E8AE1E")], startPoint: .top, endPoint: .bottom),
-                in: RoundedRectangle(cornerRadius: 10, style: .continuous)
-            )
-            .shadow(color: Theme.gold.opacity(0.45), radius: 18, y: 6)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(InkButtonStyle())
         .accessibilityLabel("Play a Game")
         .accessibilityIdentifier("kickoff")
-    }
-
-    private var seasonStrip: some View {
-        HStack(spacing: 0) {
-            stat(value: recordText, label: "RECORD")
-            divider
-            stat(value: "\(store.progress.streak)", label: "DAY STREAK", accent: store.progress.streak > 0 ? "🔥" : nil)
-            divider
-            stat(value: "\(store.progress.touchdowns)", label: "TOUCHDOWNS")
-            divider
-            stat(value: "\(store.progress.xp)", label: "XP")
-        }
-        .padding(.vertical, 10)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-        .overlay(alignment: .top) { Rectangle().fill(Theme.gold).frame(height: 2).clipShape(RoundedRectangle(cornerRadius: 1)) }
-        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
 
     private var recordText: String {
@@ -198,49 +187,14 @@ struct HomeView: View {
     }
 
     private var divider: some View {
-        Rectangle().fill(.white.opacity(0.15)).frame(width: 1, height: 28)
+        Rectangle().fill(Theme.rule).frame(width: 1, height: 30)
     }
 
-    private func stat(value: String, label: String, accent: String? = nil) -> some View {
-        VStack(spacing: 2) {
-            HStack(spacing: 3) {
-                Text(value).font(.display(20)).foregroundStyle(.white)
-                if let accent { Text(accent).font(.system(size: 14)) }
-            }
-            Text(label).font(.system(size: 9, weight: .black)).tracking(1.5).foregroundStyle(Theme.textSecondary)
+    private func stat(value: String, label: String, small: Bool = false) -> some View {
+        VStack(spacing: 1) {
+            Text(value).font(small ? .condensed(15) : .score(24)).foregroundStyle(Theme.ink).lineLimit(1).minimumScaleFactor(0.6)
+            Text(label).font(.condensed(10)).tracking(1.4).foregroundStyle(Theme.ink3)
         }
         .frame(maxWidth: .infinity)
-    }
-
-    private var footer: some View {
-        HStack {
-            NavigationLink {
-                PlaybookView()
-            } label: {
-                HStack(spacing: 8) {
-                    Image(systemName: "book.closed.fill").foregroundStyle(Theme.gold)
-                    Text("PLAYBOOK").font(.system(size: 12, weight: .black)).tracking(2)
-                    Text("\(store.learnedCount)/\(store.totalConcepts)").font(.label(12)).foregroundStyle(Theme.textSecondary)
-                    Image(systemName: "chevron.right").font(.system(size: 11, weight: .bold)).foregroundStyle(Theme.textSecondary)
-                }
-                .foregroundStyle(.white)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 10)
-                .background(.ultraThinMaterial, in: Capsule())
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel("Playbook, \(store.learnedCount) of \(store.totalConcepts) concepts learned")
-            Spacer()
-            Menu {
-                Button("Reset progress", role: .destructive) { showResetConfirm = true }
-            } label: {
-                Image(systemName: "ellipsis")
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundStyle(.white)
-                    .frame(width: 40, height: 40)
-                    .background(.ultraThinMaterial, in: Circle())
-            }
-            .accessibilityLabel("More")
-        }
     }
 }

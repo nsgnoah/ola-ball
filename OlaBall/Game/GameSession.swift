@@ -93,9 +93,10 @@ final class GameSession {
     }
 
     var drawHint: String {
-        if pathPreviewLength > 0 { return "Release to snap the ball" }
-        if situation.down == 4 { return "Drag from a glowing player to go for it, or kick" }
-        return "Drag from a glowing player to draw the play"
+        if pathPreviewLength > 0 { return "Let go to snap it." }
+        if playsRun == 0 { return "Drag from the running back, the bigger ring, and draw where he should run." }
+        if situation.down == 4 { return "Fourth down. Draw a play to go for it, or kick." }
+        return "Your call. Drag from a ring and draw where they go."
     }
 
     // MARK: Frame loop
@@ -257,7 +258,7 @@ final class GameSession {
         let voice: PlayAnalyst.Voice = userOnOffense ? .you : .them
         let verdict: PlayAnalyst.Verdict
         if let sim {
-            verdict = PlayAnalyst.verdict(for: sim, result: result, gainedFirstDown: outcome.firstDown, ending: outcome.ending, perspective: voice)
+            verdict = PlayAnalyst.verdict(for: sim, result: result, gainedFirstDown: outcome.firstDown, ending: outcome.ending, perspective: voice, cast: cast(for: sim.plan))
         } else {
             verdict = kickVerdict(result: result, ending: outcome.ending)
         }
@@ -300,6 +301,24 @@ final class GameSession {
     }
 
     private var lastPlayResolved = false
+
+    /// Names for the play-by-play: the ball handler by last name, the quarterback by last name.
+    private func cast(for plan: PlayPlan) -> PlayAnalyst.Cast {
+        var c = PlayAnalyst.Cast()
+        let roster = Roster.roster(for: offenseTeam)
+        if let qb = roster["QB0"] { c.qb = qb.name }
+        if let key = Roster.key(forOffenseTag: plan.ballHandlerTag), let e = roster[key] {
+            c.runner = e.name
+            c.receiver = e.name
+        }
+        return c
+    }
+
+    /// Display name for an offensive tag on the current offense ("Okafor").
+    func playerName(tag: String) -> String? {
+        guard let key = Roster.key(forOffenseTag: tag) else { return nil }
+        return Roster.roster(for: offenseTeam)[key]?.name
+    }
 
     /// The crowd and the field react from the user's point of view.
     private func playSounds(for play: Play, events: [PlaySim.Event]) {
@@ -413,6 +432,7 @@ final class GameSession {
         presnapPlayers = PlaySim.presnapPlayers(los: Float(situation.ballOn), defenseCall: defenseCall)
         fieldScene.layOut(players: presnapPlayers, los: Float(situation.ballOn), firstDownAt: situation.isGoalToGo ? nil : Float(situation.firstDownMarker), offenseIsUser: userOnOffense)
         fieldScene.aimCamera(at: FieldPoint(0, Float(situation.ballOn)), presnap: true, animated: true)
+        if userOnOffense && playsRun == 0 { fieldScene.emphasize(tag: "RB", among: presnapPlayers) }
 
         // Opponent 4th-down decisions are automatic.
         if !userOnOffense && situation.down == 4 {

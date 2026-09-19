@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// First launch: pick a club. Pennant tiles in team colors over a night-sky gradient.
+/// First launch: pick a club. Paper page, team-color pennants.
 struct TeamPickView: View {
     @Environment(ProgressStore.self) private var store
     @State private var selected: Team?
@@ -9,28 +9,26 @@ struct TeamPickView: View {
 
     var body: some View {
         ZStack {
-            LinearGradient(colors: [Color(hex: "0A1230"), Theme.background, Color(hex: "060A16")], startPoint: .top, endPoint: .bottom)
-                .ignoresSafeArea()
+            Theme.paper.ignoresSafeArea()
             VStack(spacing: 0) {
                 VStack(alignment: .leading, spacing: 4) {
-                    HStack(spacing: 10) {
-                        Kicker("OLA BALL")
-                        Rectangle().fill(Theme.textSecondary.opacity(0.5)).frame(width: 1, height: 10)
-                        Kicker("SEASON ONE", color: Theme.textSecondary)
+                    HStack(spacing: 8) {
+                        Text("OLA BALL").font(.condensed(13)).tracking(3).foregroundStyle(Theme.ink)
+                        Circle().fill(Theme.ink3).frame(width: 3, height: 3)
+                        Text("SEASON ONE").font(.condensed(13)).tracking(3).foregroundStyle(Theme.ink3)
                     }
                     Text("PICK YOUR")
-                        .font(.system(size: 20, weight: .heavy)).tracking(3).foregroundStyle(.white.opacity(0.8))
-                        .padding(.top, 8)
+                        .font(.condensed(22)).tracking(4).foregroundStyle(Theme.ink2)
+                        .padding(.top, 10)
                     Text("CLUB")
-                        .font(.system(size: 56, weight: .black)).tracking(-1.5).foregroundStyle(.white)
-                        .padding(.top, -6)
-                    Text("You're the head coach. You'll call every play, and the rules get explained as you go.")
-                        .font(.body(15)).foregroundStyle(Theme.textSecondary)
+                        .font(.headline(84)).foregroundStyle(Theme.ink)
+                        .padding(.top, -14)
+                    Text("You're the head coach. You'll draw every play, and Ola on the headset explains the rules the moment they matter.")
+                        .font(.body(15)).foregroundStyle(Theme.ink2)
                         .fixedSize(horizontal: false, vertical: true)
-                        .padding(.top, 2)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 18)
+                .padding(.horizontal, 20)
                 .padding(.top, 8)
 
                 ScrollView(showsIndicators: false) {
@@ -46,7 +44,7 @@ struct TeamPickView: View {
                             .accessibilityLabel("\(team.city) \(team.name)")
                         }
                     }
-                    .padding(.horizontal, 18)
+                    .padding(.horizontal, 20)
                     .padding(.top, 18)
                     .padding(.bottom, 12)
                 }
@@ -60,25 +58,25 @@ struct TeamPickView: View {
                 } label: {
                     HStack(spacing: 10) {
                         Text(selected.map { "Coach the \($0.name)" } ?? "Pick a club")
-                        Image(systemName: "arrow.right").font(.system(size: 14, weight: .black))
+                        Image(systemName: "arrow.right").font(.system(size: 15, weight: .black))
                     }
                 }
-                .buttonStyle(BroadcastButtonStyle())
+                .buttonStyle(InkButtonStyle())
                 .disabled(selected == nil)
-                .opacity(selected == nil ? 0.45 : 1)
+                .opacity(selected == nil ? 0.35 : 1)
                 .accessibilityLabel("Let's go")
                 .accessibilityIdentifier("lets-go")
-                .padding(.horizontal, 18)
+                .padding(.horizontal, 20)
                 .padding(.bottom, 12)
             }
         }
+        .preferredColorScheme(.light)
     }
 
     private func pennant(_ team: Team, isSelected: Bool) -> some View {
         ZStack(alignment: .topLeading) {
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .fill(LinearGradient(colors: [Art.swiftUI(team.color, brightness: 0.05), Art.swiftUI(team.color, brightness: -0.18)], startPoint: .topLeading, endPoint: .bottomTrailing))
-            // Diagonal stripe
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(LinearGradient(colors: [Art.swiftUI(team.color, brightness: 0.06), Art.swiftUI(team.color, brightness: -0.16)], startPoint: .topLeading, endPoint: .bottomTrailing))
             GeometryReader { geo in
                 Path { p in
                     p.move(to: CGPoint(x: geo.size.width * 0.55, y: 0))
@@ -90,18 +88,18 @@ struct TeamPickView: View {
                 .fill(.white.opacity(0.07))
             }
             VStack(alignment: .leading, spacing: 0) {
-                Monogram(team: team, size: 46)
+                Monogram(team: team, size: 44)
                 Spacer(minLength: 8)
-                Text(team.city.uppercased()).font(.system(size: 10, weight: .black)).tracking(1.8).foregroundStyle(.white.opacity(0.85))
-                Text(team.name.uppercased()).font(.system(size: 20, weight: .black)).tracking(-0.5).foregroundStyle(.white)
+                Text(team.city.uppercased()).font(.condensed(11)).tracking(2).foregroundStyle(.white.opacity(0.85))
+                Text(team.name.uppercased()).font(.headline(30)).foregroundStyle(.white)
                     .lineLimit(1).minimumScaleFactor(0.7)
             }
             .padding(14)
         }
-        .frame(height: 140)
-        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).stroke(isSelected ? Theme.gold : .white.opacity(0.12), lineWidth: isSelected ? 3 : 1))
-        .shadow(color: isSelected ? Theme.gold.opacity(0.35) : .clear, radius: 14)
+        .frame(height: 148)
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(isSelected ? Theme.ink : .clear, lineWidth: 3))
+        .shadow(color: .black.opacity(isSelected ? 0.25 : 0.10), radius: isSelected ? 16 : 8, y: 6)
         .scaleEffect(isSelected ? 1.03 : 1)
     }
 }

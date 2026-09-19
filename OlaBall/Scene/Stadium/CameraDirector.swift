@@ -28,6 +28,7 @@ final class CameraDirector {
         desiredPosition = SCNVector3(0, 27, los - 32)
         desiredLook = SCNVector3(0, 0.5, los + 7)
         node.camera?.wantsDepthOfField = true
+        node.camera?.motionBlurIntensity = 0
         node.camera?.focusDistance = CGFloat(hypot(desiredPosition.y, desiredLook.z - desiredPosition.z))
         if animated {
             SCNTransaction.begin()
@@ -52,6 +53,7 @@ final class CameraDirector {
     func follow(ball: FieldPoint, ballHeight: Float, subjects: [FieldPoint], contactDistance: Float?, ballInAir: Bool, dt: Float) {
         presnap = false
         node.camera?.wantsDepthOfField = false
+        node.camera?.motionBlurIntensity = 0.5
         clock += dt
         // Bullet time: slow down when contact is imminent or the ball is in flight.
         if let d = contactDistance, d < 2.6 { slowUntil = clock + 0.35 }
@@ -93,6 +95,7 @@ final class CameraDirector {
     /// in the upper half: the camera looks at a point short of the ball, which lifts the ball above center.
     func holdOnResult(focus: FieldPoint, big: Bool) {
         timeScale = 1
+        node.camera?.motionBlurIntensity = 0
         SCNTransaction.begin()
         SCNTransaction.animationDuration = big ? 1.6 : 0.9
         SCNTransaction.animationTimingFunction = CAMediaTimingFunction(name: .easeOut)

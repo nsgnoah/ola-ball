@@ -6,32 +6,32 @@ struct TipCardView: View {
     let onDismiss: () -> Void
 
     var body: some View {
-        BroadcastPanel(accent: Theme.gold) {
+        PaperPanel(accent: Theme.gold) {
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 8) {
-                    Image(systemName: concept.symbol).font(.system(size: 12, weight: .bold)).foregroundStyle(Theme.gold)
-                    Kicker(isNew ? "COACH'S TIP · NEW" : "COACH'S TIP")
+                    OlaBadge(size: 24)
+                    Kicker(isNew ? "COACH OLA · NEW" : "COACH OLA", color: Theme.ink2)
                     Spacer()
                     Button {
                         onDismiss()
                     } label: {
-                        Image(systemName: "xmark").font(.system(size: 12, weight: .black)).foregroundStyle(Theme.textSecondary)
+                        Image(systemName: "xmark").font(.system(size: 12, weight: .black)).foregroundStyle(Theme.ink3)
                             .frame(width: 28, height: 28)
                     }
                     .accessibilityIdentifier("dismiss-tip")
                 }
-                Text(concept.title).font(.system(size: 19, weight: .heavy)).foregroundStyle(.white)
-                Text(concept.body).font(.body(15)).foregroundStyle(.white.opacity(0.85)).fixedSize(horizontal: false, vertical: true)
+                Text(concept.title).font(.headline(24)).foregroundStyle(Theme.ink)
+                Text(concept.body).font(.body(15)).foregroundStyle(Theme.ink2).fixedSize(horizontal: false, vertical: true)
                 if isNew {
                     HStack(spacing: 6) {
                         Image(systemName: "book.closed.fill").font(.system(size: 11, weight: .bold))
-                        Kicker("ADDED TO YOUR PLAYBOOK", color: Theme.good, size: 10)
+                        Kicker("ADDED TO YOUR PLAYBOOK", color: Theme.goodInk, size: 11)
                     }
-                    .foregroundStyle(Theme.good)
+                    .foregroundStyle(Theme.goodInk)
                 }
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 10)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
         }
     }
 }
@@ -62,3 +62,4 @@ struct ConfettiView: View {
         .ignoresSafeArea()
     }
 }
+

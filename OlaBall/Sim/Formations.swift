@@ -89,10 +89,10 @@ enum DefenseCall: String, CaseIterable, Codable, Identifiable {
     /// What the offense sees written on the screen before the snap.
     var callout: String {
         switch self {
-        case .stackTheBox: return "Defense shows 8 in the box"
-        case .balanced: return "Defense in a balanced look, 7 in the box"
-        case .playThePass: return "Two safeties deep, only 6 in the box"
-        case .blitz: return "Linebackers creeping up. Blitz coming?"
+        case .stackTheBox: return "Eight in the box. They think you'll run."
+        case .balanced: return "Balanced look, seven in the box. No tell."
+        case .playThePass: return "Two safeties deep, six in the box. They think you'll throw."
+        case .blitz: return "Linebackers creeping up. Smells like a blitz."
         }
     }
 

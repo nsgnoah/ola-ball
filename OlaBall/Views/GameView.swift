@@ -38,6 +38,7 @@ struct GameView: View {
                 ConfettiView().allowsHitTesting(false).transition(.opacity)
             }
         }
+        .preferredColorScheme(.dark)
         .animation(.easeOut(duration: 0.2), value: session.phase)
         .onChange(of: session.lastPlay?.id) { _, _ in
             guard let play = session.lastPlay else { return }
@@ -88,6 +89,7 @@ struct GameView: View {
                         Text(session.drawHint)
                             .font(.body(15))
                             .foregroundStyle(.white)
+                            .fixedSize(horizontal: false, vertical: true)
                             .accessibilityIdentifier("draw-hint")
                     }
                     .padding(.horizontal, 12)
@@ -123,25 +125,25 @@ struct GameView: View {
     private var resultPanel: some View {
         VStack(spacing: 8) {
             if let verdict = session.lastVerdict {
-                BroadcastPanel(accent: headlineColor(verdict)) {
+                PaperPanel(accent: headlineColor(verdict)) {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(verdict.headline)
-                            .font(.system(size: session.lastPlay?.ending != nil ? 30 : 26, weight: .black))
+                            .font(.headline(session.lastPlay?.ending != nil ? 40 : 34))
                             .foregroundStyle(headlineColor(verdict))
                             .accessibilityIdentifier("result-headline")
                         Text(verdict.why)
                             .font(.body(15))
-                            .foregroundStyle(.white.opacity(0.9))
+                            .foregroundStyle(Theme.ink2)
                             .fixedSize(horizontal: false, vertical: true)
                     }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 10)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 12)
                 }
             }
             if let tip = session.tip {
                 TipCardView(concept: tip, isNew: true) { session.dismissTip() }
             }
-            Kicker(session.tip == nil ? "TAP TO CONTINUE" : "TAP ✕ OR ANYWHERE TO CONTINUE", color: .white.opacity(0.7), size: 10)
+            Kicker(session.tip == nil ? "TAP TO CONTINUE" : "TAP ✕ OR ANYWHERE TO CONTINUE", color: .white.opacity(0.75), size: 11)
                 .padding(.top, 2)
         }
         .contentShape(Rectangle())
@@ -154,9 +156,9 @@ struct GameView: View {
     private func headlineColor(_ v: PlayAnalyst.Verdict) -> Color {
         let goodForUser = session.userOnOffense ? v.good : v.bad
         let badForUser = session.userOnOffense ? v.bad : v.good
-        if goodForUser { return session.lastPlay?.ending?.isScore == true && session.userOnOffense ? Theme.gold : Theme.good }
-        if badForUser { return Theme.bad }
-        return .white
+        if goodForUser { return session.lastPlay?.ending?.isScore == true && session.userOnOffense ? Theme.gold : Theme.goodInk }
+        if badForUser { return Theme.badInk }
+        return Theme.ink
     }
 
     private func kickPanel(_ kind: PlayCall) -> some View {
@@ -173,18 +175,18 @@ struct GameView: View {
     private var driveOverPanel: some View {
         VStack(spacing: 6) {
             if let ending = session.driveEnding {
-                BroadcastPanel(accent: driveColor(ending)) {
+                PaperPanel(accent: driveColor(ending)) {
                     VStack(alignment: .leading, spacing: 4) {
-                        Kicker("DRIVE OVER", color: driveColor(ending))
-                        Text(driveTitle(ending)).font(.system(size: 24, weight: .black)).foregroundStyle(.white)
-                        Text(driveSubtitle(ending)).font(.body(14)).foregroundStyle(.white.opacity(0.85))
+                        Kicker("DRIVE OVER", color: Theme.ink3)
+                        Text(driveTitle(ending)).font(.headline(32)).foregroundStyle(driveColor(ending))
+                        Text(driveSubtitle(ending)).font(.body(14)).foregroundStyle(Theme.ink2)
                             .fixedSize(horizontal: false, vertical: true)
                     }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 10)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 12)
                 }
             }
-            Kicker("TAP TO CONTINUE", color: .white.opacity(0.7), size: 10)
+            Kicker("TAP TO CONTINUE", color: .white.opacity(0.75), size: 11)
         }
         .contentShape(Rectangle())
         .onTapGesture { session.skipResult() }
@@ -193,8 +195,8 @@ struct GameView: View {
     }
 
     private func driveColor(_ ending: DriveEnding) -> Color {
-        if session.userOnOffense { return ending.isScore ? Theme.gold : .white }
-        return ending.isScore ? Theme.bad : Theme.good
+        if session.userOnOffense { return ending.isScore ? Theme.gold : Theme.ink }
+        return ending.isScore ? Theme.badInk : Theme.goodInk
     }
 
     private func driveTitle(_ ending: DriveEnding) -> String {
@@ -239,14 +241,18 @@ struct GameView: View {
 
     private var gameOverOverlay: some View {
         ZStack {
-            Theme.background.opacity(0.92).ignoresSafeArea()
+            Theme.background.opacity(0.55).ignoresSafeArea()
             VStack(spacing: 0) {
-                Color.clear.frame(height: 60)
+                Color.clear.frame(height: 90)
                 GameOverView(session: session, onPlayAgain: playAgain, onHome: { dismiss() })
-                    .padding(.horizontal)
+                    .padding(.horizontal, 18)
+                    .padding(.top, 18)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Theme.paper, in: UnevenRoundedRectangle(topLeadingRadius: 28, bottomLeadingRadius: 0, bottomTrailingRadius: 0, topTrailingRadius: 28, style: .continuous))
+                    .ignoresSafeArea(edges: .bottom)
             }
         }
-        .transition(.opacity)
+        .transition(.move(edge: .bottom).combined(with: .opacity))
     }
 
     private func celebrate() {
@@ -272,7 +278,7 @@ struct DefenseCallView: View {
         VStack(spacing: 8) {
             HStack(spacing: 8) {
                 Kicker("THEIR BALL", color: Theme.bad)
-                Text("Pick your defense").font(.system(size: 15, weight: .heavy)).foregroundStyle(.white)
+                Text("Pick your defense").font(.headline(20)).foregroundStyle(.white)
                 Spacer()
             }
             .padding(.horizontal, 4)
@@ -282,14 +288,14 @@ struct DefenseCallView: View {
                         Haptics.tap()
                         session.chooseDefense(call)
                     } label: {
-                        BroadcastPanel(accent: Theme.good) {
-                            VStack(alignment: .leading, spacing: 4) {
+                        PaperPanel(accent: Theme.goodInk) {
+                            VStack(alignment: .leading, spacing: 3) {
                                 HStack(spacing: 6) {
-                                    Image(systemName: call.symbol).font(.system(size: 12, weight: .bold)).foregroundStyle(Theme.good)
-                                    Text(call.title.uppercased()).font(.system(size: 12, weight: .black)).tracking(1).foregroundStyle(.white)
+                                    Image(systemName: call.symbol).font(.system(size: 12, weight: .bold)).foregroundStyle(Theme.goodInk)
+                                    Text(call.title.uppercased()).font(.headline(18)).foregroundStyle(Theme.ink)
                                         .lineLimit(1).minimumScaleFactor(0.8)
                                 }
-                                Text(call.subtitle).font(.body(12)).foregroundStyle(.white.opacity(0.8))
+                                Text(call.subtitle).font(.body(12)).foregroundStyle(Theme.ink2)
                                     .fixedSize(horizontal: false, vertical: true)
                             }
                             .padding(.horizontal, 10)

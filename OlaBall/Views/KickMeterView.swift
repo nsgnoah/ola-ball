@@ -22,22 +22,22 @@ struct KickMeterView: View {
 
     var body: some View {
         VStack(spacing: 14) {
-            Text(title).font(.display(22)).foregroundStyle(Theme.textPrimary)
-            Text(subtitle).font(.body(14)).foregroundStyle(Theme.textSecondary).multilineTextAlignment(.center)
+            Text(title).font(.headline(30)).foregroundStyle(Theme.ink)
+            Text(subtitle).font(.body(14)).foregroundStyle(Theme.ink2).multilineTextAlignment(.center)
             TimelineView(.animation(paused: kicked)) { timeline in
                 let t = kickedAt ?? timeline.date.timeIntervalSince(start)
                 let x = needlePosition(at: t)
                 GeometryReader { geo in
                     let w = geo.size.width
                     ZStack(alignment: .leading) {
-                        RoundedRectangle(cornerRadius: 10).fill(Theme.bad.opacity(0.35))
+                        RoundedRectangle(cornerRadius: 10).fill(Theme.badInk.opacity(0.25))
                         RoundedRectangle(cornerRadius: 10).fill(Theme.gold.opacity(0.5))
                             .frame(width: w * min(0.9, targetWidth * 2.2))
                             .position(x: w / 2, y: geo.size.height / 2)
-                        RoundedRectangle(cornerRadius: 10).fill(Theme.good)
+                        RoundedRectangle(cornerRadius: 10).fill(Theme.goodInk)
                             .frame(width: w * targetWidth)
                             .position(x: w / 2, y: geo.size.height / 2)
-                        RoundedRectangle(cornerRadius: 3).fill(.white)
+                        RoundedRectangle(cornerRadius: 3).fill(Theme.ink)
                             .frame(width: 6, height: geo.size.height + 10)
                             .position(x: w * x, y: geo.size.height / 2)
                             .shadow(radius: 3)
@@ -55,13 +55,12 @@ struct KickMeterView: View {
                 Haptics.heavy()
                 onKick(accuracy)
             }
-            .buttonStyle(BroadcastButtonStyle())
+            .buttonStyle(InkButtonStyle())
             .disabled(kicked)
         }
         .padding()
-        .background(Color.black.opacity(0.30))
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .background(Theme.paper, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .shadow(color: .black.opacity(0.35), radius: 14, y: 8)
         .onAppear { start = Date() }
     }
 }

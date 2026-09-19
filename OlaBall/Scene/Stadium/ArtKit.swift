@@ -426,13 +426,17 @@ enum Art {
         }
     }
 
-    /// Small floating tag: rounded dark pill with a role abbreviation.
+    /// Small floating tag: rounded dark pill with a position and a name.
     static func tagImage(_ text: String, tint: UIColor) -> UIImage {
         cached("tag-\(text)-\(tint.hashValue)") {
-            let size = CGSize(width: 160, height: 64)
+            let font = UIFont.systemFont(ofSize: 30, weight: .heavy)
+            let attrs: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: UIColor.white]
+            let str = NSAttributedString(string: text, attributes: attrs)
+            let w = max(88, str.size().width + 40)
+            let size = CGSize(width: w, height: 64)
             return UIGraphicsImageRenderer(size: size).image { ctx in
                 let c = ctx.cgContext
-                let rect = CGRect(x: 4, y: 4, width: 152, height: 56)
+                let rect = CGRect(x: 4, y: 4, width: w - 8, height: 56)
                 c.setFillColor(UIColor(white: 0.05, alpha: 0.82).cgColor)
                 c.addPath(UIBezierPath(roundedRect: rect, cornerRadius: 28).cgPath)
                 c.fillPath()
@@ -440,8 +444,6 @@ enum Art {
                 c.setLineWidth(4)
                 c.addPath(UIBezierPath(roundedRect: rect, cornerRadius: 28).cgPath)
                 c.strokePath()
-                let attrs: [NSAttributedString.Key: Any] = [.font: UIFont.systemFont(ofSize: 34, weight: .heavy), .foregroundColor: UIColor.white]
-                let str = NSAttributedString(string: text, attributes: attrs)
                 str.draw(at: CGPoint(x: (size.width - str.size().width) / 2, y: (size.height - str.size().height) / 2))
             }
         }
