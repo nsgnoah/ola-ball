@@ -17,10 +17,7 @@ struct DeckPickView: View {
                     MatchHeader(controller: controller)
                     VStack(spacing: 4) {
                         Kicker("ROUND \(round) · \(MatchEngine.roundLabel(round))")
-                        Text("WHAT DOES \(who.uppercased()) GET?")
-                            .font(.headline(38)).foregroundStyle(.white)
-                            .multilineTextAlignment(.center).lineLimit(2).minimumScaleFactor(0.6)
-                            .shadow(color: .black.opacity(0.25), radius: 0, y: 2)
+                        StickerText("WHAT DOES \(who.uppercased()) GET?", size: TypeScale.title)
                     }
                     .padding(.top, 6)
                     WheelView(decks: decks, onPick: { controller.pick($0) }, enabled: !controller.isSubmitting)

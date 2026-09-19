@@ -1,6 +1,6 @@
 # Ola — Status / Handoff
 
-_Updated: 2026-09-19 17:00 CDT_
+_Updated: 2026-09-19 17:40 CDT_
 
 ## What this is now
 A couples trivia game: His World vs Her World. Each player declares the world they know; the challenger picks the deck their partner is quizzed on each round; five rounds, escalating difficulty, first to three crowns. Async over Game Center turn-based matches, or pass-and-play on one phone. Pivoted from the 3D football game on 2026-09-19 (that build is tagged `v1-football-draw-the-play`).
@@ -24,6 +24,12 @@ A couples trivia game: His World vs Her World. Each player declares the world th
 ## Not yet verified
 - Game Center on a real device (needs a sandbox Apple ID on the simulator or a device with Game Center signed in). All Game Center code paths are unexercised by tests.
 - Audio levels (no audio in the simulator here).
+
+## Android (planned, not started)
+Noah wants a Google Play version later. Keep that in mind now:
+- Keep game rules, scoring, question draw, and match-state JSON in plain Swift with no UIKit/SwiftUI imports (`Models/`, `Engine/MatchEngine.swift`) so they can be ported line for line to Kotlin, and keep `MatchState`'s JSON shape stable and documented; it is the cross-platform contract if the two apps ever share a backend.
+- Question content lives in Swift source today. Before the Android build, export it to a JSON file both apps load, with a unit test that the Swift and JSON copies match.
+- Game Center is iOS-only. Cross-platform async play needs a small backend (or Google Play Games on Android with no cross-play). Decide before building.
 
 ## Next
 1. Play a Game Center match between two devices; fix whatever the first real turn reveals.

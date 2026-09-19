@@ -105,9 +105,7 @@ struct JoinTeamView: View {
                     Spacer()
                 }
                 Kicker("COUPLE VS COUPLE")
-                Text("YOU'VE BEEN\nCHALLENGED").font(.headline(48)).foregroundStyle(.white)
-                    .multilineTextAlignment(.center).lineLimit(2).minimumScaleFactor(0.6)
-                    .shadow(color: .black.opacity(0.3), radius: 0, y: 3)
+                StickerText("YOU'VE BEEN\nCHALLENGED", size: TypeScale.title)
                 if let challenger {
                     HStack(spacing: 10) {
                         SideAvatars(player: challenger, size: 40)
@@ -155,7 +153,7 @@ struct MyTeamSheet: View {
             GameBackground(top: Theme.violet, bottom: Theme.violetDeep)
             VStack(alignment: .leading, spacing: 14) {
                 Kicker("COUPLE VS COUPLE")
-                Text("YOUR COUPLE").font(.headline(44)).foregroundStyle(.white).padding(.top, -8)
+                StickerText("YOUR COUPLE", size: TypeScale.title, alignment: .leading)
                 TeamSetupFields(title: "ON THIS PHONE", draft: $draft)
                 OlaSays(text: "Next you'll pick the other couple from Game Center. They set up their side on their phone.")
                 Spacer()

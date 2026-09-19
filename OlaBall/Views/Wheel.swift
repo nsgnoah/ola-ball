@@ -19,12 +19,12 @@ struct WheelView: View {
                 wheel
                     .rotationEffect(.degrees(rotation))
                 // Pointer
-                Triangle()
-                    .fill(.white)
-                    .frame(width: 34, height: 30)
-                    .rotationEffect(.degrees(180))
-                    .shadow(color: .black.opacity(0.35), radius: 3, y: 2)
-                    .offset(y: -8)
+                ZStack {
+                    Triangle().fill(Theme.panelEdge).frame(width: 34, height: 30).offset(y: 3)
+                    Triangle().fill(.white).frame(width: 34, height: 30)
+                }
+                .rotationEffect(.degrees(180))
+                .offset(y: -8)
                 // Hub
                 ZStack {
                     Circle().fill(Theme.ink.opacity(0.35)).frame(width: 74, height: 74).offset(y: 4)
@@ -41,7 +41,7 @@ struct WheelView: View {
                         Mascot(deck: landed, mood: .happy, size: 54)
                         VStack(alignment: .leading, spacing: 2) {
                             Kicker("THE WHEEL SAYS", color: Theme.ink2, size: 11)
-                            Text(landed.title.uppercased()).font(.headline(24)).foregroundStyle(Theme.ink).lineLimit(1).minimumScaleFactor(0.7)
+                            Text(landed.title.uppercased()).font(.headline(TypeScale.heading)).foregroundStyle(Theme.ink).lineLimit(1).minimumScaleFactor(0.7)
                         }
                         Spacer(minLength: 0)
                     }
@@ -98,7 +98,6 @@ struct WheelView: View {
                     Image(systemName: deck.symbol)
                         .font(.system(size: 26, weight: .black))
                         .foregroundStyle(.white)
-                        .shadow(color: .black.opacity(0.3), radius: 0, y: 1.5)
                         .frame(width: 64, height: 64)
                         .contentShape(Circle())
                 }

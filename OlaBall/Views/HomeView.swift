@@ -18,14 +18,14 @@ struct HomeView: View {
         ZStack {
             GameBackground(top: Theme.violet, bottom: Theme.violetDeep)
             ScrollView(showsIndicators: false) {
-                VStack(spacing: 16) {
+                VStack(spacing: 18) {
                     header
                     if let p = profiles.profile { youCard(p) }
                     gameCenterSection
                     passAndPlaySection
                     footer
                 }
-                .padding(.horizontal, 18)
+                .padding(.horizontal, 20)
                 .padding(.top, 8)
                 .padding(.bottom, 24)
             }
@@ -96,32 +96,15 @@ struct HomeView: View {
     // MARK: Sections
 
     private var header: some View {
-        VStack(spacing: 0) {
+        VStack(spacing: 12) {
             Kicker("OLA · TRIVIA FOR TWO")
-            HStack(alignment: .center, spacing: 10) {
-                worldBadge(.his, "HIS")
-                Text("VS").font(.headline(30)).foregroundStyle(Theme.gold)
-                    .rotationEffect(.degrees(-8))
-                worldBadge(.hers, "HER")
-            }
-            .padding(.top, 8)
-            Text("WORLD").font(.headline(46)).foregroundStyle(.white).padding(.top, -6)
-                .shadow(color: .black.opacity(0.3), radius: 0, y: 3)
+            Wordmark()
             Text("Pick what your partner gets quizzed on. They pick yours. First to three crowns.")
                 .font(.body(13)).foregroundStyle(.white.opacity(0.85))
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
-                .padding(.top, 2)
         }
-    }
-
-    private func worldBadge(_ w: World, _ label: String) -> some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 16, style: .continuous).fill(w.color.mix(with: .black, by: 0.3)).offset(y: 5)
-            RoundedRectangle(cornerRadius: 16, style: .continuous).fill(w.color)
-            Text(label).font(.headline(40)).foregroundStyle(.white)
-        }
-        .frame(width: 118, height: 66)
+        .frame(maxWidth: .infinity)
     }
 
     private func youCard(_ p: Profile) -> some View {
@@ -172,10 +155,13 @@ struct HomeView: View {
                 .buttonStyle(ChunkyButtonStyle(color: .white, edge: Theme.panelEdge, ink: Theme.ink, height: 52, fontSize: 22))
                 .accessibilityIdentifier("new-gc-teams")
             } else {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Sign in to Game Center to play from two phones.")
-                        .font(.bodyBold(15)).foregroundStyle(Theme.ink)
-                    Text(gc.authError ?? "Uses the Apple ID already on this phone. No new account, no password.")
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack(spacing: 10) {
+                        Image(systemName: "gamecontroller.fill").font(.system(size: 15, weight: .black)).foregroundStyle(.white)
+                            .frame(width: 32, height: 32).background(Theme.his, in: Circle())
+                        Text("Play from two phones").font(.headline(TypeScale.heading)).foregroundStyle(Theme.ink)
+                    }
+                    Text(gc.authError ?? "Sign in to Game Center with the Apple ID already on this phone. No new account, no password.")
                         .font(.bodyRegular(13)).foregroundStyle(Theme.ink2)
                         .fixedSize(horizontal: false, vertical: true)
                     Button(gc.authError == nil ? "Sign in" : "Open Settings") {
@@ -309,7 +295,7 @@ struct NewLocalMatchSheet: View {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 14) {
                     Kicker("PASS & PLAY")
-                    Text("WHO'S PLAYING?").font(.headline(44)).foregroundStyle(.white).padding(.top, -8)
+                    StickerText("WHO'S PLAYING?", size: TypeScale.title, alignment: .leading)
                     HStack(spacing: 8) {
                         ForEach([MatchMode.couple, .teams], id: \.self) { m in
                             Button { Haptics.tap(); mode = m } label: { Text(m.title) }

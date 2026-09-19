@@ -21,13 +21,13 @@ struct RoundRevealView: View {
                 Spacer()
                 Kicker("ROUND \(round) · \(MatchEngine.roundLabel(round))")
                 if winner != nil {
-                    Image(systemName: "crown.fill").font(.system(size: 64, weight: .black)).foregroundStyle(Theme.gold)
-                        .shadow(color: Theme.goldDeep, radius: 0, y: 4)
+                    ZStack {
+                        Image(systemName: "crown.fill").font(.system(size: 64, weight: .black)).foregroundStyle(Theme.goldDeep).offset(y: 4)
+                        Image(systemName: "crown.fill").font(.system(size: 64, weight: .black)).foregroundStyle(Theme.gold)
+                    }
                         .scaleEffect(crownPop ? 1 : 0.2).rotationEffect(.degrees(crownPop ? 0 : -30))
                 }
-                Text(headline(winner: winner, me: me)).font(.headline(56)).foregroundStyle(.white)
-                    .multilineTextAlignment(.center).lineLimit(2).minimumScaleFactor(0.5)
-                    .shadow(color: .black.opacity(0.3), radius: 0, y: 3)
+                StickerText(headline(winner: winner, me: me), size: TypeScale.title)
                     .padding(.top, -6)
                 HStack(spacing: 12) {
                     ForEach(s.players) { p in

@@ -62,8 +62,8 @@ struct ChunkyButtonStyle: ButtonStyle {
     var color: Color = Theme.gold
     var edge: Color? = nil
     var ink: Color = Theme.ink
-    var height: CGFloat = 60
-    var fontSize: CGFloat = 26
+    var height: CGFloat = 56
+    var fontSize: CGFloat = TypeScale.button
 
     func makeBody(configuration: Configuration) -> some View {
         let pressed = configuration.isPressed
@@ -77,12 +77,12 @@ struct ChunkyButtonStyle: ButtonStyle {
             .frame(height: height)
             .background(
                 ZStack {
-                    RoundedRectangle(cornerRadius: 18, style: .continuous).fill(edgeColor).offset(y: pressed ? 2 : 7)
-                    RoundedRectangle(cornerRadius: 18, style: .continuous).fill(color)
-                    RoundedRectangle(cornerRadius: 18, style: .continuous).fill(LinearGradient(colors: [.white.opacity(0.25), .clear], startPoint: .top, endPoint: .center))
+                    RoundedRectangle(cornerRadius: 16, style: .continuous).fill(edgeColor).offset(y: pressed ? 2 : 6)
+                    RoundedRectangle(cornerRadius: 16, style: .continuous).fill(color)
+                    RoundedRectangle(cornerRadius: 16, style: .continuous).fill(LinearGradient(colors: [.white.opacity(0.22), .clear], startPoint: .top, endPoint: .center))
                 }
             )
-            .offset(y: pressed ? 5 : 0)
+            .offset(y: pressed ? 4 : 0)
             .animation(.spring(duration: 0.15), value: pressed)
     }
 }

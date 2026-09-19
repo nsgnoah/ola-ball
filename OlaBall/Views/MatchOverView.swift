@@ -20,13 +20,12 @@ struct MatchOverView: View {
                 MatchHeader(controller: controller, onClose: onClose)
                 Spacer()
                 Kicker("FINAL")
-                Image(systemName: "trophy.fill").font(.system(size: 76, weight: .black)).foregroundStyle(Theme.gold)
-                    .shadow(color: Theme.goldDeep, radius: 0, y: 5)
+                ZStack {
+                    Image(systemName: "trophy.fill").font(.system(size: 76, weight: .black)).foregroundStyle(Theme.goldDeep).offset(y: 5)
+                    Image(systemName: "trophy.fill").font(.system(size: 76, weight: .black)).foregroundStyle(Theme.gold)
+                }
                     .scaleEffect(pop ? 1 : 0.2).rotationEffect(.degrees(pop ? 0 : 20))
-                Text(winner == nil ? "IT'S A TIE" : (iWon ? "YOU WIN" : "\(s.player(winner!)?.name.uppercased() ?? "THEY") WINS"))
-                    .font(.headline(70)).foregroundStyle(.white)
-                    .lineLimit(1).minimumScaleFactor(0.5)
-                    .shadow(color: .black.opacity(0.3), radius: 0, y: 3)
+                StickerText(winner == nil ? "IT'S A TIE" : (iWon ? "YOU WIN" : "\(s.player(winner!)?.name.uppercased() ?? "THEY") WINS"), size: TypeScale.display)
                     .padding(.top, -8)
                     .accessibilityIdentifier("match-over")
                 HStack(spacing: 12) {

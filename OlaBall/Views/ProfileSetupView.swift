@@ -14,10 +14,8 @@ struct ProfileSetupView: View {
                 VStack(spacing: 18) {
                     VStack(spacing: 2) {
                         Kicker("OLA · TRIVIA FOR TWO")
-                        Text("WHOSE WORLD").font(.headline(30)).foregroundStyle(.white.opacity(0.85))
-                        Text("DO YOU KNOW?").font(.headline(58)).foregroundStyle(.white)
-                            .shadow(color: .black.opacity(0.3), radius: 0, y: 3)
-                            .padding(.top, -12)
+                        Text("WHOSE WORLD").font(.headline(TypeScale.heading)).foregroundStyle(.white.opacity(0.85))
+                        StickerText("DO YOU KNOW?", size: TypeScale.display).padding(.top, -10)
                     }
                     .padding(.top, 10)
 
@@ -94,8 +92,8 @@ struct ProfileSetupView: View {
                 }
                 .padding(.top, 8)
                 Spacer(minLength: 6)
-                Text(w == .hers ? "HER" : "HIS").font(.headline(44)).foregroundStyle(.white).padding(.bottom, -10)
-                Text("WORLD").font(.headline(24)).foregroundStyle(.white.opacity(0.9))
+                StickerText(w == .hers ? "HER" : "HIS", size: 44, alignment: .leading).padding(.bottom, -8)
+                Text("WORLD").font(.headline(22)).foregroundStyle(.white.opacity(0.9))
                 Text(w == .hers ? "Beauty, fashion, rom-coms, reality TV, divas, weddings" : "Football, ball sports, cars, grilling, games, gear")
                     .font(.bodyRegular(11)).foregroundStyle(.white.opacity(0.85)).fixedSize(horizontal: false, vertical: true)
                     .padding(.top, 4)

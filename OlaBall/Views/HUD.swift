@@ -1,8 +1,41 @@
 import SwiftUI
 
+// MARK: - Type scale and sticker text
+
+/// The app's five text sizes. Nothing else.
+enum TypeScale {
+    static let display: CGFloat = 60   // one word on a screen
+    static let title: CGFloat = 40     // screen titles
+    static let heading: CGFloat = 26   // card headings, questions
+    static let button: CGFloat = 22
+    static let label: CGFloat = 13
+}
+
+/// Big condensed type with a single hard "print" offset underneath. The only text shadow in the app.
+struct StickerText: View {
+    let text: String
+    var size: CGFloat = TypeScale.title
+    var color: Color = .white
+    var alignment: TextAlignment = .center
+
+    init(_ text: String, size: CGFloat = TypeScale.title, color: Color = .white, alignment: TextAlignment = .center) {
+        self.text = text; self.size = size; self.color = color; self.alignment = alignment
+    }
+
+    var body: some View {
+        ZStack {
+            Text(text).font(.headline(size)).foregroundStyle(Theme.ink.opacity(0.3)).offset(y: max(2, size * 0.055))
+            Text(text).font(.headline(size)).foregroundStyle(color)
+        }
+        .multilineTextAlignment(alignment)
+        .lineLimit(2)
+        .minimumScaleFactor(0.5)
+    }
+}
+
 // MARK: - Backgrounds
 
-/// Saturated world-colored background with a diagonal stripe pattern and a soft vignette.
+/// Saturated world-colored background: vertical gradient, faint diagonal stripes, a soft glow at the top.
 struct GameBackground: View {
     var top: Color
     var bottom: Color
@@ -17,8 +50,8 @@ struct GameBackground: View {
     var body: some View {
         ZStack {
             LinearGradient(colors: [top, bottom], startPoint: .top, endPoint: .bottom)
-            Stripes().fill(.white.opacity(0.06))
-            RadialGradient(colors: [.white.opacity(0.18), .clear], center: .top, startRadius: 0, endRadius: 420)
+            Stripes().fill(.white.opacity(0.045))
+            RadialGradient(colors: [.white.opacity(0.16), .clear], center: UnitPoint(x: 0.5, y: -0.1), startRadius: 0, endRadius: 460)
         }
         .ignoresSafeArea()
     }
@@ -27,7 +60,7 @@ struct GameBackground: View {
 struct Stripes: Shape {
     func path(in rect: CGRect) -> Path {
         var p = Path()
-        let step: CGFloat = 46
+        let step: CGFloat = 54
         var x: CGFloat = -rect.height
         while x < rect.width + rect.height {
             p.move(to: CGPoint(x: x, y: rect.maxY))
@@ -43,17 +76,18 @@ struct Stripes: Shape {
 
 // MARK: - Small pieces
 
+/// Small caps label. Used for section titles and one-line context, nothing else.
 struct Kicker: View {
     let text: String
-    var color: Color = .white.opacity(0.8)
-    var size: CGFloat = 13
+    var color: Color = .white.opacity(0.85)
+    var size: CGFloat = TypeScale.label
 
-    init(_ text: String, color: Color = .white.opacity(0.8), size: CGFloat = 13) {
+    init(_ text: String, color: Color = .white.opacity(0.85), size: CGFloat = TypeScale.label) {
         self.text = text; self.color = color; self.size = size
     }
 
     var body: some View {
-        Text(text).font(.label(size)).tracking(1.2).textCase(.uppercase).foregroundStyle(color)
+        Text(text).font(.label(size)).tracking(1.1).textCase(.uppercase).foregroundStyle(color)
     }
 }
 
@@ -61,9 +95,9 @@ struct WorldTag: View {
     let world: World
     var body: some View {
         Text(world.title.uppercased())
-            .font(.label(11)).tracking(1)
+            .font(.label(11)).tracking(0.8)
             .foregroundStyle(.white)
-            .padding(.horizontal, 9).padding(.vertical, 5)
+            .padding(.horizontal, 10).padding(.vertical, 6)
             .background(world.color, in: Capsule())
     }
 }
@@ -98,13 +132,12 @@ struct Crowns: View {
                 Image(systemName: i < count ? "crown.fill" : "crown")
                     .font(.system(size: size, weight: .black))
                     .foregroundStyle(i < count ? Theme.gold : .white.opacity(0.45))
-                    .shadow(color: i < count ? Theme.goldDeep.opacity(0.6) : .clear, radius: 0, y: 1.5)
             }
         }
     }
 }
 
-/// Ola, the host: a gold disc with a headset.
+/// Ola, the host.
 struct OlaBadge: View {
     var size: CGFloat = 28
     var body: some View {
@@ -117,100 +150,103 @@ struct OlaBadge: View {
     }
 }
 
-/// Speech bubble from Ola.
+/// Speech bubble from Ola, with a tail.
 struct OlaSays: View {
     let text: String
     var body: some View {
         HStack(alignment: .top, spacing: 10) {
             OlaBadge(size: 30)
             Text(text).font(.body(15)).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
-                .padding(.horizontal, 12).padding(.vertical, 10)
-                .background(Theme.cream, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .padding(.horizontal, 14).padding(.vertical, 11)
+                .background(Theme.cream, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .overlay(alignment: .topLeading) {
+                    Triangle().fill(Theme.cream).frame(width: 12, height: 10).rotationEffect(.degrees(-90)).offset(x: -9, y: 10)
+                }
         }
     }
 }
 
 // MARK: - Mascots
 
-/// Every deck has a little character. Simple shapes, a face, and moods, in the deck's color.
+/// Every deck has a little character: a soft body in the deck's color, big eyes, feet, and the deck's icon
+/// pinned like a badge. Moods change the eyes and mouth. Idles with a slow breath, blinks, glances around.
 struct Mascot: View {
     enum Mood { case idle, happy, sad, think }
     let deck: Deck
     var mood: Mood = .idle
     var size: CGFloat = 120
 
-    @State private var bob = false
+    @State private var breathe = false
     @State private var blink = false
     @State private var glance: CGFloat = 0
 
     var body: some View {
         let body = deck.color
-        let dark = body.mix(with: .black, by: 0.28)
-        let light = body.mix(with: .white, by: 0.35)
+        let dark = body.mix(with: .black, by: 0.3)
+        let light = body.mix(with: .white, by: 0.28)
         ZStack {
-            // Shadow on the ground
-            Ellipse().fill(.black.opacity(0.18)).frame(width: size * 0.7, height: size * 0.14).offset(y: size * 0.52)
-            VStack(spacing: 0) {
-                ZStack {
-                    // Body blob
-                    RoundedRectangle(cornerRadius: size * 0.34, style: .continuous)
-                        .fill(LinearGradient(colors: [light, body, dark], startPoint: .topLeading, endPoint: .bottomTrailing))
-                        .frame(width: size * 0.82, height: size * 0.9)
-                    // Belly
-                    Ellipse().fill(.white.opacity(0.22)).frame(width: size * 0.5, height: size * 0.36).offset(y: size * 0.22)
-                    // Accessory badge on the belly
-                    Image(systemName: deck.symbol)
-                        .font(.system(size: size * 0.16, weight: .black))
-                        .foregroundStyle(dark)
-                        .offset(y: size * 0.24)
-                    // Eyes
-                    HStack(spacing: size * 0.14) {
-                        eye(dark: dark)
-                        eye(dark: dark)
-                    }
-                    .offset(y: -size * 0.14 + (mood == .happy ? -size * 0.02 : 0))
-                    // Brows for moods
-                    if mood == .sad || mood == .think {
-                        HStack(spacing: size * 0.16) {
-                            Capsule().fill(dark).frame(width: size * 0.16, height: size * 0.035).rotationEffect(.degrees(mood == .sad ? 18 : -10))
-                            Capsule().fill(dark).frame(width: size * 0.16, height: size * 0.035).rotationEffect(.degrees(mood == .sad ? -18 : 6))
-                        }
-                        .offset(y: -size * 0.3)
-                    }
-                    // Mouth
-                    mouth(dark: dark).offset(y: size * 0.02)
-                    // Blush when happy
-                    if mood == .happy {
-                        HStack(spacing: size * 0.34) {
-                            Circle().fill(Theme.hers.opacity(0.45)).frame(width: size * 0.12)
-                            Circle().fill(Theme.hers.opacity(0.45)).frame(width: size * 0.12)
-                        }
-                        .offset(y: -size * 0.02)
-                    }
-                }
-                .scaleEffect(y: mood == .happy ? 1.04 : 1)
-                .rotationEffect(.degrees(mood == .sad ? -4 : 0))
+            // Ground shadow
+            Ellipse().fill(.black.opacity(0.16)).frame(width: size * 0.62, height: size * 0.11).offset(y: size * 0.56)
+            // Feet
+            HStack(spacing: size * 0.14) {
+                Capsule().fill(dark).frame(width: size * 0.2, height: size * 0.1)
+                Capsule().fill(dark).frame(width: size * 0.2, height: size * 0.1)
             }
-            .offset(y: bob ? -size * 0.05 : size * 0.02)
+            .offset(y: size * 0.47)
+            // Body
+            ZStack {
+                RoundedRectangle(cornerRadius: size * 0.36, style: .continuous)
+                    .fill(LinearGradient(colors: [light, body, dark], startPoint: .top, endPoint: .bottom))
+                RoundedRectangle(cornerRadius: size * 0.36, style: .continuous)
+                    .strokeBorder(.white.opacity(0.35), lineWidth: max(1.5, size * 0.02))
+                    .mask(LinearGradient(colors: [.white, .clear], startPoint: .top, endPoint: .center))
+                face(dark: dark)
+                // Icon badge, pinned bottom-right
+                ZStack {
+                    Circle().fill(.white)
+                    Image(systemName: deck.symbol).font(.system(size: size * 0.12, weight: .black)).foregroundStyle(dark)
+                }
+                .frame(width: size * 0.26, height: size * 0.26)
+                .overlay(Circle().stroke(dark.opacity(0.2), lineWidth: 1))
+                .offset(x: size * 0.28, y: size * 0.28)
+            }
+            .frame(width: size * 0.82, height: size * 0.86)
+            .scaleEffect(x: breathe ? 1.02 : 1, y: breathe ? 0.98 : 1.0, anchor: .bottom)
+            .rotationEffect(.degrees(mood == .sad ? -3 : 0))
+            .offset(y: mood == .happy && breathe ? -size * 0.06 : 0)
         }
         .frame(width: size, height: size * 1.15)
         .onAppear {
-            withAnimation(.easeInOut(duration: mood == .happy ? 0.35 : 1.3).repeatForever(autoreverses: true)) { bob = true }
+            withAnimation(.easeInOut(duration: mood == .happy ? 0.3 : 1.6).repeatForever(autoreverses: true)) { breathe = true }
             scheduleBlink()
             scheduleGlance()
         }
     }
 
-    private func eye(dark: Color) -> some View {
-        ZStack {
-            Ellipse().fill(.white).frame(width: size * 0.2, height: size * 0.24)
-            Circle().fill(Theme.ink).frame(width: size * 0.1).offset(x: glance * size * 0.03, y: size * 0.02)
-            Circle().fill(.white).frame(width: size * 0.035).offset(x: -size * 0.02 + glance * size * 0.03, y: -size * 0.02)
+    private func face(dark: Color) -> some View {
+        VStack(spacing: size * 0.04) {
+            HStack(spacing: size * 0.1) {
+                eye()
+                eye()
+            }
+            mouth(dark: dark)
         }
-        .scaleEffect(y: blink ? 0.08 : (mood == .happy ? 0.55 : 1), anchor: .center)
-        .overlay {
-            if mood == .happy {
-                Capsule().fill(dark).frame(width: size * 0.2, height: size * 0.04).offset(y: -size * 0.04)
+        .offset(y: -size * 0.06)
+    }
+
+    private func eye() -> some View {
+        ZStack {
+            Circle().fill(.white).frame(width: size * 0.2, height: size * 0.2)
+            Circle().fill(Theme.ink).frame(width: size * 0.095)
+                .offset(x: glance * size * 0.03 + (mood == .think ? size * 0.03 : 0), y: mood == .think ? -size * 0.025 : size * 0.01)
+            Circle().fill(.white).frame(width: size * 0.035)
+                .offset(x: -size * 0.02 + glance * size * 0.03, y: -size * 0.025)
+        }
+        .scaleEffect(y: blink ? 0.1 : (mood == .happy ? 0.45 : 1))
+        .overlay(alignment: .top) {
+            if mood == .sad {
+                Capsule().fill(Theme.ink.opacity(0.85)).frame(width: size * 0.16, height: size * 0.03)
+                    .rotationEffect(.degrees(12)).offset(y: -size * 0.04)
             }
         }
     }
@@ -219,72 +255,61 @@ struct Mascot: View {
     private func mouth(dark: Color) -> some View {
         switch mood {
         case .happy:
-            Path { p in
-                p.addArc(center: .zero, radius: size * 0.13, startAngle: .degrees(10), endAngle: .degrees(170), clockwise: false)
-            }
-            .fill(dark)
-            .frame(width: size * 0.3, height: size * 0.15)
-            .offset(y: size * 0.04)
+            Path { p in p.addArc(center: CGPoint(x: size * 0.11, y: 0), radius: size * 0.11, startAngle: .degrees(10), endAngle: .degrees(170), clockwise: false) }
+                .fill(Theme.ink.opacity(0.85))
+                .frame(width: size * 0.22, height: size * 0.12)
         case .sad:
-            Path { p in
-                p.addArc(center: .zero, radius: size * 0.09, startAngle: .degrees(200), endAngle: .degrees(340), clockwise: false)
-            }
-            .stroke(dark, style: StrokeStyle(lineWidth: size * 0.035, lineCap: .round))
-            .frame(width: size * 0.2, height: size * 0.1)
-            .offset(y: size * 0.14)
+            Path { p in p.addArc(center: CGPoint(x: size * 0.08, y: size * 0.09), radius: size * 0.08, startAngle: .degrees(200), endAngle: .degrees(340), clockwise: false) }
+                .stroke(Theme.ink.opacity(0.85), style: StrokeStyle(lineWidth: max(2, size * 0.03), lineCap: .round))
+                .frame(width: size * 0.16, height: size * 0.1)
         case .think:
-            Capsule().fill(dark).frame(width: size * 0.1, height: size * 0.035).offset(x: size * 0.05, y: size * 0.08)
+            Capsule().fill(Theme.ink.opacity(0.85)).frame(width: size * 0.09, height: max(2, size * 0.03)).offset(x: size * 0.04)
         case .idle:
-            Path { p in
-                p.addArc(center: .zero, radius: size * 0.1, startAngle: .degrees(20), endAngle: .degrees(160), clockwise: false)
-            }
-            .stroke(dark, style: StrokeStyle(lineWidth: size * 0.035, lineCap: .round))
-            .frame(width: size * 0.2, height: size * 0.1)
-            .offset(y: size * 0.06)
+            Path { p in p.addArc(center: CGPoint(x: size * 0.08, y: 0), radius: size * 0.08, startAngle: .degrees(20), endAngle: .degrees(160), clockwise: false) }
+                .stroke(Theme.ink.opacity(0.85), style: StrokeStyle(lineWidth: max(2, size * 0.03), lineCap: .round))
+                .frame(width: size * 0.16, height: size * 0.08)
         }
     }
 
     private func scheduleBlink() {
         DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(Int.random(in: 2...5))) {
-            withAnimation(.easeInOut(duration: 0.08)) { blink = true }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
-                withAnimation(.easeInOut(duration: 0.08)) { blink = false }
+            withAnimation(.easeInOut(duration: 0.07)) { blink = true }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                withAnimation(.easeInOut(duration: 0.07)) { blink = false }
                 scheduleBlink()
             }
         }
     }
 
     private func scheduleGlance() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(Int.random(in: 1200...3500))) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(Int.random(in: 1500...3800))) {
             withAnimation(.spring(duration: 0.4)) { glance = CGFloat([-1, 0, 1, 0].randomElement()!) }
             scheduleGlance()
         }
     }
 }
 
-/// Deck tile: color block with the mascot peeking and the name.
+/// Deck tile: color block with the mascot and the name.
 struct DeckTile: View {
     let deck: Deck
     var compact = false
 
     var body: some View {
         ZStack(alignment: .bottomLeading) {
-            RoundedRectangle(cornerRadius: 20, style: .continuous).fill(deck.color.mix(with: .black, by: 0.3)).offset(y: 6)
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .fill(LinearGradient(colors: [deck.color.mix(with: .white, by: 0.12), deck.color], startPoint: .top, endPoint: .bottom))
-            Stripes().fill(.white.opacity(0.07)).clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+            RoundedRectangle(cornerRadius: 22, style: .continuous).fill(deck.color.mix(with: .black, by: 0.3)).offset(y: 5)
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                .fill(LinearGradient(colors: [deck.color.mix(with: .white, by: 0.1), deck.color], startPoint: .top, endPoint: .bottom))
             Mascot(deck: deck, size: compact ? 56 : 84)
                 .frame(maxWidth: .infinity, alignment: .topTrailing)
-                .padding(.trailing, 8).padding(.top, compact ? 4 : 10)
+                .padding(.trailing, 10).padding(.top, compact ? 4 : 8)
                 .frame(maxHeight: .infinity, alignment: .top)
             VStack(alignment: .leading, spacing: 2) {
-                Text(deck.title.uppercased()).font(.headline(compact ? 18 : 22)).foregroundStyle(.white).lineLimit(2).minimumScaleFactor(0.7)
-                    .shadow(color: .black.opacity(0.25), radius: 0, y: 1.5)
+                StickerText(deck.title.uppercased(), size: compact ? 18 : 22, alignment: .leading)
                 if !compact {
                     Text(deck.tagline).font(.bodyRegular(11)).foregroundStyle(.white.opacity(0.85)).lineLimit(2).fixedSize(horizontal: false, vertical: true)
                 }
             }
-            .padding(12)
+            .padding(14)
         }
         .frame(height: compact ? 100 : 156)
     }
@@ -295,7 +320,7 @@ struct DeckTile: View {
 struct TimerRing: View {
     let start: Date
     let duration: Double
-    var size: CGFloat = 64
+    var size: CGFloat = 56
     var color: Color = Theme.gold
 
     var body: some View {
@@ -304,13 +329,16 @@ struct TimerRing: View {
             let fraction = max(0, min(1, 1 - elapsed / duration))
             let left = max(0, Int(ceil(duration - elapsed)))
             ZStack {
-                Circle().stroke(.white.opacity(0.25), lineWidth: size * 0.12)
+                Circle().fill(.white)
+                Circle().stroke(Theme.panelEdge, lineWidth: size * 0.1).padding(size * 0.08)
                 Circle().trim(from: 0, to: fraction)
-                    .stroke(fraction < 0.25 ? Theme.bad : color, style: StrokeStyle(lineWidth: size * 0.12, lineCap: .round))
+                    .stroke(fraction < 0.25 ? Theme.bad : color, style: StrokeStyle(lineWidth: size * 0.1, lineCap: .round))
                     .rotationEffect(.degrees(-90))
-                Text("\(left)").font(.score(size * 0.42)).foregroundStyle(.white)
+                    .padding(size * 0.08)
+                Text("\(left)").font(.score(size * 0.4)).foregroundStyle(Theme.ink)
             }
             .frame(width: size, height: size)
+            .background(Circle().fill(Theme.panelEdge).offset(y: 3))
         }
     }
 }
@@ -355,6 +383,39 @@ struct Shake: GeometryEffect {
     var animatableData: CGFloat
     func effectValue(size: CGSize) -> ProjectionTransform {
         ProjectionTransform(CGAffineTransform(translationX: amount * sin(animatableData * .pi * shakes), y: 0))
+    }
+}
+
+/// The logo: two stacked world chips with a VS badge on the seam.
+struct Wordmark: View {
+    var scale: CGFloat = 1
+
+    var body: some View {
+        ZStack {
+            VStack(spacing: 8 * scale) {
+                chip("HIS WORLD", Theme.his)
+                chip("HER WORLD", Theme.hers)
+            }
+            ZStack {
+                Circle().fill(Theme.goldDeep).offset(y: 3 * scale)
+                Circle().fill(Theme.gold)
+                Circle().stroke(.white, lineWidth: 3 * scale)
+                Text("VS").font(.headline(20 * scale)).foregroundStyle(Theme.ink)
+            }
+            .frame(width: 48 * scale, height: 48 * scale)
+            .rotationEffect(.degrees(-8))
+        }
+    }
+
+    private func chip(_ text: String, _ color: Color) -> some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 18 * scale, style: .continuous).fill(color.mix(with: .black, by: 0.3)).offset(y: 6 * scale)
+            RoundedRectangle(cornerRadius: 18 * scale, style: .continuous).fill(color)
+            RoundedRectangle(cornerRadius: 18 * scale, style: .continuous)
+                .fill(LinearGradient(colors: [.white.opacity(0.22), .clear], startPoint: .top, endPoint: .center))
+            Text(text).font(.headline(40 * scale)).foregroundStyle(.white)
+        }
+        .frame(width: 270 * scale, height: 66 * scale)
     }
 }
 

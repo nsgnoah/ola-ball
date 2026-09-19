@@ -92,8 +92,7 @@ struct HandoffView: View {
                 .rotationEffect(.degrees(bounce ? 8 : -8))
                 .onAppear { withAnimation(.easeInOut(duration: 0.4).repeatForever(autoreverses: true)) { bounce = true } }
             Kicker("HAND THE PHONE TO")
-            Text(name.uppercased()).font(.headline(72)).foregroundStyle(.white).lineLimit(1).minimumScaleFactor(0.5)
-                .shadow(color: .black.opacity(0.3), radius: 0, y: 3)
+            StickerText(name.uppercased(), size: TypeScale.display)
             OlaSays(text: "No peeking. Their questions are next.")
             Spacer()
             Button(name.contains("&") ? "We're ready" : "I'm \(name), let's go") { Haptics.tap(); onContinue() }
@@ -118,12 +117,10 @@ struct RoundIntroView: View {
                 if let deck {
                     Mascot(deck: deck, mood: .think, size: 170)
                     if controller.state.mode == .teams, let m = controller.currentMember {
-                        Text("\(m.name.uppercased()), YOU'RE UP").font(.headline(26)).foregroundStyle(Theme.gold)
+                        StickerText("\(m.name.uppercased()), YOU'RE UP", size: TypeScale.heading, color: Theme.gold)
                     }
                     Kicker("ROUND \(round) OF \(MatchState.maxRounds) · \(MatchEngine.roundLabel(round))")
-                    Text(deck.title.uppercased()).font(.headline(50)).foregroundStyle(.white)
-                        .multilineTextAlignment(.center).lineLimit(2).minimumScaleFactor(0.6)
-                        .shadow(color: .black.opacity(0.3), radius: 0, y: 3)
+                    StickerText(deck.title.uppercased(), size: TypeScale.title)
                         .padding(.top, -6)
                     OlaSays(text: introLine(deck))
                 }
@@ -170,8 +167,7 @@ struct WaitingView: View {
             Spacer()
             if let deck = Decks.all.randomElement() { Mascot(deck: deck, mood: .think, size: 130) }
             Kicker("THEIR MOVE")
-            Text("\(controller.partner?.name.uppercased() ?? "YOUR PARTNER")'S TURN").font(.headline(44)).foregroundStyle(.white)
-                .multilineTextAlignment(.center).lineLimit(2).minimumScaleFactor(0.6)
+            StickerText("\(controller.partner?.name.uppercased() ?? "YOUR PARTNER")'S TURN", size: TypeScale.title)
             OlaSays(text: controller.transport.isPassAndPlay ? "Hand the phone over when they're ready." : "You'll get a notification when they've played. Go live your life.")
             if let err = controller.error {
                 Text(err).font(.body(13)).foregroundStyle(Theme.gold)
