@@ -15,7 +15,8 @@ struct QuestionView: View {
                 // Header row: deck, score
                 HStack(spacing: 10) {
                     if let deck {
-                        Text(deck.title.uppercased()).font(.label(13)).tracking(1).foregroundStyle(.white.opacity(0.9))
+                        Text(((controller.state.mode == .teams ? (controller.currentMember?.name.uppercased() ?? "") + " · " : "") + deck.title.uppercased()))
+                            .font(.label(13)).tracking(1).foregroundStyle(.white.opacity(0.9)).lineLimit(1).minimumScaleFactor(0.7)
                     }
                     Spacer()
                     HStack(alignment: .firstTextBaseline, spacing: 4) {

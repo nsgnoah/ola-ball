@@ -6,6 +6,9 @@ struct HomeView: View {
     @Environment(LocalMatchStore.self) private var localMatches
     @State private var gc = GameCenterService.shared
     @State private var showMatchmaker = false
+    @State private var showMyTeam = false
+    @State private var gcMode: MatchMode = .couple
+    @State private var myTeamDraft = TeamDraft()
     @State private var showNewLocal = false
     @State private var showResetConfirm = false
     @State private var openLocalID: String?
@@ -37,14 +40,23 @@ struct HomeView: View {
         }
         .fullScreenCover(item: $openGCMatch) { match in
             if let p = profiles.profile {
-                let state = gc.state(for: match) ?? MatchState(seed: UInt64.random(in: 0...UInt64.max), creator: MatchPlayer(id: gc.localPlayerID, name: p.name, world: p.world))
+                let state = gc.state(for: match) ?? newGCState(profile: p)
                 MatchView(controller: MatchController(state: state, transport: GameCenterTransport(match: match, profile: p)))
                     .environment(localMatches)
                     .environment(profiles)
             }
         }
         .sheet(isPresented: $showMatchmaker) {
-            MatchmakerView { showMatchmaker = false }.ignoresSafeArea()
+            MatchmakerView(mode: gcMode) { showMatchmaker = false }.ignoresSafeArea()
+        }
+        .sheet(isPresented: $showMyTeam) {
+            MyTeamSheet { draft in
+                myTeamDraft = draft
+                gcMode = .teams
+                showMyTeam = false
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { showMatchmaker = true }
+            }
+            .presentationDetents([.large])
         }
         .sheet(isPresented: $showNewLocal) {
             NewLocalMatchSheet { id in
@@ -71,6 +83,15 @@ struct HomeView: View {
     }
 
     private struct AuthSheet: Identifiable { let controller: UIViewController; var id: ObjectIdentifier { ObjectIdentifier(controller) } }
+
+    /// A brand-new Game Center match: this phone created it, so it seeds the state.
+    private func newGCState(profile p: Profile) -> MatchState {
+        let seed = UInt64.random(in: 0...UInt64.max)
+        if gcMode == .teams, myTeamDraft.isComplete {
+            return MatchState(seed: seed, creator: .team(id: gc.localPlayerID, members: myTeamDraft.members), mode: .teams)
+        }
+        return MatchState(seed: seed, creator: .solo(id: gc.localPlayerID, name: p.name, world: p.world))
+    }
 
     // MARK: Sections
 
@@ -129,6 +150,7 @@ struct HomeView: View {
                 }
                 Button {
                     Haptics.tap()
+                    gcMode = .couple
                     showMatchmaker = true
                 } label: {
                     HStack(spacing: 10) {
@@ -138,6 +160,17 @@ struct HomeView: View {
                 }
                 .buttonStyle(ChunkyButtonStyle(color: Theme.gold))
                 .accessibilityIdentifier("new-gc-match")
+                Button {
+                    Haptics.tap()
+                    showMyTeam = true
+                } label: {
+                    HStack(spacing: 10) {
+                        Image(systemName: "person.2.wave.2.fill").font(.system(size: 16, weight: .black))
+                        Text("Challenge another couple")
+                    }
+                }
+                .buttonStyle(ChunkyButtonStyle(color: .white, edge: Theme.panelEdge, ink: Theme.ink, height: 52, fontSize: 22))
+                .accessibilityIdentifier("new-gc-teams")
             } else {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Sign in to Game Center to play from two phones.")
@@ -196,15 +229,11 @@ struct HomeView: View {
         let a = state.players[0], b = state.players.count > 1 ? state.players[1] : nil
         let turnName = state.player(state.turnPlayerID ?? "")?.name ?? ""
         return HStack(spacing: 12) {
-            ZStack {
-                Avatar(name: a.name, world: a.world, size: 40).offset(x: -10)
-                if let b { Avatar(name: b.name, world: b.world, size: 40).offset(x: 12) }
-            }
-            .frame(width: 66)
+            SideAvatars(player: a, size: 36)
             VStack(alignment: .leading, spacing: 2) {
-                Text("\(a.name.uppercased()) VS \(b?.name.uppercased() ?? "?")").font(.headline(22)).foregroundStyle(Theme.ink).lineLimit(1).minimumScaleFactor(0.7)
-                Text(state.status == .finished ? "Final · \(state.winnerID.flatMap { state.player($0)?.name }.map { "\($0) won" } ?? "Tie")" : "Round \(max(1, state.rounds.count)) · \(turnName)'s move")
-                    .font(.body(13)).foregroundStyle(Theme.ink2)
+                Text("\(a.name.uppercased()) VS \(b?.name.uppercased() ?? "?")").font(.headline(20)).foregroundStyle(Theme.ink).lineLimit(1).minimumScaleFactor(0.6)
+                Text((state.mode == .teams ? "Couples · " : "") + (state.status == .finished ? "Final · \(state.winnerID.flatMap { state.player($0)?.name }.map { "\($0) won" } ?? "Tie")" : "Round \(max(1, state.rounds.count)) · \(turnName)'s move"))
+                    .font(.body(12)).foregroundStyle(Theme.ink2).lineLimit(1).minimumScaleFactor(0.8)
             }
             Spacer()
             VStack(alignment: .trailing, spacing: 3) {
@@ -220,12 +249,13 @@ struct HomeView: View {
         let mine = gc.isMyTurn(m)
         let me = gc.localPlayerID
         let opponent = gc.opponentName(m)
+        let them = state?.partner(of: me)
         return HStack(spacing: 12) {
-            Avatar(name: opponent, world: state?.partner(of: me)?.world ?? (profiles.profile?.world.other ?? .his), size: 40)
+            if let them { SideAvatars(player: them, size: 36) } else { Avatar(name: opponent, world: profiles.profile?.world.other ?? .his, size: 40) }
             VStack(alignment: .leading, spacing: 2) {
-                Text("VS \(opponent.uppercased())").font(.headline(22)).foregroundStyle(Theme.ink).lineLimit(1).minimumScaleFactor(0.7)
-                Text(m.status == .ended ? "Final" : (mine ? "Your move" : "Their move") + (state.map { " · Round \(max(1, $0.rounds.count))" } ?? ""))
-                    .font(.body(13)).foregroundStyle(mine ? Theme.hers : Theme.ink2)
+                Text("VS \((them?.name ?? opponent).uppercased())").font(.headline(20)).foregroundStyle(Theme.ink).lineLimit(1).minimumScaleFactor(0.6)
+                Text(((state?.mode == .teams) ? "Couples · " : "") + (m.status == .ended ? "Final" : (mine ? "Your move" : "Their move") + (state.map { " · Round \(max(1, $0.rounds.count))" } ?? "")))
+                    .font(.body(12)).foregroundStyle(mine ? Theme.hers : Theme.ink2)
             }
             Spacer()
             if let state {
@@ -255,52 +285,88 @@ struct HomeView: View {
     }
 }
 
-/// Set up a pass-and-play match: who's the other player and what world they know.
+/// Set up a pass-and-play match: you vs your partner, or your couple vs another couple, all on this phone.
 struct NewLocalMatchSheet: View {
     @Environment(ProfileStore.self) private var profiles
     @Environment(LocalMatchStore.self) private var localMatches
+    @State private var mode: MatchMode = .couple
     @State private var partnerName = ""
     @State private var partnerWorld: World?
+    @State private var ours = TeamDraft()
+    @State private var theirs = TeamDraft()
     let onCreate: (String) -> Void
+
+    private var canStart: Bool {
+        switch mode {
+        case .couple: return partnerWorld != nil && !partnerName.trimmingCharacters(in: .whitespaces).isEmpty
+        case .teams: return ours.isComplete && theirs.isComplete
+        }
+    }
 
     var body: some View {
         ZStack {
             GameBackground(top: Theme.violet, bottom: Theme.violetDeep)
-            VStack(alignment: .leading, spacing: 14) {
-                Kicker("PASS & PLAY")
-                Text("WHO'S PLAYING?").font(.headline(44)).foregroundStyle(.white).padding(.top, -8)
-                TextField("Partner's first name", text: $partnerName)
-                    .font(.bodyBold(20)).foregroundStyle(Theme.ink)
-                    .textInputAutocapitalization(.words).autocorrectionDisabled()
-                    .padding(.horizontal, 14).frame(height: 54)
-                    .background(Theme.cream, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-                    .accessibilityIdentifier("partner-name")
-                Kicker("THEY KNOW")
-                HStack(spacing: 10) {
-                    ForEach(World.allCases) { w in
-                        Button {
-                            Haptics.tap(); partnerWorld = w
-                        } label: {
-                            Text(w.title.uppercased())
+            ScrollView(showsIndicators: false) {
+                VStack(alignment: .leading, spacing: 14) {
+                    Kicker("PASS & PLAY")
+                    Text("WHO'S PLAYING?").font(.headline(44)).foregroundStyle(.white).padding(.top, -8)
+                    HStack(spacing: 8) {
+                        ForEach([MatchMode.couple, .teams], id: \.self) { m in
+                            Button { Haptics.tap(); mode = m } label: { Text(m.title) }
+                                .buttonStyle(ChunkyButtonStyle(color: mode == m ? Theme.gold : .white, edge: mode == m ? nil : Theme.panelEdge, ink: Theme.ink, height: 46, fontSize: 17))
+                                .accessibilityIdentifier("mode-\(m.rawValue)")
                         }
-                        .buttonStyle(ChunkyButtonStyle(color: partnerWorld == w ? w.color : .white, edge: partnerWorld == w ? nil : Theme.panelEdge, ink: partnerWorld == w ? .white : Theme.ink, height: 50, fontSize: 20))
-                        .accessibilityIdentifier("partner-world-\(w.rawValue)")
                     }
+                    if mode == .couple {
+                        TextField("Partner's first name", text: $partnerName)
+                            .font(.bodyBold(20)).foregroundStyle(Theme.ink)
+                            .textInputAutocapitalization(.words).autocorrectionDisabled()
+                            .padding(.horizontal, 14).frame(height: 54)
+                            .background(Theme.cream, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                            .accessibilityIdentifier("partner-name")
+                        Kicker("THEY KNOW")
+                        HStack(spacing: 10) {
+                            ForEach(World.allCases) { w in
+                                Button { Haptics.tap(); partnerWorld = w } label: { Text(w.title.uppercased()) }
+                                    .buttonStyle(ChunkyButtonStyle(color: partnerWorld == w ? w.color : .white, edge: partnerWorld == w ? nil : Theme.panelEdge, ink: partnerWorld == w ? .white : Theme.ink, height: 50, fontSize: 20))
+                                    .accessibilityIdentifier("partner-world-\(w.rawValue)")
+                            }
+                        }
+                        OlaSays(text: "You get quizzed on their world. They get quizzed on yours.")
+                    } else {
+                        TeamSetupFields(title: "YOUR COUPLE", draft: $ours)
+                        TeamSetupFields(title: "THE OTHER COUPLE", draft: $theirs, placeholder1: "Their first name", placeholder2: "Their partner's first name")
+                        OlaSays(text: "Each couple picks decks for the other couple. Scores add up. First to three crowns.")
+                    }
+                    Button("Start the match") {
+                        guard let me = profiles.profile, canStart else { return }
+                        Haptics.heavy()
+                        switch mode {
+                        case .couple:
+                            onCreate(localMatches.create(me: me, partnerName: partnerName.trimmingCharacters(in: .whitespaces), partnerWorld: partnerWorld ?? me.world.other))
+                        case .teams:
+                            var p = me
+                            p.teamPartnerName = ours.name2.trimmingCharacters(in: .whitespaces)
+                            p.teamMyLane = ours.lane1
+                            p.teamPartnerLane = ours.lane2
+                            profiles.profile = p
+                            onCreate(localMatches.createTeams(ours: ours.members, theirs: theirs.members))
+                        }
+                    }
+                    .buttonStyle(ChunkyButtonStyle(color: Theme.gold))
+                    .disabled(!canStart)
+                    .opacity(canStart ? 1 : 0.45)
+                    .accessibilityIdentifier("create-local-match")
+                    .padding(.top, 4)
                 }
-                Spacer()
-                Button("Start the match") {
-                    guard let me = profiles.profile, let partnerWorld, !partnerName.trimmingCharacters(in: .whitespaces).isEmpty else { return }
-                    Haptics.heavy()
-                    onCreate(localMatches.create(me: me, partnerName: partnerName.trimmingCharacters(in: .whitespaces), partnerWorld: partnerWorld))
-                }
-                .buttonStyle(ChunkyButtonStyle(color: Theme.gold))
-                .disabled(partnerWorld == nil || partnerName.trimmingCharacters(in: .whitespaces).isEmpty)
-                .opacity(partnerWorld == nil || partnerName.trimmingCharacters(in: .whitespaces).isEmpty ? 0.45 : 1)
-                .accessibilityIdentifier("create-local-match")
+                .padding(20)
             }
-            .padding(20)
+            .scrollDismissesKeyboard(.interactively)
         }
-        .onAppear { partnerWorld = profiles.profile?.world.other }
+        .onAppear {
+            partnerWorld = profiles.profile?.world.other
+            ours = .mine(from: profiles.profile)
+        }
         .preferredColorScheme(.dark)
     }
 }

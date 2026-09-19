@@ -45,4 +45,29 @@ final class PlayThroughUITests: XCTestCase {
         XCTAssertTrue(app.buttons["new-local-match"].waitForExistence(timeout: 5))
         snap(app, "10-home-after")
     }
+
+    func testPassAndPlayCouplesMatch() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-ui-testing-reset", "-ui-testing-seed"]
+        app.launch()
+        XCTAssertTrue(app.buttons["new-local-match"].waitForExistence(timeout: 8))
+        let row = app.buttons["local-match-seed-teams"]
+        XCTAssertTrue(row.waitForExistence(timeout: 5))
+        row.tap()
+        var shots: Set<String> = []
+        var steps = 0
+        while steps < 900 {
+            steps += 1
+            if app.staticTexts["match-over"].exists { snap(app, "t9-match-over"); break }
+            if app.buttons["handoff-continue"].exists { if shots.insert("handoff").inserted { snap(app, "t5-handoff") }; app.buttons["handoff-continue"].tap(); continue }
+            if app.buttons["start-round"].exists { if shots.insert("intro").inserted { snap(app, "t6-round-intro") }; app.buttons["start-round"].tap(); continue }
+            if app.buttons["next-question"].exists { app.buttons["next-question"].tap(); continue }
+            if app.buttons["option-0"].exists { if shots.insert("question").inserted { snap(app, "t7-question") }; app.buttons["option-\(steps % 4)"].tap(); continue }
+            if app.buttons["reveal-continue"].exists { if shots.insert("reveal").inserted { snap(app, "t8-round-reveal") }; app.buttons["reveal-continue"].tap(); continue }
+            let deckButtons = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'deck-'"))
+            if deckButtons.count > 0 { if shots.insert("pick").inserted { snap(app, "t4-pick") }; deckButtons.element(boundBy: steps % deckButtons.count).tap(); continue }
+            usleep(200_000)
+        }
+        XCTAssertTrue(app.staticTexts["match-over"].waitForExistence(timeout: 5), "couples match never finished after \(steps) steps")
+    }
 }

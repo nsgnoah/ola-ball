@@ -1,6 +1,6 @@
 # Ola
 
-Native SwiftUI iOS trivia game for couples (iOS 17+). Two "worlds": His World and Her World. Each player declares the world they know; each round the challenger picks the deck their partner gets quizzed on (from the challenger's own world). Five rounds, seven questions each, difficulty escalates from Rookie to Legend, first to three crowns wins. Async on two phones through Game Center turn-based matches, or pass-and-play on one phone.
+Native SwiftUI iOS trivia game for couples (iOS 17+). Two "worlds": His World and Her World. Two modes: **couple** (you vs your partner: each declares the world they know and is quizzed on the other's) and **teams** (your couple vs another couple: each member has a lane, the world they answer, and the other couple picks a deck per member; scores add up). Five rounds, seven questions each, difficulty escalates from Rookie to Legend, first to three crowns wins. Async on two phones through Game Center turn-based matches (one phone per side, a couple shares theirs), or pass-and-play on one phone.
 
 ## Non-negotiables
 - **Opinionated, not generic.** The his/her framing is the identity. Ola (the host) has a voice: dry, warm, never scolding.
@@ -9,9 +9,9 @@ Native SwiftUI iOS trivia game for couples (iOS 17+). Two "worlds": His World an
 - **Design system (game register, like Trivia Crack)**: saturated world-colored striped backgrounds (`GameBackground`), white chunky panels with a bottom edge (`.panel()`), 3D `ChunkyButtonStyle` buttons, gold crowns, a `Mascot` per deck with moods, a spinning `WheelView` for picks, `TimerRing`, `ConfettiBurst`. Type: Futura Condensed ExtraBold for loud text, rounded system for reading. Never revert to a flat text/paper interface.
 
 ## Architecture
-- `Models/`: `Deck`/`Question` (content), `MatchState` (the JSON both phones agree on), `Profile`.
+- `Models/`: `Deck`/`Question` (content), `MatchState` (the JSON both phones agree on: `MatchPlayer` sides with `Member`s, picks and results keyed by member id), `Profile`.
 - `Content/HerWorld.swift`, `Content/HisWorld.swift`: 12 decks × 36 questions (12 per tier). Author with `Q(tier, prompt, correct, [wrong×3], fact?)`. Option order is shuffled deterministically per question id.
-- `Engine/MatchEngine.swift`: pure rules (question draw, tiers per round, scoring). `Engine/MatchController.swift`: one match's UI state machine; it talks to a `MatchTransport`.
+- `Engine/MatchEngine.swift`: pure rules (question draw, tiers per round, scoring). `Engine/MatchController.swift`: one match's UI state machine (`route()` is the single source of what's next; hand-offs between members of a couple on one phone); it talks to a `MatchTransport`. Never leave an async submit in flight without first setting a stage the views can render.
 - `Services/GameCenterService.swift` (+ `GameCenterTransport`), `Services/LocalMatchStore.swift` (+ `PassAndPlayTransport`).
 - `Views/`: `HomeView` (match lists), `MatchView` (stage switch), `DeckPickView`, `QuestionView`, `RoundRevealView`, `MatchOverView`, `ProfileSetupView`.
 - `Audio/SoundKit.swift`: synthesized cues, no audio files.

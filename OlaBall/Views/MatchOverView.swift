@@ -32,8 +32,8 @@ struct MatchOverView: View {
                 HStack(spacing: 12) {
                     ForEach(s.players) { p in
                         VStack(spacing: 6) {
-                            Avatar(name: p.name, world: p.world, size: 44)
-                            Text(p.name.uppercased()).font(.label(13)).foregroundStyle(Theme.ink).lineLimit(1)
+                            SideAvatars(player: p, size: 40)
+                            Text(p.name.uppercased()).font(.label(13)).foregroundStyle(Theme.ink).lineLimit(1).minimumScaleFactor(0.6)
                             Crowns(count: s.crowns(for: p.id), size: 15)
                             Text("\(controller.total(p.id))").font(.score(36)).foregroundStyle(Theme.ink)
                             Kicker("TOTAL POINTS", color: Theme.ink3, size: 10)
@@ -48,7 +48,13 @@ struct MatchOverView: View {
                 if controller.transport.isPassAndPlay, let p = profiles.profile, let partner = s.partner(of: s.players[0].id) {
                     Button("Rematch") {
                         Haptics.heavy()
-                        rematchID = localMatches.create(me: p, partnerName: partner.name, partnerWorld: partner.world)
+                        if s.mode == .teams {
+                            let a = s.players[0].members.map { (name: $0.name, lane: $0.answers) }
+                            let b = partner.members.map { (name: $0.name, lane: $0.answers) }
+                            rematchID = localMatches.createTeams(ours: a, theirs: b)
+                        } else {
+                            rematchID = localMatches.create(me: p, partnerName: partner.name, partnerWorld: partner.world)
+                        }
                     }
                     .buttonStyle(ChunkyButtonStyle(color: Theme.gold))
                     .accessibilityIdentifier("rematch")

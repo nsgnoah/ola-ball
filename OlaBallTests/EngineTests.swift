@@ -48,6 +48,9 @@ struct EngineTests {
         let used = Set(a.map(\.id))
         let c = MatchEngine.questions(deck: deck, round: 2, playerID: "x", seed: 99, excluding: used)
         #expect(Set(c.map(\.id)).isDisjoint(with: used))
+        // Two members of one couple on the same deck get different questions.
+        let d = MatchEngine.questions(deck: deck, round: 2, playerID: "y", seed: 99, excluding: [])
+        #expect(a.map(\.id) != d.map(\.id))
     }
 
     @Test func scoringRewardsSpeedAndStreaks() {
@@ -58,40 +61,70 @@ struct EngineTests {
         #expect(MatchEngine.points(correct: true, elapsedMs: 1000, streak: 3) > MatchEngine.points(correct: true, elapsedMs: 1000, streak: 1))
     }
 
+    private static func result(_ score: Int, _ correct: Int) -> RoundResult {
+        RoundResult(questionIDs: [], answers: [], timesMs: [], score: score, correct: correct)
+    }
+
     @Test func matchFlowsToAWinner() {
-        let a = MatchPlayer(id: "a", name: "Noah", world: .his)
-        let b = MatchPlayer(id: "b", name: "Sam", world: .hers)
-        var s = MatchState(seed: 5, creator: a)
-        s.join(b)
-        #expect(s.pendingPick(for: "a") == 1)
-        s.pick(deckID: "football", forRound: 1, by: "a")     // a picks for b
-        #expect(s.pendingAnswer(for: "b")?.number == 1)
-        #expect(s.pendingPick(for: "b") == 1)
-        s.pick(deckID: "skincare", forRound: 1, by: "b")     // b picks for a
+        var s = MatchState(seed: 5, creator: .solo(id: "a", name: "Noah", world: .his))
+        s.join(.solo(id: "b", name: "Sam", world: .hers))
+        let am = "a/0", bm = "b/0"
+        #expect(s.pendingPicks(for: "a")?.round == 1)
+        #expect(s.pendingPicks(for: "a")?.targets.map(\.id) == [bm])
+        s.pick(deckID: "football", forMember: bm, round: 1)     // a picks for b: from his world, since b answers his
+        #expect(s.pendingAnswers(for: "b").first?.round == 1)
+        #expect(s.pendingPicks(for: "b")?.round == 1)
+        s.pick(deckID: "skincare", forMember: am, round: 1)
         for r in 1...3 {
-            if r > 1 { s.pick(deckID: "football", forRound: r, by: "a"); s.pick(deckID: "fashion", forRound: r, by: "b") }
-            s.record(RoundResult(questionIDs: [], answers: [], timesMs: [], score: 700, correct: 7), forRound: r, by: "a")
-            s.record(RoundResult(questionIDs: [], answers: [], timesMs: [], score: 300, correct: 3), forRound: r, by: "b")
+            if r > 1 { s.pick(deckID: "football", forMember: bm, round: r); s.pick(deckID: "fashion", forMember: am, round: r) }
+            s.record(Self.result(700, 7), forMember: am, round: r)
+            s.record(Self.result(300, 3), forMember: bm, round: r)
         }
         #expect(s.crowns(for: "a") == 3)
         #expect(s.status == .finished)
         #expect(s.winnerID == "a")
     }
 
+    @Test func couplesScoresAddUpAndPicksCoverBothMembers() {
+        var s = MatchState(seed: 9, creator: .team(id: "a", members: [("Noah", .his), ("Sam", .hers)]), mode: .teams)
+        s.join(.team(id: "b", members: [("Alex", .his), ("Jo", .hers)]))
+        #expect(s.player("a")?.name == "Noah & Sam")
+        #expect(s.member("a/0")?.answers == .his)
+        #expect(s.member("a/1")?.answers == .hers)
+        let picks = s.pendingPicks(for: "a")
+        #expect(picks?.targets.map(\.id) == ["b/0", "b/1"])
+        s.pick(deckID: "football", forMember: "b/0", round: 1)
+        #expect(s.pendingPicks(for: "a")?.targets.map(\.id) == ["b/1"])
+        s.pick(deckID: "skincare", forMember: "b/1", round: 1)
+        #expect(s.pendingPicks(for: "a") == nil || s.pendingPicks(for: "a")?.round == 2)
+        #expect(s.pendingAnswers(for: "b").map(\.member.id) == ["b/0", "b/1"])
+        s.record(Self.result(400, 4), forMember: "b/0", round: 1)
+        #expect(s.pendingAnswers(for: "b").map(\.member.id) == ["b/1"])
+        s.record(Self.result(300, 3), forMember: "b/1", round: 1)
+        #expect(s.pendingAnswers(for: "b").isEmpty)
+        s.pick(deckID: "cars", forMember: "a/0", round: 1)
+        s.pick(deckID: "divas", forMember: "a/1", round: 1)
+        s.record(Self.result(500, 5), forMember: "a/0", round: 1)
+        #expect(s.roundWinner(s.rounds[0]) == nil, "round not complete until every member has answered")
+        s.record(Self.result(100, 1), forMember: "a/1", round: 1)
+        #expect(s.rounds[0].score(for: s.player("a")!) == 600)
+        #expect(s.rounds[0].score(for: s.player("b")!) == 700)
+        #expect(s.roundWinner(s.rounds[0]) == "b")
+    }
+
     @Test func tiesGiveNoCrown() {
-        let a = MatchPlayer(id: "a", name: "A", world: .his), b = MatchPlayer(id: "b", name: "B", world: .hers)
-        var s = MatchState(seed: 1, creator: a); s.join(b)
-        s.pick(deckID: "cars", forRound: 1, by: "a"); s.pick(deckID: "divas", forRound: 1, by: "b")
-        s.record(RoundResult(questionIDs: [], answers: [], timesMs: [], score: 500, correct: 5), forRound: 1, by: "a")
-        s.record(RoundResult(questionIDs: [], answers: [], timesMs: [], score: 500, correct: 5), forRound: 1, by: "b")
+        var s = MatchState(seed: 1, creator: .solo(id: "a", name: "A", world: .his)); s.join(.solo(id: "b", name: "B", world: .hers))
+        s.pick(deckID: "cars", forMember: "b/0", round: 1); s.pick(deckID: "divas", forMember: "a/0", round: 1)
+        s.record(Self.result(500, 5), forMember: "a/0", round: 1)
+        s.record(Self.result(500, 5), forMember: "b/0", round: 1)
         #expect(s.roundWinner(s.rounds[0]) == nil)
         #expect(s.crowns(for: "a") == 0 && s.crowns(for: "b") == 0)
     }
 
     @Test func stateRoundTripsThroughJSON() throws {
-        let a = MatchPlayer(id: "a", name: "A", world: .his), b = MatchPlayer(id: "b", name: "B", world: .hers)
-        var s = MatchState(seed: 3, creator: a); s.join(b)
-        s.pick(deckID: "grill", forRound: 1, by: "a")
+        var s = MatchState(seed: 3, creator: .team(id: "a", members: [("A", .his), ("B", .hers)]), mode: .teams)
+        s.join(.team(id: "b", members: [("C", .his), ("D", .hers)]))
+        s.pick(deckID: "grill", forMember: "b/0", round: 1)
         let data = try JSONEncoder().encode(s)
         let back = try JSONDecoder().decode(MatchState.self, from: data)
         #expect(back == s)
@@ -113,19 +146,21 @@ struct ControllerTests {
         func save(_ s: MatchState) async throws { state = s }
     }
 
-    @Test @MainActor func aWholePassAndPlayMatchCompletes() async throws {
-        let a = MatchPlayer(id: "a", name: "Noah", world: .his), b = MatchPlayer(id: "b", name: "Sam", world: .hers)
-        var s = MatchState(seed: 42, creator: a); s.join(b)
-        let t = MemoryTransport(state: s)
-        let c = MatchController(state: s, transport: t)
-        c.start()
+    /// Drives a controller to the end. Side "a" answers everything right; side "b" always taps option 0.
+    @MainActor
+    private static func playOut(_ c: MatchController) async throws -> Int {
+        c.start(announce: true)
         var guardCount = 0
-        while c.stage != .finished && guardCount < 500 {
+        var trace: [String] = []
+        while c.stage != .finished && guardCount < 1500 {
             guardCount += 1
+            trace.append("\(c.me):\(c.stage)")
+            if trace.count > 40 { trace.removeFirst() }
             switch c.stage {
-            case .picking:
-                let world = c.state.player(c.me)!.world
-                c.pick(Decks.decks(in: world)[guardCount % 6])
+            case .setupTeam:
+                c.joinTeam(members: [("X", .his), ("Y", .hers)])
+            case .picking(_, let target):
+                c.pick(Decks.decks(in: target.answers)[guardCount % 6])
                 try await Task.sleep(for: .milliseconds(20))
             case .handoff:
                 c.continueAfterHandoff()
@@ -142,9 +177,52 @@ struct ControllerTests {
                 break
             }
         }
+        if c.stage != .finished {
+            Issue.record("stalled after \(guardCount) steps; rounds=\(c.state.rounds.count) status=\(c.state.status) turn=\(c.state.turnPlayerID ?? "-") trace=\(trace.suffix(12).joined(separator: " | "))")
+        }
+        return guardCount
+    }
+
+    @Test @MainActor func aWholePassAndPlayMatchCompletes() async throws {
+        var s = MatchState(seed: 42, creator: .solo(id: "a", name: "Noah", world: .his)); s.join(.solo(id: "b", name: "Sam", world: .hers))
+        let c = MatchController(state: s, transport: MemoryTransport(state: s))
+        _ = try await Self.playOut(c)
         #expect(c.stage == .finished)
         #expect(c.state.status == .finished)
-        #expect(c.state.winnerID == "a", "the player answering everything right should win")
+        #expect(c.state.winnerID == "a", "the side answering everything right should win")
         #expect(c.state.completedRounds.count >= 3)
+    }
+
+    @Test @MainActor func aCouplesMatchCompletesWithHandoffsBetweenMembers() async throws {
+        var s = MatchState(seed: 7, creator: .team(id: "a", members: [("Noah", .his), ("Sam", .hers)]), mode: .teams)
+        s.join(.team(id: "b", members: [("Alex", .his), ("Jo", .hers)]))
+        let c = MatchController(state: s, transport: MemoryTransport(state: s))
+        _ = try await Self.playOut(c)
+        #expect(c.stage == .finished)
+        #expect(c.state.winnerID == "a")
+        // Every member of both couples answered every completed round.
+        for r in c.state.completedRounds {
+            #expect(r.results.count == 4, "round \(r.number) has \(r.results.count) results")
+            #expect(r.picks.count == 4)
+        }
+        // Lanes were respected: each member's picked deck comes from the world they answer.
+        for r in c.state.rounds {
+            for (memberID, deckID) in r.picks {
+                #expect(Decks.byID(deckID)?.world == c.state.member(memberID)?.answers, "\(memberID) got \(deckID)")
+            }
+        }
+    }
+
+    @Test @MainActor func aChallengedCoupleJoinsBeforePlaying() async throws {
+        // The creator's phone made the match; this phone ("b") opens it and must set up its couple first.
+        let s = MatchState(seed: 11, creator: .team(id: "a", members: [("Noah", .his), ("Sam", .hers)]), mode: .teams)
+        let t = MemoryTransport(state: s)
+        t.turn = "b"
+        let c = MatchController(state: s, transport: t)
+        c.start(announce: true)
+        #expect(c.stage == .setupTeam)
+        c.joinTeam(members: [("Alex", .his), ("Jo", .hers)])
+        #expect(c.state.isReady)
+        #expect(c.state.player("b")?.name == "Alex & Jo")
     }
 }

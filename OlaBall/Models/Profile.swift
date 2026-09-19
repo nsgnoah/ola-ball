@@ -5,6 +5,10 @@ import Observation
 struct Profile: Codable, Equatable {
     var name: String
     var world: World
+    /// Couples mode: who's on your team and which lane each of you answers. Remembered between matches.
+    var teamPartnerName: String? = nil
+    var teamMyLane: World? = nil
+    var teamPartnerLane: World? = nil
 }
 
 @Observable

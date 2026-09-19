@@ -3,7 +3,7 @@ import Observation
 
 /// How a match's state reaches the other phone. Game Center or the same phone handed across the couch.
 protocol MatchTransport: AnyObject {
-    /// The player acting on this phone right now. For pass-and-play this is whoever holds the phone.
+    /// The side acting on this phone right now. For pass-and-play this is whoever holds the phone.
     var activePlayerID: String { get }
     var activePlayerName: String { get }
     var activePlayerWorld: World { get }
@@ -19,12 +19,13 @@ protocol MatchTransport: AnyObject {
 @Observable
 final class MatchController {
     enum Stage: Equatable {
-        case handoff(to: String)          // pass-and-play: hand the phone over
-        case intro(round: Int)            // "Round 3: Legend territory. Deck: Cars & Engines."
+        case setupTeam                         // couples mode: this phone has to say who its two people are
+        case handoff(to: String)               // hand the phone over
+        case intro(round: Int)                 // "Round 3: Legend territory. Deck: Cars & Engines."
         case answering
-        case picking(round: Int)
+        case picking(round: Int, target: Member)
         case roundReveal(round: Int)
-        case waiting                      // their move
+        case waiting                           // their move
         case finished
     }
 
@@ -35,6 +36,7 @@ final class MatchController {
     private(set) var isSubmitting = false
 
     // Answering
+    private(set) var currentMember: Member?
     private(set) var roundNumber = 0
     private(set) var deck: Deck?
     private(set) var questions: [Question] = []
@@ -58,38 +60,67 @@ final class MatchController {
     var partner: MatchPlayer? { state.partner(of: me) }
     var currentQuestion: Question? { index < questions.count ? questions[index] : nil }
     var secondsLeft: Double { max(0, MatchEngine.secondsPerQuestion - Date().timeIntervalSince(questionStart)) }
+    /// Two people share this phone: pass-and-play, or a couple playing as a team.
+    var sharesPhone: Bool { transport.isPassAndPlay || state.mode == .teams }
 
     // MARK: Entry
 
-    /// Work out what this player should be doing right now.
-    /// `announce`: for pass-and-play, first show whose phone it should be, so nobody sees the wrong questions.
+    /// Work out what this side should be doing right now.
+    /// `announce`: when people share the phone, first show who should be holding it.
     func start(announce: Bool = false) {
         stopTimer()
         error = nil
-        if announce, transport.isPassAndPlay, state.status == .active, state.isReady {
-            stage = .handoff(to: transport.activePlayerName)
+        if state.player(me) == nil, state.players.count < 2 {
+            if state.mode == .teams { stage = .setupTeam; return }
+            state.join(.solo(id: me, name: transport.activePlayerName, world: transport.activePlayerWorld))
+        }
+        currentMember = nil
+        if announce, sharesPhone, state.status == .active, state.isReady, transport.isMyTurn {
+            stage = .handoff(to: handoffName())
             return
         }
-        // Join on first contact.
-        if state.player(me) == nil, state.players.count < 2 {
-            state.join(MatchPlayer(id: me, name: transport.activePlayerName, world: transport.activePlayerWorld))
-        }
+        route()
+    }
+
+    /// Couples mode: this phone joins as a team of two.
+    func joinTeam(members: [(name: String, lane: World)]) {
+        guard state.mode == .teams, state.player(me) == nil, members.count == 2 else { return }
+        state.join(.team(id: me, members: members))
+        Task { try? await transport.save(state) }
+        start(announce: true)
+    }
+
+    /// Whose hands the phone belongs in next: the first member with a deck to answer, else the whole side.
+    private func handoffName() -> String {
+        state.pendingAnswers(for: me).first?.member.name ?? meName
+    }
+
+    /// The single source of "what's next".
+    private func route() {
         if state.status == .finished {
             stage = unrevealedRound().map { .roundReveal(round: $0) } ?? .finished
             return
         }
         guard transport.isMyTurn else { stage = .waiting; return }
         if let r = unrevealedRound() { stage = .roundReveal(round: r); return }
-        if let pending = state.pendingAnswer(for: me) {
-            prepareRound(pending)
-            stage = .intro(round: pending.number)
+        if let next = state.pendingAnswers(for: me).first {
+            // Switching from one member to another on the same phone: hand it over first.
+            if state.mode == .teams, let cur = currentMember, cur.id != next.member.id {
+                stage = .handoff(to: next.member.name)
+                return
+            }
+            prepare(next)
+            stage = .intro(round: next.round)
             return
         }
-        if let r = state.pendingPick(for: me) { stage = .picking(round: r); return }
+        if let p = state.pendingPicks(for: me), let target = p.targets.first {
+            stage = .picking(round: p.round, target: target)
+            return
+        }
         stage = .waiting
     }
 
-    /// A completed round this player hasn't seen the results of yet.
+    /// A completed round this side hasn't seen the results of yet.
     private func unrevealedRound() -> Int? { unrevealedRoundFor(me) }
 
     private func unrevealedRoundFor(_ player: String) -> Int? {
@@ -102,19 +133,19 @@ final class MatchController {
         state.revealed[me] = max(state.revealed[me] ?? 0, r)
         Task { try? await transport.save(state) }
         if state.status == .finished { stage = .finished; return }
-        // After seeing a result it may still be my move (answer or pick), or theirs.
-        if let pending = state.pendingAnswer(for: me) { prepareRound(pending); stage = .intro(round: pending.number); return }
-        if let r = state.pendingPick(for: me) { stage = .picking(round: r); return }
-        stage = .waiting
+        route()
+        if stage == .waiting, transport.isMyTurn { Task { await finishTurn() } }
     }
 
     // MARK: Answering
 
-    private func prepareRound(_ round: Round) {
-        guard let deckID = round.picks[me], let d = Decks.byID(deckID) else { return }
-        roundNumber = round.number
+    private func prepare(_ pending: MatchState.PendingAnswer) {
+        guard let round = state.rounds.first(where: { $0.number == pending.round }),
+              let deckID = round.picks[pending.member.id], let d = Decks.byID(deckID) else { return }
+        currentMember = pending.member
+        roundNumber = pending.round
         deck = d
-        questions = MatchEngine.questions(deck: d, round: round.number, playerID: me, seed: state.seed, excluding: state.usedQuestionIDs)
+        questions = MatchEngine.questions(deck: d, round: pending.round, playerID: pending.member.id, seed: state.seed, excluding: state.usedQuestionIDs)
         index = 0
         answers = []
         timesMs = []
@@ -180,29 +211,31 @@ final class MatchController {
 
     private func finishRound() {
         stopTimer()
+        guard let member = currentMember else { return }
         let result = MatchEngine.score(questions: questions, answers: answers, timesMs: timesMs)
-        state.record(result, forRound: roundNumber, by: me)
-        if let r = unrevealedRound() {
-            Task { try? await transport.save(state) }
-            stage = .roundReveal(round: r)
-        } else if state.status == .finished {
-            stage = .finished
+        state.record(result, forMember: member.id, round: roundNumber)
+        if state.status == .finished {
+            stage = .waiting          // never leave `.answering` with no question while the submit is in flight
             Task { await finishTurn() }
-        } else if let r = state.pendingPick(for: me) {
-            Task { try? await transport.save(state) }
-            stage = .picking(round: r)
-        } else {
-            Task { await finishTurn() }
+            return
         }
+        Task { try? await transport.save(state) }
+        route()
+        if stage == .waiting { Task { await finishTurn() } }
     }
 
     // MARK: Picking
 
     func pick(_ deck: Deck) {
-        guard case .picking(let r) = stage else { return }
-        state.pick(deckID: deck.id, forRound: r, by: me)
+        guard case .picking(let r, let target) = stage else { return }
+        state.pick(deckID: deck.id, forMember: target.id, round: r)
         SoundKit.shared.play(.swoosh)
-        Task { await finishTurn() }
+        if let p = state.pendingPicks(for: me), p.round == r, let next = p.targets.first {
+            stage = .picking(round: r, target: next)
+        } else {
+            stage = .waiting
+            Task { await finishTurn() }
+        }
     }
 
     // MARK: Turn hand-off
@@ -211,16 +244,16 @@ final class MatchController {
     private func finishTurn() async {
         isSubmitting = true
         defer { isSubmitting = false }
-        // Capture before submitting: for pass-and-play the transport's active player flips on submit.
+        // Capture before submitting: for pass-and-play the transport's active side flips on submit.
         let mover = me
-        let nextName = partner?.name ?? "your partner"
         state.endTurn(from: mover)
         do {
             try await transport.submitTurn(state)
+            currentMember = nil
             if state.status == .finished {
                 stage = unrevealedRoundFor(mover).map { .roundReveal(round: $0) } ?? .finished
             } else if transport.isPassAndPlay {
-                stage = .handoff(to: nextName)
+                stage = .handoff(to: handoffName())
             } else {
                 stage = .waiting
             }
@@ -230,15 +263,15 @@ final class MatchController {
         }
     }
 
-    /// Pass-and-play: the other player has the phone now.
+    /// The next person has the phone now.
     func continueAfterHandoff() {
         guard case .handoff = stage else { return }
+        currentMember = nil
         start()
     }
 
     // MARK: Summary helpers
 
     func crowns(_ id: String) -> Int { state.crowns(for: id) }
-
-    func total(_ id: String) -> Int { state.rounds.compactMap { $0.results[id]?.score }.reduce(0, +) }
+    func total(_ id: String) -> Int { state.total(for: id) }
 }

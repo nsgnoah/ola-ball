@@ -161,6 +161,7 @@ struct GameCenterControllerPresenter: UIViewControllerRepresentable {
 
 /// The system "pick a friend" screen for a new turn-based match.
 struct MatchmakerView: UIViewControllerRepresentable {
+    var mode: MatchMode = .couple
     let onDismiss: () -> Void
 
     func makeCoordinator() -> Coordinator { Coordinator(onDismiss: onDismiss) }
@@ -169,7 +170,7 @@ struct MatchmakerView: UIViewControllerRepresentable {
         let request = GKMatchRequest()
         request.minPlayers = 2
         request.maxPlayers = 2
-        request.inviteMessage = "Think you know my world? Prove it."
+        request.inviteMessage = mode == .teams ? "Think your couple knows more than ours? Prove it." : "Think you know my world? Prove it."
         let vc = GKTurnBasedMatchmakerViewController(matchRequest: request)
         vc.turnBasedMatchmakerDelegate = context.coordinator
         vc.showExistingMatches = false

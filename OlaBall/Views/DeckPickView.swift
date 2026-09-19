@@ -4,13 +4,14 @@ import SwiftUI
 struct DeckPickView: View {
     let controller: MatchController
     let round: Int
+    let target: Member
 
     var body: some View {
-        let myWorld = controller.state.player(controller.me)?.world ?? .his
-        let decks = Decks.decks(in: myWorld)
-        let who = controller.partner?.name ?? "your partner"
+        let world = target.answers
+        let decks = Decks.decks(in: world)
+        let who = target.name
         ZStack {
-            GameBackground(world: myWorld)
+            GameBackground(world: world)
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 14) {
                     MatchHeader(controller: controller)
@@ -23,7 +24,10 @@ struct DeckPickView: View {
                     }
                     .padding(.top, 6)
                     WheelView(decks: decks, onPick: { controller.pick($0) }, enabled: !controller.isSubmitting)
-                    OlaSays(text: "Spin for a suggestion, or tap the slice you want. Be kind. Or don't.")
+                        .id(target.id)
+                    OlaSays(text: controller.state.mode == .teams
+                            ? "\(who) answers \(world == .his ? "his" : "her") world. Spin, or tap a slice. Be kind. Or don't."
+                            : "Spin for a suggestion, or tap the slice you want. Be kind. Or don't.")
                     if controller.isSubmitting { ProgressView().tint(.white) }
                 }
                 .padding(20)

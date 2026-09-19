@@ -13,14 +13,16 @@ struct MatchView: View {
         ZStack {
             GameBackground(top: Theme.violet, bottom: Theme.violetDeep)
             switch controller.stage {
+            case .setupTeam:
+                JoinTeamView(controller: controller) { dismiss() }
             case .handoff(let name):
                 HandoffView(name: name) { controller.continueAfterHandoff() }
             case .intro(let round):
                 RoundIntroView(controller: controller, round: round)
             case .answering:
                 QuestionView(controller: controller)
-            case .picking(let round):
-                DeckPickView(controller: controller, round: round)
+            case .picking(let round, let target):
+                DeckPickView(controller: controller, round: round, target: target)
             case .roundReveal(let round):
                 RoundRevealView(controller: controller, round: round)
             case .waiting:
@@ -66,12 +68,12 @@ struct MatchHeader: View {
 
     private func side(_ p: MatchPlayer, leading: Bool) -> some View {
         HStack(spacing: 6) {
-            if leading { Avatar(name: p.name, world: p.world, size: 32) }
+            if leading { SideAvatars(player: p, size: 30) }
             VStack(alignment: leading ? .leading : .trailing, spacing: 1) {
-                Text(p.name.uppercased()).font(.label(12)).foregroundStyle(.white).lineLimit(1)
+                Text(p.name.uppercased()).font(.label(11)).foregroundStyle(.white).lineLimit(1).minimumScaleFactor(0.7)
                 Crowns(count: controller.crowns(p.id), size: 12)
             }
-            if !leading { Avatar(name: p.name, world: p.world, size: 32) }
+            if !leading { SideAvatars(player: p, size: 30) }
         }
         .frame(maxWidth: .infinity, alignment: leading ? .leading : .trailing)
     }
@@ -94,7 +96,7 @@ struct HandoffView: View {
                 .shadow(color: .black.opacity(0.3), radius: 0, y: 3)
             OlaSays(text: "No peeking. Their questions are next.")
             Spacer()
-            Button("I'm \(name), let's go") { Haptics.tap(); onContinue() }
+            Button(name.contains("&") ? "We're ready" : "I'm \(name), let's go") { Haptics.tap(); onContinue() }
                 .buttonStyle(ChunkyButtonStyle(color: Theme.gold))
                 .accessibilityIdentifier("handoff-continue")
         }
@@ -115,6 +117,9 @@ struct RoundIntroView: View {
                 Spacer()
                 if let deck {
                     Mascot(deck: deck, mood: .think, size: 170)
+                    if controller.state.mode == .teams, let m = controller.currentMember {
+                        Text("\(m.name.uppercased()), YOU'RE UP").font(.headline(26)).foregroundStyle(Theme.gold)
+                    }
                     Kicker("ROUND \(round) OF \(MatchState.maxRounds) · \(MatchEngine.roundLabel(round))")
                     Text(deck.title.uppercased()).font(.headline(50)).foregroundStyle(.white)
                         .multilineTextAlignment(.center).lineLimit(2).minimumScaleFactor(0.6)
@@ -192,11 +197,15 @@ struct RoundHistory: View {
                 HStack(spacing: 8) {
                     Text("R\(r.number)").font(.label(12)).foregroundStyle(Theme.ink3).frame(width: 28, alignment: .leading)
                     ForEach(s.players) { p in
-                        let deck = r.picks[p.id].flatMap(Decks.byID)
-                        let res = r.results[p.id]
+                        let picked = p.members.contains { r.picks[$0.id] != nil }
+                        let done = p.members.allSatisfy { r.results[$0.id] != nil }
                         HStack(spacing: 6) {
-                            if let deck { Image(systemName: deck.symbol).font(.system(size: 11, weight: .bold)).foregroundStyle(deck.color) }
-                            Text(res.map { "\($0.score)" } ?? (deck == nil ? "—" : "…")).font(.score(20)).foregroundStyle(Theme.ink)
+                            ForEach(p.members) { m in
+                                if let deck = r.picks[m.id].flatMap(Decks.byID) {
+                                    Image(systemName: deck.symbol).font(.system(size: 11, weight: .bold)).foregroundStyle(deck.color)
+                                }
+                            }
+                            Text(done ? "\(r.score(for: p))" : (picked ? "…" : "—")).font(.score(20)).foregroundStyle(Theme.ink)
                             if s.roundWinner(r) == p.id { Image(systemName: "crown.fill").font(.system(size: 11, weight: .black)).foregroundStyle(Theme.gold) }
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)

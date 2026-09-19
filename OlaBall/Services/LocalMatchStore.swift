@@ -11,8 +11,18 @@ final class LocalMatchStore {
 
     func create(me: Profile, partnerName: String, partnerWorld: World) -> String {
         let id = UUID().uuidString
-        var state = MatchState(seed: UInt64.random(in: 0...UInt64.max), creator: MatchPlayer(id: "local-a", name: me.name, world: me.world))
-        state.join(MatchPlayer(id: "local-b", name: partnerName, world: partnerWorld))
+        var state = MatchState(seed: UInt64.random(in: 0...UInt64.max), creator: .solo(id: "local-a", name: me.name, world: me.world))
+        state.join(.solo(id: "local-b", name: partnerName, world: partnerWorld))
+        matches[id] = state
+        save()
+        return id
+    }
+
+    /// Couple vs couple on one phone.
+    func createTeams(ours: [(name: String, lane: World)], theirs: [(name: String, lane: World)]) -> String {
+        let id = UUID().uuidString
+        var state = MatchState(seed: UInt64.random(in: 0...UInt64.max), creator: .team(id: "local-a", members: ours), mode: .teams)
+        state.join(.team(id: "local-b", members: theirs))
         matches[id] = state
         save()
         return id
