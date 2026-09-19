@@ -11,7 +11,7 @@ final class GameSession {
 
     let userTeam: Team
     let opponentTeam: Team
-    let fieldScene: FieldScene
+    let fieldScene: StadiumScene
     private let store: ProgressStore
     private var rng: SeededRNG
     let autoplay: Bool
@@ -61,7 +61,7 @@ final class GameSession {
         self.store = store
         self.rng = SeededRNG(seed: seed)
         self.autoplay = autoplay
-        self.fieldScene = FieldScene(userTeam: userTeam, opponentTeam: opponentTeam)
+        self.fieldScene = StadiumScene(userTeam: userTeam, opponentTeam: opponentTeam)
         beginPossession()
     }
 
@@ -102,6 +102,7 @@ final class GameSession {
     func advance(dt: Float) {
         switch phase {
         case .presnap:
+            fieldScene.idle(dt: dt)
             guard autoplay else { return }
             presnapDelay += dt
             if presnapDelay > 0.6 {
@@ -117,7 +118,7 @@ final class GameSession {
         case .live:
             guard var live = sim, !kickInProgress else { return }
             if !live.isOver {
-                live.tick(dt)
+                live.tick(dt * fieldScene.timeScale)
                 sim = live
                 fieldScene.apply(live)
                 fieldScene.aimCamera(at: live.ballPos, presnap: false, animated: false)
