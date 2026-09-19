@@ -166,18 +166,26 @@ struct PlaySim {
                 players[r].state = .blocked(until: Float.random(in: 1.4...3.0, using: &rng) * holdScale)
             }
         }
-        var line = freeRushers.filter { !blitzers.contains($0) }
-        assign(blockers: linemenBlockers, to: &line, holdScale: 1.0)
-        var leftovers = line + freeRushers.filter { blitzers.contains($0) }
-        assign(blockers: backBlockers, to: &leftovers, holdScale: 0.35)
-        freeRushers = leftovers
+        if plan.kind == .run {
+            // Run blocking: everyone up front takes the nearest rusher, blitzers included.
+            var pool = freeRushers
+            assign(blockers: linemenBlockers + backBlockers, to: &pool, holdScale: 1.0)
+            freeRushers = pool
+        } else {
+            // Pass protection: linemen take the line; blitzers are the tight end's and back's problem, briefly.
+            var line = freeRushers.filter { !blitzers.contains($0) }
+            assign(blockers: linemenBlockers, to: &line, holdScale: 1.0)
+            var leftovers = line + freeRushers.filter { blitzers.contains($0) }
+            assign(blockers: backBlockers, to: &leftovers, holdScale: 0.35)
+            freeRushers = leftovers
+        }
 
         // Run plays: the tight end and the play-side lineman climb to block the second level near the point of attack.
         // The lineman's defender gets handed to a neighbor (a combo block), which holds a little less well.
         if plan.kind == .run, let poa = plan.path.first(where: { $0.y >= los + 0.5 }) ?? plan.path.last {
             let secondLevel = players.indices.filter { i in
                 // Unblocked blitzers count too: the play-side blockers pick up the one nearest the hole.
-                players[i].side == .defense && (!rushers.contains(i) || leftovers.contains(i)) && (players[i].role == .linebacker || players[i].role == .safety) && players[i].pos.y - los < 9
+                players[i].side == .defense && (!rushers.contains(i) || freeRushers.contains(i)) && (players[i].role == .linebacker || players[i].role == .safety) && players[i].pos.y - los < 9
             }.sorted { players[$0].pos.distance(to: poa) < players[$1].pos.distance(to: poa) }
             // Two blockers get up to the second level: the two nearest the point of attack out of the tight end,
             // the uncovered lineman, and the play-side linemen. A lineman who has a down lineman combos off him
@@ -206,6 +214,19 @@ struct PlaySim {
                 let climber = free.remove(at: idx)
                 // Don't send a blocker on a hopeless 10-yard chase.
                 if players[climber].pos.distance(to: players[lb].pos) < 9 { players[climber].state = .climbing(target: lb) }
+            }
+        }
+        // Run plays: receivers who aren't carrying the ball block the defender over them (the corner or nickel),
+        // which is what makes edge runs possible.
+        if plan.kind == .run {
+            for i in players.indices where players[i].side == .offense && players[i].role == .wideReceiver && players[i].tag != plan.ballHandlerTag {
+                let me = players[i].pos
+                let target = players.indices.filter { j in
+                    guard players[j].side == .defense, !rushers.contains(j) else { return false }
+                    guard players[j].role == .cornerback || players[j].role == .safety else { return false }
+                    return players[j].pos.distance(to: me) < 8
+                }.min { players[$0].pos.distance(to: me) < players[$1].pos.distance(to: me) }
+                if let t = target { players[i].state = .climbing(target: t) }
             }
         }
     }
@@ -265,7 +286,7 @@ struct PlaySim {
                     switch players[lb].state {
                     case .blocked, .stunned, .down: break
                     default:
-                        let hold = Float.random(in: 0.7...1.5, using: &rng)
+                        let hold = players[i].role == .wideReceiver ? Float.random(in: 0.5...1.0, using: &rng) : Float.random(in: 0.7...1.5, using: &rng)
                         players[lb].state = .blocked(until: time + hold)
                         assignedBlocks[lb] = i
                     }

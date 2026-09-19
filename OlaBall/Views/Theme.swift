@@ -60,8 +60,8 @@ struct BigButtonStyle: ButtonStyle {
 }
 
 enum Haptics {
-    static func tap() { UIImpactFeedbackGenerator(style: .light).impactOccurred() }
-    static func heavy() { UIImpactFeedbackGenerator(style: .heavy).impactOccurred() }
+    static func tap() { UIImpactFeedbackGenerator(style: .light).impactOccurred(); SoundKit.shared.play(.tap, volume: 0.5) }
+    static func heavy() { UIImpactFeedbackGenerator(style: .heavy).impactOccurred(); SoundKit.shared.play(.tap, volume: 0.9) }
     static func success() { UINotificationFeedbackGenerator().notificationOccurred(.success) }
     static func failure() { UINotificationFeedbackGenerator().notificationOccurred(.error) }
 }

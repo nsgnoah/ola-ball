@@ -62,6 +62,7 @@ final class GameSession {
         self.rng = SeededRNG(seed: seed)
         self.autoplay = autoplay
         self.fieldScene = StadiumScene(userTeam: userTeam, opponentTeam: opponentTeam)
+        SoundKit.shared.setScene(crowd: 0.2)
         beginPossession()
     }
 
@@ -100,6 +101,7 @@ final class GameSession {
 
     /// Called every frame by the scene view.
     func advance(dt: Float) {
+        SoundKit.shared.update(dt: dt)
         switch phase {
         case .presnap:
             fieldScene.idle(dt: dt)
@@ -204,12 +206,15 @@ final class GameSession {
         fieldScene.showPath(plan.path, color: userOnOffense ? UIColor(red: 0.96, green: 0.77, blue: 0.26, alpha: 0.9) : UIColor.white.withAlphaComponent(0.5))
         phase = .live
         holdTimer = 0
-        Haptics.tap()
+        SoundKit.shared.play(.snap, volume: 0.8)
+        SoundKit.shared.excite(0.12)
     }
 
     private func performKick(_ kind: PlayCall, result: PlayResultKind) {
         kickInProgress = true
         phase = .live
+        SoundKit.shared.play(.kick, volume: 0.9)
+        SoundKit.shared.excite(0.1)
         let los = Float(situation.ballOn)
         let made: Bool
         let distance: Float
@@ -260,6 +265,7 @@ final class GameSession {
         lastVerdict = verdict
         drivePlays.append(play)
         playsRun += 1
+        playSounds(for: play, events: sim?.events ?? [])
 
         if userOnOffense {
             xpEarned += 2
@@ -293,6 +299,43 @@ final class GameSession {
     }
 
     private var lastPlayResolved = false
+
+    /// The crowd and the field react from the user's point of view.
+    private func playSounds(for play: Play, events: [PlaySim.Event]) {
+        let kit = SoundKit.shared
+        let mine = userOnOffense
+        let caught = events.contains { if case .caught = $0 { return true } else { return false } }
+        let tackled = events.contains { if case .tackle = $0 { return true } else { return false } }
+        if caught { kit.play(.catchBall, volume: 0.8) }
+        if events.contains(.sack) { kit.play(.bigHit, volume: 1.0) }
+        else if tackled { kit.play(play.yards < 0 || play.yards >= 12 ? .bigHit : .thud, volume: 0.9) }
+        switch play.ending {
+        case .touchdown:
+            kit.play(.touchdown, volume: mine ? 0.9 : 0.35)
+            kit.play(mine ? .cheer : .groan, volume: 1.0)
+            kit.excite(mine ? 0.6 : 0.25)
+        case .fieldGoal:
+            kit.play(mine ? .cheer : .groan, volume: 0.8)
+            kit.excite(mine ? 0.4 : 0.15)
+        case .missedFieldGoal:
+            kit.play(mine ? .groan : .cheer, volume: 0.8)
+        case .interception, .fumble, .turnoverOnDowns:
+            kit.play(mine ? .groan : .cheer, volume: 1.0)
+            kit.excite(mine ? 0.15 : 0.5)
+        case .punt:
+            break
+        case nil:
+            if play.gainedFirstDown {
+                kit.play(.firstDown, volume: mine ? 0.8 : 0.3)
+                if mine { kit.excite(0.25) }
+            } else if play.result == .incomplete {
+                kit.play(.incomplete, volume: mine ? 0.6 : 0.3)
+            }
+        }
+        if play.call.isKick == false || play.ending == .missedFieldGoal {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) { kit.play(.whistle, volume: 0.35) }
+        }
+    }
 
     private func kickVerdict(result: PlayResultKind, ending: DriveEnding?) -> PlayAnalyst.Verdict {
         switch result {
@@ -403,6 +446,8 @@ final class GameSession {
     private func finishGame() {
         phase = .gameOver
         tip = nil
+        SoundKit.shared.play(.whistle, volume: 0.6)
+        if userScore > opponentScore { SoundKit.shared.play(.cheer, volume: 1.0); SoundKit.shared.play(.touchdown, volume: 0.7); SoundKit.shared.excite(0.6) }
         let result: Outcome
         if userScore > opponentScore { result = .win; xpEarned += 150 }
         else if userScore < opponentScore { result = .loss; xpEarned += 40 }

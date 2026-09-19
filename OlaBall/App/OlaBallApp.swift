@@ -13,6 +13,7 @@ struct OlaBallApp: App {
             RootView()
                 .environment(store)
                 .preferredColorScheme(.dark)
+                .onAppear { SoundKit.shared.start() }
         }
     }
 }

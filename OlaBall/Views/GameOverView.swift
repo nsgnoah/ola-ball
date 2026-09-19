@@ -8,57 +8,82 @@ struct GameOverView: View {
 
     var body: some View {
         ScrollView(showsIndicators: false) {
-            VStack(spacing: 14) {
-                VStack(spacing: 6) {
-                    Text(title).font(.display(34)).foregroundStyle(session.outcome == .win ? Theme.gold : Theme.textPrimary)
-                    Text("\(session.userTeam.name) \(session.userScore), \(session.opponentTeam.name) \(session.opponentScore)")
-                        .font(.body(16)).foregroundStyle(Theme.textSecondary)
+            VStack(spacing: 10) {
+                VStack(spacing: 8) {
+                    Kicker("FINAL", color: Theme.gold)
+                    Text(title)
+                        .font(.system(size: 46, weight: .black))
+                        .tracking(-1)
+                        .foregroundStyle(session.outcome == .win ? Theme.gold : .white)
+                        .shadow(color: .black.opacity(0.5), radius: 10, y: 4)
+                    HStack(spacing: 14) {
+                        scoreSide(session.userTeam, score: session.userScore, leading: true)
+                        Rectangle().fill(.white.opacity(0.25)).frame(width: 1, height: 30)
+                        scoreSide(session.opponentTeam, score: session.opponentScore, leading: false)
+                    }
                 }
-                .padding(.vertical, 16)
+                .padding(.vertical, 18)
                 .frame(maxWidth: .infinity)
-                .card()
+                .background(Color.black.opacity(0.30))
+                .background(.ultraThinMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .overlay(alignment: .top) { Rectangle().fill(Theme.gold).frame(height: 3) }
 
-                HStack(spacing: 10) {
-                    stat("\(session.touchdowns)", "TDs")
-                    stat("\(session.firstDowns)", "1st downs")
-                    stat("\(session.defensiveStops)", "stops")
+                HStack(spacing: 0) {
+                    stat("\(session.touchdowns)", "TOUCHDOWNS")
+                    divider
+                    stat("\(session.firstDowns)", "1ST DOWNS")
+                    divider
+                    stat("\(session.defensiveStops)", "STOPS")
+                    divider
                     stat("+\(session.xpEarned)", "XP")
                 }
+                .padding(.vertical, 10)
+                .background(Color.black.opacity(0.30))
+                .background(.ultraThinMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
 
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Text(store.rank.title).font(.display(16)).foregroundStyle(Theme.textPrimary)
-                        Spacer()
-                        Text("\(store.progress.xp) XP").font(.label(13)).foregroundStyle(Theme.gold)
-                    }
-                    ProgressView(value: store.rankProgress).tint(Theme.gold)
-                }
-                .padding()
-                .card()
-
-                if !session.newlyLearned.isEmpty {
+                BroadcastPanel(accent: Theme.gold) {
                     VStack(alignment: .leading, spacing: 8) {
-                        Label("New in your Playbook", systemImage: "book.closed.fill")
-                            .font(.label(13)).foregroundStyle(Theme.gold)
-                        ForEach(session.newlyLearned) { concept in
-                            HStack(spacing: 10) {
-                                Image(systemName: concept.symbol).foregroundStyle(Theme.good).frame(width: 22)
-                                Text(concept.title).font(.body(15)).foregroundStyle(Theme.textPrimary)
-                            }
+                        HStack {
+                            Text(store.rank.title.uppercased()).font(.system(size: 13, weight: .black)).tracking(1.5).foregroundStyle(.white)
+                            Spacer()
+                            Text("\(store.progress.xp) XP").font(.system(size: 12, weight: .black)).tracking(1).foregroundStyle(Theme.gold)
+                        }
+                        ProgressView(value: store.rankProgress).tint(Theme.gold)
+                        if let next = store.nextRank {
+                            Text("\(next.minXP - store.progress.xp) XP to \(next.title)").font(.body(12)).foregroundStyle(Theme.textSecondary)
                         }
                     }
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .card()
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 10)
+                }
+
+                if !session.newlyLearned.isEmpty {
+                    BroadcastPanel(accent: Theme.good) {
+                        VStack(alignment: .leading, spacing: 7) {
+                            Kicker("NEW IN YOUR PLAYBOOK", color: Theme.good)
+                            ForEach(session.newlyLearned) { concept in
+                                HStack(spacing: 10) {
+                                    Image(systemName: concept.symbol).font(.system(size: 13, weight: .bold)).foregroundStyle(Theme.good).frame(width: 22)
+                                    Text(concept.title).font(.body(15)).foregroundStyle(.white)
+                                }
+                            }
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 10)
+                    }
                 }
 
                 Button("Play again") {
                     Haptics.heavy()
                     onPlayAgain()
                 }
-                .buttonStyle(BigButtonStyle())
+                .buttonStyle(BroadcastButtonStyle())
+                .accessibilityLabel("Play again")
                 Button("Back to home") { onHome() }
-                    .buttonStyle(BigButtonStyle(fill: Theme.card, foreground: Theme.textPrimary))
+                    .buttonStyle(BroadcastButtonStyle(fill: Color.black.opacity(0.55), ink: .white, prominent: false))
+                    .accessibilityLabel("Back to home")
             }
         }
     }
@@ -66,19 +91,35 @@ struct GameOverView: View {
     private var title: String {
         switch session.outcome {
         case .win: return "YOU WIN!"
-        case .loss: return "Tough loss"
-        case .tie: return "Tie game"
-        case nil: return "Final"
+        case .loss: return "TOUGH LOSS"
+        case .tie: return "TIE GAME"
+        case nil: return "FINAL"
         }
+    }
+
+    private func scoreSide(_ team: Team, score: Int, leading: Bool) -> some View {
+        HStack(spacing: 8) {
+            if leading {
+                Text(team.emoji).font(.system(size: 20))
+                Text(team.abbreviation).font(.system(size: 13, weight: .black)).tracking(1.5).foregroundStyle(.white.opacity(0.85))
+                Text("\(score)").font(.system(size: 30, weight: .black)).foregroundStyle(.white)
+            } else {
+                Text("\(score)").font(.system(size: 30, weight: .black)).foregroundStyle(.white)
+                Text(team.abbreviation).font(.system(size: 13, weight: .black)).tracking(1.5).foregroundStyle(.white.opacity(0.85))
+                Text(team.emoji).font(.system(size: 20))
+            }
+        }
+    }
+
+    private var divider: some View {
+        Rectangle().fill(.white.opacity(0.15)).frame(width: 1, height: 28)
     }
 
     private func stat(_ value: String, _ label: String) -> some View {
         VStack(spacing: 2) {
-            Text(value).font(.display(20)).foregroundStyle(Theme.textPrimary)
-            Text(label).font(.label(11)).foregroundStyle(Theme.textSecondary)
+            Text(value).font(.display(20)).foregroundStyle(.white)
+            Text(label).font(.system(size: 9, weight: .black)).tracking(1.2).foregroundStyle(Theme.textSecondary)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 12)
-        .card()
     }
 }

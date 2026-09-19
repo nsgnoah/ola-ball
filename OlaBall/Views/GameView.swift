@@ -19,12 +19,15 @@ struct GameView: View {
                 .id(ObjectIdentifier(session))
 
             VStack(spacing: 0) {
-                topBar.padding(.horizontal).padding(.top, 4)
-                ScoreboardView(session: session).padding(.horizontal).padding(.top, 6)
+                ScoreBug(session: session) {
+                    if session.phase == .gameOver { dismiss() } else { showQuitConfirm = true }
+                }
+                .padding(.horizontal, 12)
+                .padding(.top, 2)
                 Spacer()
                 bottomPanel
-                    .padding(.horizontal)
-                    .padding(.bottom, 10)
+                    .padding(.horizontal, 12)
+                    .padding(.bottom, 8)
             }
 
             if session.phase == .gameOver {
@@ -50,34 +53,6 @@ struct GameView: View {
         }
     }
 
-    // MARK: Chrome
-
-    private var topBar: some View {
-        HStack {
-            Button {
-                if session.phase == .gameOver { dismiss() } else { showQuitConfirm = true }
-            } label: {
-                Image(systemName: "xmark").font(.label(14)).foregroundStyle(Theme.textSecondary)
-                    .frame(width: 36, height: 36)
-                    .background(Theme.card.opacity(0.9), in: Circle())
-            }
-            .accessibilityIdentifier("close-game")
-            Spacer()
-            if session.phase == .live {
-                Text("LIVE").font(.label(12)).foregroundStyle(.white)
-                    .padding(.horizontal, 10).padding(.vertical, 5)
-                    .background(Theme.bad, in: Capsule())
-            } else {
-                Text(session.userOnOffense ? "YOUR BALL" : "YOUR DEFENSE").font(.label(12))
-                    .foregroundStyle(session.userOnOffense ? Theme.gold : Theme.good)
-                    .padding(.horizontal, 10).padding(.vertical, 5)
-                    .background(Theme.card.opacity(0.9), in: Capsule())
-            }
-            Spacer()
-            Color.clear.frame(width: 36, height: 36)
-        }
-    }
-
     // MARK: Bottom panel
 
     @ViewBuilder
@@ -86,7 +61,7 @@ struct GameView: View {
         case .presnap:
             presnapPanel
         case .live:
-            situationPill
+            EmptyView()
         case .result:
             resultPanel
         case .kicking(let kind):
@@ -98,49 +73,43 @@ struct GameView: View {
         }
     }
 
-    private var situationPill: some View {
-        Text(session.situationText)
-            .font(.label(13)).foregroundStyle(Theme.textPrimary)
-            .padding(.horizontal, 14).padding(.vertical, 8)
-            .background(Theme.card.opacity(0.92), in: Capsule())
-            .accessibilityIdentifier("situation")
-            .allowsHitTesting(false)
-    }
-
     private var presnapPanel: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 8) {
             if let tip = session.tip {
                 TipCardView(concept: tip, isNew: true) { session.dismissTip() }
             }
-            situationPill
             if session.userOnOffense {
-                VStack(spacing: 6) {
-                    Label(session.defenseCall.callout, systemImage: "eye.fill")
-                        .font(.label(13)).foregroundStyle(Theme.gold)
-                    Text(session.drawHint)
-                        .font(.body(14)).foregroundStyle(Theme.textPrimary)
-                        .accessibilityIdentifier("draw-hint")
+                BroadcastPanel(accent: Theme.gold) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack(spacing: 6) {
+                            Image(systemName: "eye.fill").font(.system(size: 11, weight: .bold)).foregroundStyle(Theme.gold)
+                            Kicker(session.defenseCall.callout.uppercased())
+                        }
+                        Text(session.drawHint)
+                            .font(.body(15))
+                            .foregroundStyle(.white)
+                            .accessibilityIdentifier("draw-hint")
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 10)
                 }
-                .padding(.vertical, 10).padding(.horizontal, 14)
-                .frame(maxWidth: .infinity)
-                .background(Theme.card.opacity(0.92), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
                 .allowsHitTesting(false)
                 if session.isFourthDown {
-                    HStack(spacing: 10) {
+                    HStack(spacing: 8) {
                         Button {
                             Haptics.tap(); session.beginKick(.punt)
                         } label: {
                             Label("Punt", systemImage: "arrow.up.to.line")
                         }
-                        .buttonStyle(BigButtonStyle(fill: Theme.card, foreground: Theme.textPrimary))
+                        .buttonStyle(BroadcastButtonStyle(fill: Color.black.opacity(0.55), ink: .white, prominent: false))
                         .accessibilityIdentifier("kick-punt")
                         if session.situation.canAttemptFieldGoal {
                             Button {
                                 Haptics.tap(); session.beginKick(.fieldGoal)
                             } label: {
-                                Label("Field Goal · \(session.situation.fieldGoalDistance) yds", systemImage: "target")
+                                Label("Field goal · \(session.situation.fieldGoalDistance) yds", systemImage: "target")
                             }
-                            .buttonStyle(BigButtonStyle())
+                            .buttonStyle(BroadcastButtonStyle())
                             .accessibilityIdentifier("kick-fieldGoal")
                         }
                     }
@@ -152,28 +121,28 @@ struct GameView: View {
     }
 
     private var resultPanel: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 8) {
             if let verdict = session.lastVerdict {
-                VStack(spacing: 6) {
-                    Text(verdict.headline)
-                        .font(.display(session.lastPlay?.ending != nil ? 32 : 26))
-                        .foregroundStyle(headlineColor(verdict))
-                        .multilineTextAlignment(.center)
-                        .accessibilityIdentifier("result-headline")
-                    Text(verdict.why)
-                        .font(.body(15)).foregroundStyle(Theme.textSecondary)
-                        .multilineTextAlignment(.center)
-                        .fixedSize(horizontal: false, vertical: true)
+                BroadcastPanel(accent: headlineColor(verdict)) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(verdict.headline)
+                            .font(.system(size: session.lastPlay?.ending != nil ? 30 : 26, weight: .black))
+                            .foregroundStyle(headlineColor(verdict))
+                            .accessibilityIdentifier("result-headline")
+                        Text(verdict.why)
+                            .font(.body(15))
+                            .foregroundStyle(.white.opacity(0.9))
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 10)
                 }
-                .padding(.vertical, 12).padding(.horizontal, 14)
-                .frame(maxWidth: .infinity)
-                .background(Theme.card.opacity(0.94), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
             }
             if let tip = session.tip {
                 TipCardView(concept: tip, isNew: true) { session.dismissTip() }
             }
-            Text(session.tip == nil ? "Tap to continue" : "Tap ✕ or anywhere to continue")
-                .font(.label(12)).foregroundStyle(Theme.textSecondary)
+            Kicker(session.tip == nil ? "TAP TO CONTINUE" : "TAP ✕ OR ANYWHERE TO CONTINUE", color: .white.opacity(0.7), size: 10)
+                .padding(.top, 2)
         }
         .contentShape(Rectangle())
         .onTapGesture {
@@ -183,12 +152,11 @@ struct GameView: View {
     }
 
     private func headlineColor(_ v: PlayAnalyst.Verdict) -> Color {
-        // Color from the user's point of view
         let goodForUser = session.userOnOffense ? v.good : v.bad
         let badForUser = session.userOnOffense ? v.bad : v.good
         if goodForUser { return session.lastPlay?.ending?.isScore == true && session.userOnOffense ? Theme.gold : Theme.good }
         if badForUser { return Theme.bad }
-        return Theme.textPrimary
+        return .white
     }
 
     private func kickPanel(_ kind: PlayCall) -> some View {
@@ -203,25 +171,29 @@ struct GameView: View {
     }
 
     private var driveOverPanel: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 6) {
             if let ending = session.driveEnding {
-                Text(driveTitle(ending)).font(.display(24)).foregroundStyle(driveColor(ending))
-                Text(driveSubtitle(ending)).font(.body(14)).foregroundStyle(Theme.textSecondary)
-                    .multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true)
+                BroadcastPanel(accent: driveColor(ending)) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Kicker("DRIVE OVER", color: driveColor(ending))
+                        Text(driveTitle(ending)).font(.system(size: 24, weight: .black)).foregroundStyle(.white)
+                        Text(driveSubtitle(ending)).font(.body(14)).foregroundStyle(.white.opacity(0.85))
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 10)
+                }
             }
-            Text("Tap to continue").font(.label(12)).foregroundStyle(Theme.textSecondary)
+            Kicker("TAP TO CONTINUE", color: .white.opacity(0.7), size: 10)
         }
-        .padding(.vertical, 14).padding(.horizontal, 14)
-        .frame(maxWidth: .infinity)
-        .background(Theme.card.opacity(0.94), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
         .contentShape(Rectangle())
         .onTapGesture { session.skipResult() }
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("drive-over")
     }
 
     private func driveColor(_ ending: DriveEnding) -> Color {
-        if session.userOnOffense { return ending.isScore ? Theme.gold : Theme.textPrimary }
+        if session.userOnOffense { return ending.isScore ? Theme.gold : .white }
         return ending.isScore ? Theme.bad : Theme.good
     }
 
@@ -294,29 +266,36 @@ struct GameView: View {
 
 struct DefenseCallView: View {
     let session: GameSession
-    private let columns = [GridItem(.flexible()), GridItem(.flexible())]
+    private let columns = [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)]
 
     var body: some View {
         VStack(spacing: 8) {
-            Text("Their ball. Pick your defense:")
-                .font(.display(16)).foregroundStyle(Theme.textPrimary)
+            HStack(spacing: 8) {
+                Kicker("THEIR BALL", color: Theme.bad)
+                Text("Pick your defense").font(.system(size: 15, weight: .heavy)).foregroundStyle(.white)
+                Spacer()
+            }
+            .padding(.horizontal, 4)
             LazyVGrid(columns: columns, spacing: 8) {
                 ForEach(DefenseCall.allCases) { call in
                     Button {
                         Haptics.tap()
                         session.chooseDefense(call)
                     } label: {
-                        VStack(alignment: .leading, spacing: 4) {
-                            HStack(spacing: 6) {
-                                Image(systemName: call.symbol).foregroundStyle(Theme.good)
-                                Text(call.title).font(.display(15)).foregroundStyle(Theme.textPrimary)
+                        BroadcastPanel(accent: Theme.good) {
+                            VStack(alignment: .leading, spacing: 4) {
+                                HStack(spacing: 6) {
+                                    Image(systemName: call.symbol).font(.system(size: 12, weight: .bold)).foregroundStyle(Theme.good)
+                                    Text(call.title.uppercased()).font(.system(size: 12, weight: .black)).tracking(1).foregroundStyle(.white)
+                                        .lineLimit(1).minimumScaleFactor(0.8)
+                                }
+                                Text(call.subtitle).font(.body(12)).foregroundStyle(.white.opacity(0.8))
+                                    .fixedSize(horizontal: false, vertical: true)
                             }
-                            Text(call.subtitle).font(.body(12)).foregroundStyle(Theme.textSecondary)
-                                .fixedSize(horizontal: false, vertical: true)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 8)
+                            .frame(minHeight: 84, alignment: .topLeading)
                         }
-                        .padding(10)
-                        .frame(maxWidth: .infinity, minHeight: 92, alignment: .topLeading)
-                        .background(Theme.card.opacity(0.94), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
                     }
                     .buttonStyle(.plain)
                     .accessibilityIdentifier("defense-\(call.rawValue)")

@@ -23,7 +23,7 @@ struct HomeView: View {
                 }
             }
             .toolbar(.hidden, for: .navigationBar)
-            .onAppear { if !pickedOpponent { pickOpponent() } }
+            .onAppear { if !pickedOpponent { pickOpponent() }; SoundKit.shared.setScene(crowd: 0.14) }
             .fullScreenCover(isPresented: $showGame, onDismiss: { pickOpponent() }) {
                 if let team = store.team {
                     GameView(session: GameSession(userTeam: team, opponentTeam: opponent, store: store, autoplay: CommandLine.arguments.contains("-ui-testing-autoplay")))
@@ -159,6 +159,7 @@ struct HomeView: View {
     private var kickoff: some View {
         Button {
             Haptics.heavy()
+            SoundKit.shared.play(.stinger, volume: 0.8)
             showGame = true
         } label: {
             HStack(spacing: 12) {

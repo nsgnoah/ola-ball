@@ -5,7 +5,7 @@ import UIKit
 enum StadiumBuilder {
     static func buildField(into root: SCNNode, user: Team, opponent: Team) -> SCNNode {
         let plane = SCNPlane(width: Art.grassWidthYards, height: Art.grassLengthYards)
-        let material = Art.textured(Art.grassImage(user: user, opponent: opponent), roughness: 0.92)
+        let material = Art.textured(Art.grassImage(), roughness: 0.92)
         material.diffuse.wrapS = .clamp
         material.diffuse.wrapT = .clamp
         material.diffuse.contentsTransform = SCNMatrix4Identity
@@ -17,6 +17,30 @@ enum StadiumBuilder {
         field.position = SCNVector3(0, 0, 50)
         field.castsShadow = false
         root.addChildNode(field)
+
+        // Painted end zones and the midfield crest sit just above the turf as small overlays,
+        // so the big turf texture is generated once and shared by every game.
+        func overlay(_ image: UIImage, width: CGFloat, height: CGFloat, z: Float) -> SCNNode {
+            let p = SCNPlane(width: width, height: height)
+            let m = Art.textured(image, roughness: 0.92)
+            m.diffuse.wrapS = .clamp
+            m.diffuse.wrapT = .clamp
+            m.diffuse.contentsTransform = SCNMatrix4Identity
+            m.transparency = 1
+            p.materials = [m]
+            let n = SCNNode(geometry: p)
+            n.eulerAngles.x = -.pi / 2
+            n.position = SCNVector3(0, 0.012, z)
+            n.castsShadow = false
+            n.renderingOrder = 1
+            return n
+        }
+        root.addChildNode(overlay(Art.endZoneImage(team: user, goalLineAtTop: false), width: CGFloat(Field.width), height: 10, z: -5))
+        root.addChildNode(overlay(Art.endZoneImage(team: opponent, goalLineAtTop: true), width: CGFloat(Field.width), height: 10, z: 105))
+        let crest = overlay(Art.crestImage(team: user), width: 12, height: 12, z: 50)
+        crest.geometry?.firstMaterial?.blendMode = .alpha
+        crest.geometry?.firstMaterial?.transparencyMode = .aOne
+        root.addChildNode(crest)
 
         // Dark apron far beyond the field so nothing reads as a void
         let apron = SCNPlane(width: 600, height: 600)

@@ -25,7 +25,7 @@ final class CameraDirector {
     func framePresnap(los: Float, animated: Bool) {
         presnap = true
         timeScale = 1
-        desiredPosition = SCNVector3(0, 26, los - 30)
+        desiredPosition = SCNVector3(0, 27, los - 32)
         desiredLook = SCNVector3(0, 0.5, los + 7)
         node.camera?.wantsDepthOfField = true
         node.camera?.focusDistance = CGFloat(hypot(desiredPosition.y, desiredLook.z - desiredPosition.z))
@@ -70,8 +70,8 @@ final class CameraDirector {
 
         let back: Float = (16 + min(6, ballHeight * 0.4)) * zoom
         let height: Float = (12.5 + ballHeight * 0.5) * zoom
-        desiredPosition = SCNVector3(center.x * 0.6, height, center.y - back)
-        desiredLook = SCNVector3(center.x * 0.85, 0.8 + ballHeight * 0.5, center.y + 2.5)
+        desiredPosition = SCNVector3(center.x * 0.35, height, center.y - back)
+        desiredLook = SCNVector3(center.x * 0.8, 0.8 + ballHeight * 0.5, center.y + 2.5)
         let k = min(1, dt * 4.5)
         currentPosition = lerp(currentPosition, desiredPosition, k)
         currentLook = lerp(currentLook, desiredLook, min(1, dt * 6))
@@ -96,9 +96,9 @@ final class CameraDirector {
         SCNTransaction.begin()
         SCNTransaction.animationDuration = big ? 1.6 : 0.9
         SCNTransaction.animationTimingFunction = CAMediaTimingFunction(name: .easeOut)
-        let side: Float = big ? 10 : 5.5
-        let height: Float = big ? 9 : 12
-        let back: Float = big ? 11 : 14
+        let side: Float = big ? 10 : 6
+        let height: Float = big ? 10 : 14
+        let back: Float = big ? 12 : 16
         node.position = SCNVector3(focus.x + side, height, focus.y - back)
         node.look(at: SCNVector3(focus.x + side * 0.15, 0.4, focus.y - 3.5))
         SCNTransaction.commit()

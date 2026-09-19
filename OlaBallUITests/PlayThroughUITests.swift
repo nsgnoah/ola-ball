@@ -41,7 +41,7 @@ final class PlayThroughUITests: XCTestCase {
         print("OLABALL game length: \(Int(elapsed)) s")
         XCTAssertTrue(app.buttons["Play again"].waitForExistence(timeout: 5), "Game never reached the final screen")
         app.buttons["Back to home"].tap()
-        XCTAssertTrue(app.buttons["Play a Game"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Play a Game"].waitForExistence(timeout: 15))
         snap(app, "08-home-after-game")
         app.buttons.matching(NSPredicate(format: "label CONTAINS 'Playbook'")).firstMatch.tap()
         XCTAssertTrue(app.staticTexts["The Goal & Four Tries"].waitForExistence(timeout: 5))
@@ -60,8 +60,8 @@ final class PlayThroughUITests: XCTestCase {
         // Dismiss any tip so the field is unobstructed, then drag from the backfield straight upfield.
         if app.buttons["dismiss-tip"].exists { app.buttons["dismiss-tip"].tap() }
         let window = app.windows.firstMatch
-        let from = window.coordinate(withNormalizedOffset: CGVector(dx: 0.44, dy: 0.62))
-        let to = window.coordinate(withNormalizedOffset: CGVector(dx: 0.30, dy: 0.30))
+        let from = window.coordinate(withNormalizedOffset: CGVector(dx: 0.645, dy: 0.645))
+        let to = window.coordinate(withNormalizedOffset: CGVector(dx: 0.55, dy: 0.34))
         from.press(forDuration: 0.1, thenDragTo: to)
         let live = app.staticTexts["LIVE"].waitForExistence(timeout: 3)
         snap(app, "12-after-drag")

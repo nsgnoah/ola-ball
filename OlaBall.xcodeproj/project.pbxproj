@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		068E91701F94BE659E507C30 /* TipDirector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A5E07BD8B56E7E7A3EDA4B /* TipDirector.swift */; };
+		09237C79004E7B8431416AF6 /* SoundKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8A2AE37D0ED796CF90B7C8D /* SoundKit.swift */; };
 		0F0EB3FA65B50257520FF7FA /* GameOverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEDCC075FBF76B439338849 /* GameOverView.swift */; };
 		10D06D4BD458493D0C0B31A7 /* OlaBallApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18F064202EEBD07686BA9389 /* OlaBallApp.swift */; };
 		16E4C228C22B805EAB57228C /* PlayAnalyst.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4F7635E2DCC483B8B25A262 /* PlayAnalyst.swift */; };
@@ -28,6 +29,7 @@
 		59F765E87EC9483A42F2F1FE /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE971345D0D0B52CBD12D47E /* Theme.swift */; };
 		665A76C4346EC80D06ADF75F /* ArtKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEA126B01A4793E336951628 /* ArtKit.swift */; };
 		6B3B9870D9D2030737972384 /* GameSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23DCEB0D42474F0C63EE6453 /* GameSession.swift */; };
+		6F68C78D975C20107B782A85 /* HUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = C73634D2584CBC365EF159CD /* HUD.swift */; };
 		74293DC35DED01E64B324EDE /* Team.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A869CE7218F143B9181A5EB /* Team.swift */; };
 		74A41DB1CAF3EFDB1684FD50 /* HomeSceneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC65CBC0F782D7CA64252B15 /* HomeSceneView.swift */; };
 		7A515E069867340FF2C84930 /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 799C8611EB2178437DFF7F28 /* GameView.swift */; };
@@ -91,6 +93,7 @@
 		84A5E07BD8B56E7E7A3EDA4B /* TipDirector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TipDirector.swift; sourceTree = "<group>"; };
 		861E3FC7724CF424E1B71FD9 /* RulesEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulesEngine.swift; sourceTree = "<group>"; };
 		99DA89790D4CF872BC6A86D2 /* Play.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Play.swift; sourceTree = "<group>"; };
+		A8A2AE37D0ED796CF90B7C8D /* SoundKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundKit.swift; sourceTree = "<group>"; };
 		AA774E78CE553708DD4C4BBF /* EngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineTests.swift; sourceTree = "<group>"; };
 		AB01AD0DD5DBD73850490F6E /* FieldSceneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FieldSceneView.swift; sourceTree = "<group>"; };
 		AB2493D093B186730A811CD1 /* FieldGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FieldGeometry.swift; sourceTree = "<group>"; };
@@ -98,6 +101,7 @@
 		AF4E4A92D9971125574E14E3 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		B9D3B4CD4B593EA3245E178B /* SeededRNG.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeededRNG.swift; sourceTree = "<group>"; };
 		C5E93C1F2304E6984158858B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		C73634D2584CBC365EF159CD /* HUD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HUD.swift; sourceTree = "<group>"; };
 		D4F7635E2DCC483B8B25A262 /* PlayAnalyst.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayAnalyst.swift; sourceTree = "<group>"; };
 		D6A1219E295AB575F75894BA /* PlaybookView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybookView.swift; sourceTree = "<group>"; };
 		DEA126B01A4793E336951628 /* ArtKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtKit.swift; sourceTree = "<group>"; };
@@ -117,6 +121,7 @@
 				5BEDCC075FBF76B439338849 /* GameOverView.swift */,
 				799C8611EB2178437DFF7F28 /* GameView.swift */,
 				AF4E4A92D9971125574E14E3 /* HomeView.swift */,
+				C73634D2584CBC365EF159CD /* HUD.swift */,
 				600EB206143259F0653BAA61 /* KickMeterView.swift */,
 				D6A1219E295AB575F75894BA /* PlaybookView.swift */,
 				5C76BD28218E95DA0CCAE1DB /* TeamPickView.swift */,
@@ -178,6 +183,7 @@
 				29AE2497FBB3AE71C7F0F61F /* Info.plist */,
 				2FB54E8A2979C8D2D7C0446D /* PrivacyInfo.xcprivacy */,
 				735D250A5BF636CA43C8697E /* App */,
+				8DAE0EE45721366615A0EB32 /* Audio */,
 				87900341152A40984872E5BA /* Content */,
 				842B29C4C47249846FA81739 /* Engine */,
 				A6224AD131AD2F9714C47938 /* Game */,
@@ -216,6 +222,14 @@
 				AA774E78CE553708DD4C4BBF /* EngineTests.swift */,
 			);
 			path = OlaBallTests;
+			sourceTree = "<group>";
+		};
+		8DAE0EE45721366615A0EB32 /* Audio */ = {
+			isa = PBXGroup;
+			children = (
+				A8A2AE37D0ED796CF90B7C8D /* SoundKit.swift */,
+			);
+			path = Audio;
 			sourceTree = "<group>";
 		};
 		A1AF66A3D23DF2BFD4B836CC /* Scene */ = {
@@ -414,6 +428,7 @@
 				0F0EB3FA65B50257520FF7FA /* GameOverView.swift in Sources */,
 				6B3B9870D9D2030737972384 /* GameSession.swift in Sources */,
 				7A515E069867340FF2C84930 /* GameView.swift in Sources */,
+				6F68C78D975C20107B782A85 /* HUD.swift in Sources */,
 				74A41DB1CAF3EFDB1684FD50 /* HomeSceneView.swift in Sources */,
 				F7355AE2664FF230153A8582 /* HomeView.swift in Sources */,
 				44272F3D45F5E0307B1CF108 /* KickMeterView.swift in Sources */,
@@ -430,6 +445,7 @@
 				3E1CCD2E39D10E1069F40B55 /* RulesEngine.swift in Sources */,
 				49D5F4FAE6E2900A71584780 /* SeededRNG.swift in Sources */,
 				43C960441B331674B04B9AFB /* Situation.swift in Sources */,
+				09237C79004E7B8431416AF6 /* SoundKit.swift in Sources */,
 				E8892C5E67FAE1174B059FC0 /* StadiumBuilder.swift in Sources */,
 				B5F4A8EC39BF07CE16663DAE /* StadiumScene.swift in Sources */,
 				74293DC35DED01E64B324EDE /* Team.swift in Sources */,

@@ -55,11 +55,13 @@ struct KickMeterView: View {
                 Haptics.heavy()
                 onKick(accuracy)
             }
-            .buttonStyle(BigButtonStyle())
+            .buttonStyle(BroadcastButtonStyle())
             .disabled(kicked)
         }
         .padding()
-        .card(Theme.cardElevated)
+        .background(Color.black.opacity(0.30))
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         .onAppear { start = Date() }
     }
 }

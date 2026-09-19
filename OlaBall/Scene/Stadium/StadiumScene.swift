@@ -165,6 +165,7 @@ final class StadiumScene {
                 burst.runAction(.sequence([.wait(duration: 1.5), .removeFromParentNode()]))
             }
             director.holdOnResult(focus: bp, big: touchdown)
+            pathRoot.opacity = 0.4
         }
     }
 
@@ -186,6 +187,7 @@ final class StadiumScene {
 
     func showPath(_ points: [FieldPoint], color: UIColor) {
         clearPath()
+        pathRoot.opacity = 1
         pathRoot.addChildNode(Effects.pathRibbon(points, color: color))
     }
 

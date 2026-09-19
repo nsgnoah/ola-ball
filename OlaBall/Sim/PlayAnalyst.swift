@@ -35,15 +35,15 @@ enum PlayAnalyst {
                 if let t = a.timeToThrow { return "The rush got home in \(String(format: "%.1f", t)) seconds. A shorter route gets the ball out before that." }
                 return "The rush got to \(qb) before \(route) came open. Shorter routes beat the rush."
             case .interception:
-                if let sep = a.separationAtCatch, sep < 1.5 { return "\(receiver.capitalized) had under a yard of space. Next time look for the receiver with room around him." }
+                if let sep = a.separationAtCatch, sep < 1.5 { return "\(receiver.sentenceCased) had under a yard of space. Next time look for the receiver with room around him." }
                 return "The defender read the throw and jumped it. A sharper cut in the route would have shaken him."
             case .incomplete:
-                if threwItAway { return "\(qb.capitalized) threw it away to avoid the sack. No loss. A quicker, shorter route would have been open in time." }
-                if a.underPressure { return "\(qb.capitalized) had to throw early under pressure. A shorter route, or a run, beats a rush like that." }
+                if threwItAway { return "\(qb.sentenceCased) threw it away to avoid the sack. No loss. A quicker, shorter route would have been open in time." }
+                if a.underPressure { return "\(qb.sentenceCased) had to throw early under pressure. A shorter route, or a run, beats a rush like that." }
                 if let sep = a.separationAtCatch {
                     if sep < 1.5 { return "The defender was all over \(receiver): under a yard of space. Throw to the side with fewer defenders." }
                     if sim.throwDistanceForAnalysis > 30 { return "A long throw is a low-odds throw, even with space. Shorter throws land more often." }
-                    return "\(receiver.capitalized) had space; this one just slipped through. Same idea again works."
+                    return "\(receiver.sentenceCased) had space; this one just slipped through. Same idea again works."
                 }
                 return "The pass fell incomplete. No yards lost, and the same read again is fine."
             case .fumble:
@@ -52,9 +52,9 @@ enum PlayAnalyst {
                 if kind == .pass {
                     let sep = a.separationAtCatch ?? 0
                     let yac = Int(a.yardsAfterCatch.rounded())
-                    if ending == .touchdown { return sep >= 2 ? "\(receiver.capitalized) had \(Int(sep)) yards of space and nobody caught him. That's what open looks like." : "Tight window, big finish." }
+                    if ending == .touchdown { return sep >= 2 ? "\(receiver.sentenceCased) had \(Int(sep)) yards of space and nobody caught him. That's what open looks like." : "Tight window, big finish." }
                     if yac >= 8 { return "Caught with \(Int(sep)) yards of space, then \(yac) more after the catch. Space is yards." }
-                    if sep >= 2.5 { return "\(receiver.capitalized) was open by \(Int(sep)) yards. Easy pitch and catch." }
+                    if sep >= 2.5 { return "\(receiver.sentenceCased) was open by \(Int(sep)) yards. Easy pitch and catch." }
                     return "Tight coverage, but the catch was made. Risky; a route away from the defender is safer."
                 }
                 let box = a.defendersAtPointOfAttack
@@ -79,4 +79,9 @@ enum PlayAnalyst {
 
 extension PlaySim {
     var throwDistanceForAnalysis: Float { analysis.separationAtCatch == nil ? 0 : (plan.pathLength) }
+}
+
+extension String {
+    /// Uppercases only the first character: "your receiver" -> "Your receiver".
+    var sentenceCased: String { prefix(1).uppercased() + dropFirst() }
 }

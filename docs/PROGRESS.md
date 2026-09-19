@@ -2,6 +2,16 @@
 
 Live log of build rounds, newest first. One entry per round: what was built, what the critic said, what changed.
 
+## 2026-09-19 09:05–09:50 (lead session, live with Noah)
+- Noah's verdict on the first 3D pass: "AI slop." New bar: a game you'd show a friend (his reference: Tiger Woods PGA on an iPod Touch).
+- Replaced the renderer with `OlaBall/Scene/Stadium/`: procedural night stadium (turf with mow stripes and painted numbers, crowd bowl, sponsor wall, light towers with bloom, starfield sky used as the lighting environment), articulated players (helmet + facemask, pads, numbered jerseys, run cycle, role stances, tackle pose), glowing drawn-path ribbon with flowing dashes, confetti and turf-burst particles, cinematic camera (pre-snap framing that fits all 22 on a portrait screen, adaptive follow that keeps the receiver in frame, bullet time near contact, result hold framed above the HUD).
+- Home screen is now the stadium: warm-up laps, crane flyover, broadcast-style wordmark, matchup strip, kickoff button, season strip.
+- In-game HUD rebuilt in the same broadcast language: score bug with possession, situation chip, status chip, glass panels with accent bars; game-over restyled to match.
+- Sound: every effect synthesized at launch (`OlaBall/Audio/SoundKit.swift`), no asset files: crowd bed that swells on big plays, snap, pads, catch, whistle, first-down chime, touchdown fanfare and roar, groans, kicks, UI clicks.
+- Formation tightened to fit portrait (receivers ±9.5, corners ±10.5); the shared turf texture is team-agnostic with end zones and crest as overlays, so a new opponent no longer regenerates it.
+- Balance after the formation change: receivers now block the corner over them on run plays, the stacked-box safety lines up over the tight end, run blocking picks up blitzers, and the AI reads a blitz look 70% of the time. Harness: gap run 7.3 vs crowd 0.6, out route 65% caught, slant beats blitz 13 yd, go route vs blitz sacked 45%.
+- Overnight-session overlap postmortem: the 04:25 run started while this session was still alive; both edited the same files for ~4 h (lost tuning, "modified during build" failures). Split ownership at 09:05; it then produced two clean commits and finished ~09:10. Rule going forward: one lead at a time.
+
 ## 2026-09-19 08:38 (autonomous overnight session)
 - Confirmed build compiles, 29 GB disk free. Ran the simlab balance harness cold against the uncommitted PlaySim tuning from the previous session:
   runs 1.0-2.0 yd (no gap-vs-crowd differentiation, BAR wants <3 crowd / 5+ gap), "X go vs blitz" sacked 81% of the time, interceptions up to 21% on some routes.

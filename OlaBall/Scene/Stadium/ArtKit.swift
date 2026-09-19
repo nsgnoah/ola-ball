@@ -72,6 +72,11 @@ enum Art {
         return UIColor(hue: h, saturation: min(1, max(0, s + sDelta)), brightness: min(1, max(0, b + delta)), alpha: a)
     }
 
+    /// SwiftUI color shifted in brightness (for tiles and gradients).
+    static func swiftUI(_ c: Color, brightness delta: CGFloat) -> Color {
+        Color(color(UIColor(c), brightness: delta))
+    }
+
     static func luminance(_ c: UIColor) -> CGFloat {
         var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
         c.getRed(&r, green: &g, blue: &b, alpha: &a)
@@ -122,15 +127,15 @@ enum Art {
 
     // MARK: Grass
 
-    /// The whole playing surface: 65.3 yd across (x in -32.65...32.65) by 132 yd (z in -16...116).
+    /// The playing surface without team art: 65.3 yd across (x in -32.65...32.65) by 132 yd (z in -16...116).
     /// Image row 0 is z = -16 (the near end): the plane's top edge lands at world -z after its rotation.
     /// Screen "up" is world +z and screen "right" is world -x, so glyphs are drawn rotated 180° to read from the camera.
     static let grassPixelsPerYard: CGFloat = 14
     static let grassWidthYards: CGFloat = CGFloat(Field.width) + 12
     static let grassLengthYards: CGFloat = 132
 
-    static func grassImage(user: Team, opponent: Team) -> UIImage {
-        cached("grass-\(user.id)-\(opponent.id)") {
+    static func grassImage() -> UIImage {
+        cached("grass") {
             let ppy = grassPixelsPerYard
             let size = CGSize(width: grassWidthYards * ppy, height: grassLengthYards * ppy)
             return UIGraphicsImageRenderer(size: size).image { ctx in
@@ -147,7 +152,7 @@ enum Art {
                     c.setFillColor(((i / 5) % 2 == 0) ? turfLight.cgColor : turfDark.cgColor)
                     c.fill(CGRect(x: px(-halfW), y: pz(CGFloat(i)), width: halfW * 2 * ppy, height: 5 * ppy))
                 }
-                // Grain: thousands of faint flecks
+                // Grain
                 var rng = SeededRNG(seed: 11)
                 for _ in 0..<14000 {
                     let x = CGFloat(Float.random(in: 0..<1, using: &rng)) * size.width
@@ -160,39 +165,7 @@ enum Art {
                 c.setFillColor(UIColor(red: 0.35, green: 0.30, blue: 0.15, alpha: 0.10).cgColor)
                 c.fill(CGRect(x: px(-CGFloat(Field.hashX) - 1), y: pz(15), width: (CGFloat(Field.hashX) + 1) * 2 * ppy, height: 70 * ppy))
 
-                // End zones with diagonal texture and the team wordmark
-                for (team, z0) in [(user, CGFloat(-10)), (opponent, CGFloat(100))] {
-                    c.setFillColor(color(UIColor(team.color), brightness: -0.08).cgColor)
-                    c.fill(CGRect(x: px(-halfW), y: pz(z0), width: halfW * 2 * ppy, height: 10 * ppy))
-                    c.saveGState()
-                    c.clip(to: CGRect(x: px(-halfW), y: pz(z0), width: halfW * 2 * ppy, height: 10 * ppy))
-                    c.setStrokeColor(UIColor.white.withAlphaComponent(0.06).cgColor)
-                    c.setLineWidth(0.6 * ppy)
-                    var d: CGFloat = -20
-                    while d < grassWidthYards + 20 {
-                        c.move(to: CGPoint(x: px(d), y: pz(z0)))
-                        c.addLine(to: CGPoint(x: px(d + 10), y: pz(z0 + 10)))
-                        d += 2.5
-                    }
-                    c.strokePath()
-                    c.restoreGState()
-                    // Wordmark reads from the +x sideline
-                    let word = team.name.uppercased()
-                    let attrs: [NSAttributedString.Key: Any] = [
-                        .font: UIFont.systemFont(ofSize: 6.2 * ppy, weight: .black),
-                        .foregroundColor: UIColor.white.withAlphaComponent(0.92),
-                        .strokeColor: color(UIColor(team.color), brightness: -0.35),
-                        .strokeWidth: -3.0,
-                    ]
-                    let str = NSAttributedString(string: word, attributes: attrs)
-                    c.saveGState()
-                    c.translateBy(x: px(0), y: pz(z0 + 5))
-                    c.rotate(by: .pi)
-                    str.draw(at: CGPoint(x: -str.size().width / 2, y: -str.size().height / 2))
-                    c.restoreGState()
-                }
-
-                // Sideline borders (6 ft solid) and goal lines
+                // Sideline borders (6 ft solid) and end lines
                 c.setFillColor(paint.cgColor)
                 c.fill(CGRect(x: px(-halfW - 2), y: pz(-10), width: 2 * ppy, height: 120 * ppy))
                 c.fill(CGRect(x: px(halfW), y: pz(-10), width: 2 * ppy, height: 120 * ppy))
@@ -237,28 +210,74 @@ enum Art {
                         str.draw(at: CGPoint(x: -str.size().width / 2, y: -str.size().height / 2))
                         c.restoreGState()
                         if yard != 50 {
-                            // Arrow toward the nearest goal line
                             let dir: CGFloat = yard < 50 ? -1 : 1
-                            let ax = x + (side < 0 ? 0 : 0)
                             let ay = y + dir * 1.9 * ppy
                             c.setFillColor(paint.withAlphaComponent(0.9).cgColor)
-                            c.move(to: CGPoint(x: ax, y: ay + dir * 0.6 * ppy))
-                            c.addLine(to: CGPoint(x: ax - 0.35 * ppy, y: ay - dir * 0.2 * ppy))
-                            c.addLine(to: CGPoint(x: ax + 0.35 * ppy, y: ay - dir * 0.2 * ppy))
+                            c.move(to: CGPoint(x: x, y: ay + dir * 0.6 * ppy))
+                            c.addLine(to: CGPoint(x: x - 0.35 * ppy, y: ay - dir * 0.2 * ppy))
+                            c.addLine(to: CGPoint(x: x + 0.35 * ppy, y: ay - dir * 0.2 * ppy))
                             c.closePath()
                             c.fillPath()
                         }
                     }
                 }
+            }
+        }
+    }
 
-                // Midfield crest: a ring with the home team's emoji
-                let cx = px(0), cy = pz(50)
+    /// A team's painted end zone: 53.3 yd across by 10 deep, with the wordmark reading from the camera.
+    /// `goalLineAtTop` is true for the far end zone (its goal line is the row nearest z = 100).
+    static func endZoneImage(team: Team, goalLineAtTop: Bool) -> UIImage {
+        cached("endzone-\(team.id)-\(goalLineAtTop)") {
+            let ppy = grassPixelsPerYard
+            let size = CGSize(width: CGFloat(Field.width) * ppy, height: 10 * ppy)
+            return UIGraphicsImageRenderer(size: size).image { ctx in
+                let c = ctx.cgContext
+                let base = UIColor(team.color)
+                c.setFillColor(color(base, brightness: -0.08).cgColor)
+                c.fill(CGRect(origin: .zero, size: size))
+                c.setStrokeColor(UIColor.white.withAlphaComponent(0.06).cgColor)
+                c.setLineWidth(0.6 * ppy)
+                var d: CGFloat = -20
+                while d < CGFloat(Field.width) + 20 {
+                    c.move(to: CGPoint(x: d * ppy, y: 0))
+                    c.addLine(to: CGPoint(x: (d + 10) * ppy, y: 10 * ppy))
+                    d += 2.5
+                }
+                c.strokePath()
+                let attrs: [NSAttributedString.Key: Any] = [
+                    .font: UIFont.systemFont(ofSize: 6.2 * ppy, weight: .black),
+                    .foregroundColor: UIColor.white.withAlphaComponent(0.92),
+                    .strokeColor: color(base, brightness: -0.35),
+                    .strokeWidth: -3.0,
+                ]
+                let str = NSAttributedString(string: team.name.uppercased(), attributes: attrs)
+                c.saveGState()
+                c.translateBy(x: size.width / 2, y: size.height / 2)
+                c.rotate(by: .pi)
+                str.draw(at: CGPoint(x: -str.size().width / 2, y: -str.size().height / 2))
+                c.restoreGState()
+                // Goal line along the inner edge
+                c.setFillColor(paint.cgColor)
+                c.fill(CGRect(x: 0, y: goalLineAtTop ? 0 : size.height - 0.22 * ppy, width: size.width, height: 0.22 * ppy))
+            }
+        }
+    }
+
+    /// Midfield crest: a ring with the home team's mark.
+    static func crestImage(team: Team) -> UIImage {
+        cached("crest-\(team.id)") {
+            let ppy = grassPixelsPerYard
+            let size = CGSize(width: 12 * ppy, height: 12 * ppy)
+            return UIGraphicsImageRenderer(size: size).image { ctx in
+                let c = ctx.cgContext
+                let cx = size.width / 2, cy = size.height / 2
+                c.setFillColor(color(UIColor(team.color), brightness: -0.05).withAlphaComponent(0.9).cgColor)
+                c.fillEllipse(in: CGRect(x: cx - 4.5 * ppy, y: cy - 4.5 * ppy, width: 9 * ppy, height: 9 * ppy))
                 c.setStrokeColor(UIColor.white.withAlphaComponent(0.85).cgColor)
                 c.setLineWidth(0.35 * ppy)
                 c.strokeEllipse(in: CGRect(x: cx - 5 * ppy, y: cy - 5 * ppy, width: 10 * ppy, height: 10 * ppy))
-                c.setFillColor(color(UIColor(user.color), brightness: -0.05).withAlphaComponent(0.9).cgColor)
-                c.fillEllipse(in: CGRect(x: cx - 4.5 * ppy, y: cy - 4.5 * ppy, width: 9 * ppy, height: 9 * ppy))
-                let emoji = NSAttributedString(string: user.emoji, attributes: [.font: UIFont.systemFont(ofSize: 5.5 * ppy)])
+                let emoji = NSAttributedString(string: team.emoji, attributes: [.font: UIFont.systemFont(ofSize: 5.5 * ppy)])
                 c.saveGState()
                 c.translateBy(x: cx, y: cy)
                 c.rotate(by: .pi)

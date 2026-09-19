@@ -23,11 +23,11 @@ enum AIPlaycaller {
         func points(from start: FieldPoint, towardMiddle: Float) -> [FieldPoint] {
             let m = towardMiddle // -1 or +1: direction toward the middle of the field
             switch self {
-            case .slant: return [start, start + FieldPoint(0, 3), start + FieldPoint(m * 8, 11), start + FieldPoint(m * 12, 16)]
-            case .out: return [start, start + FieldPoint(0, 6), start + FieldPoint(-m * 7, 7)]
+            case .slant: return [start, start + FieldPoint(0, 2.5), start + FieldPoint(m * 7, 9)]
+            case .out: return [start, start + FieldPoint(0, 6), start + FieldPoint(-m * 6, 7)]
             case .go: return [start, start + FieldPoint(m * 1.5, 10), start + FieldPoint(m * 2, 24)]
-            case .curl: return [start, start + FieldPoint(0, 10), start + FieldPoint(m * 1.5, 8.5)]
-            case .drag: return [start, start + FieldPoint(0, 4), start + FieldPoint(m * 14, 5)]
+            case .curl: return [start, start + FieldPoint(0, 9), start + FieldPoint(m * 1, 7.5)]
+            case .drag: return [start, start + FieldPoint(0, 3), start + FieldPoint(m * 10, 4)]
             }
         }
     }
@@ -38,7 +38,8 @@ enum AIPlaycaller {
         let roll = Int.random(in: 0..<100, using: &rng)
 
         // Does the AI read the defense this snap?
-        let reads = Int.random(in: 0..<100, using: &rng) < 40
+        // A blitz is the easiest look to spot (linebackers creeping up), so the AI reads it most of the time.
+        let reads = Int.random(in: 0..<100, using: &rng) < (call == .blitz ? 70 : 40)
         var wantsPass: Bool
         if s.yardsToGo <= 2 { wantsPass = roll < 25 }
         else if s.down >= 3 && s.yardsToGo >= 7 { wantsPass = roll < 82 }
@@ -74,7 +75,8 @@ enum AIPlaycaller {
     }
 
     private static func passPlan<R: RandomNumberGenerator>(los: Float, players: [SimPlayer], against call: DefenseCall, reads: Bool, using rng: inout R) -> PlayPlan {
-        let tags = ["X", "Z", "Y", "TE"]
+        // Against a blitz the tight end stays in to block, so a read keeps the ball going to the receivers.
+        let tags = (call == .blitz && reads) ? ["X", "Z", "Y"] : ["X", "Z", "Y", "TE"]
         let tag = tags[Int.random(in: 0..<tags.count, using: &rng)]
         guard let receiver = players.first(where: { $0.tag == tag }) else { return PlayPlan(ballHandlerTag: "Z", path: []) }
         var route: Route
