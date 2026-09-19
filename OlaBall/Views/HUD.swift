@@ -1,47 +1,13 @@
 import SwiftUI
 
-/// Field HUD pieces (night glass) and the shared paper components.
-
-struct BroadcastPanel<Content: View>: View {
-    var accent: Color? = nil
-    @ViewBuilder let content: Content
-
-    var body: some View {
-        HStack(spacing: 0) {
-            if let accent { Rectangle().fill(accent).frame(width: 5) }
-            content.frame(maxWidth: .infinity, alignment: .leading)
-        }
-        .fixedSize(horizontal: false, vertical: true)
-        .background(Color.black.opacity(0.30))
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).stroke(.white.opacity(0.12), lineWidth: 1))
-    }
-}
-
-/// A cream note card over the field: Ola's notes, results, calls.
-struct PaperPanel<Content: View>: View {
-    var accent: Color? = nil
-    @ViewBuilder let content: Content
-
-    var body: some View {
-        HStack(spacing: 0) {
-            if let accent { Rectangle().fill(accent).frame(width: 6) }
-            content.frame(maxWidth: .infinity, alignment: .leading)
-        }
-        .fixedSize(horizontal: false, vertical: true)
-        .background(Theme.paper)
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-        .shadow(color: .black.opacity(0.35), radius: 14, y: 8)
-    }
-}
+/// Shared paper-and-ink pieces.
 
 struct Kicker: View {
     let text: String
-    var color: Color = Theme.gold
+    var color: Color = Theme.ink3
     var size: CGFloat = 12
 
-    init(_ text: String, color: Color = Theme.gold, size: CGFloat = 12) {
+    init(_ text: String, color: Color = Theme.ink3, size: CGFloat = 12) {
         self.text = text; self.color = color; self.size = size
     }
 
@@ -50,173 +16,53 @@ struct Kicker: View {
     }
 }
 
-struct StatusChip: View {
-    let text: String
-    let fill: Color
-    let ink: Color
-
+/// A small pill that names a world.
+struct WorldTag: View {
+    let world: World
     var body: some View {
-        Text(text)
-            .font(.condensed(13))
-            .tracking(1.6)
-            .foregroundStyle(ink)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 6)
-            .background(fill, in: RoundedRectangle(cornerRadius: 6, style: .continuous))
-    }
-}
-
-struct BroadcastButtonStyle: ButtonStyle {
-    var fill: Color = Theme.gold
-    var ink: Color = Color(hex: "0B1220")
-    var prominent = true
-
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .font(.headline(20))
-            .tracking(1)
-            .textCase(.uppercase)
-            .foregroundStyle(ink)
-            .frame(maxWidth: .infinity)
-            .frame(height: 50)
-            .background(
-                prominent
-                    ? AnyShapeStyle(LinearGradient(colors: [Color(hex: "FFD65C"), Theme.gold, Color(hex: "E8AE1E")], startPoint: .top, endPoint: .bottom))
-                    : AnyShapeStyle(fill),
-                in: RoundedRectangle(cornerRadius: 10, style: .continuous)
-            )
-            .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).stroke(.white.opacity(prominent ? 0.25 : 0.15), lineWidth: 1))
-            .scaleEffect(configuration.isPressed ? 0.97 : 1)
-            .animation(.spring(duration: 0.2), value: configuration.isPressed)
-    }
-}
-
-/// The TV-style score bug: both teams, period, possession, plus a status row with the down and distance.
-struct ScoreBug: View {
-    let session: GameSession
-    let onClose: () -> Void
-
-    var body: some View {
-        VStack(spacing: 6) {
-            HStack(spacing: 0) {
-                teamCell(session.userTeam, score: session.userScore, hasBall: session.userOnOffense && session.phase != .gameOver, leading: true)
-                periodCell
-                teamCell(session.opponentTeam, score: session.opponentScore, hasBall: !session.userOnOffense && session.phase != .gameOver, leading: false)
-            }
-            .frame(height: 54)
-            .background(Color.black.opacity(0.32))
-            .background(.ultraThinMaterial)
-            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).stroke(.white.opacity(0.12), lineWidth: 1))
-
-            HStack(spacing: 8) {
-                Button(action: onClose) {
-                    Image(systemName: "xmark")
-                        .font(.system(size: 12, weight: .black))
-                        .foregroundStyle(.white)
-                        .frame(width: 30, height: 30)
-                        .background(Color.black.opacity(0.45), in: RoundedRectangle(cornerRadius: 7, style: .continuous))
-                }
-                .accessibilityIdentifier("close-game")
-                Text(session.situationText)
-                    .font(.condensed(14))
-                    .tracking(1)
-                    .textCase(.uppercase)
-                    .foregroundStyle(.white)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.7)
-                    .padding(.horizontal, 10)
-                    .frame(height: 30)
-                    .background(Color.black.opacity(0.45), in: RoundedRectangle(cornerRadius: 7, style: .continuous))
-                    .accessibilityIdentifier("situation")
-                Spacer(minLength: 4)
-                statusChip
-            }
-        }
-    }
-
-    private var statusChip: some View {
-        Group {
-            switch session.phase {
-            case .live:
-                StatusChip(text: "LIVE", fill: Theme.bad, ink: .white)
-            case .gameOver:
-                StatusChip(text: "FINAL", fill: .white, ink: Theme.ink)
-            default:
-                if session.userOnOffense {
-                    StatusChip(text: "YOUR BALL", fill: Theme.gold, ink: Theme.ink)
-                } else {
-                    StatusChip(text: "YOUR DEFENSE", fill: Theme.good, ink: Theme.ink)
-                }
-            }
-        }
-    }
-
-    private var periodCell: some View {
-        VStack(spacing: -2) {
-            Text(session.periodLabel).font(.score(22)).foregroundStyle(Theme.gold)
-            Text(session.phase == .gameOver ? "FINAL" : "QTR").font(.condensed(9)).tracking(1.5).foregroundStyle(Theme.textSecondary)
-        }
-        .frame(width: 52)
-        .frame(maxHeight: .infinity)
-        .background(Color.black.opacity(0.25))
-    }
-
-    private func teamCell(_ team: Team, score: Int, hasBall: Bool, leading: Bool) -> some View {
-        HStack(spacing: 6) {
-            if leading {
-                Rectangle().fill(team.color).frame(width: 5)
-                Monogram(team: team, size: 26).padding(.leading, 4)
-                Text(team.abbreviation).font(.condensed(15)).tracking(1.5).foregroundStyle(.white)
-                if hasBall { possession }
-                Spacer(minLength: 2)
-                scoreText(score).padding(.trailing, 10)
-            } else {
-                scoreText(score).padding(.leading, 10)
-                Spacer(minLength: 2)
-                if hasBall { possession }
-                Text(team.abbreviation).font(.condensed(15)).tracking(1.5).foregroundStyle(.white)
-                Monogram(team: team, size: 26).padding(.trailing, 4)
-                Rectangle().fill(team.color).frame(width: 5)
-            }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-
-    private var possession: some View {
-        Circle().fill(Theme.gold).frame(width: 7, height: 7)
-    }
-
-    private func scoreText(_ score: Int) -> some View {
-        Text("\(score)")
-            .font(.score(36))
+        Text(world.title.uppercased())
+            .font(.condensed(11)).tracking(1.5)
             .foregroundStyle(.white)
-            .contentTransition(.numericText())
-            .animation(.spring(duration: 0.5), value: score)
+            .padding(.horizontal, 8).padding(.vertical, 4)
+            .background(world.color, in: Capsule())
     }
 }
 
-/// A club crest: the monogram letter on a team-color disc with a fine ring.
-struct Monogram: View {
-    let team: Team
+/// A player's avatar: initial on a world-colored disc.
+struct Avatar: View {
+    let name: String
+    let world: World
     var size: CGFloat = 40
 
     var body: some View {
         ZStack {
-            Circle().fill(LinearGradient(colors: [Art.swiftUI(team.color, brightness: 0.08), Art.swiftUI(team.color, brightness: -0.14)], startPoint: .top, endPoint: .bottom))
-            Circle().stroke(.white.opacity(0.35), lineWidth: max(1, size * 0.035))
-            Circle().stroke(.black.opacity(0.25), lineWidth: max(1, size * 0.02)).padding(size * 0.1)
-            Text(team.monogram)
-                .font(.headline(size * 0.6))
+            Circle().fill(LinearGradient(colors: [world.color.opacity(0.95), world.color.opacity(0.7)], startPoint: .top, endPoint: .bottom))
+            Circle().stroke(.white.opacity(0.4), lineWidth: max(1, size * 0.03))
+            Text(String(name.prefix(1)).uppercased())
+                .font(.headline(size * 0.55))
                 .foregroundStyle(.white)
                 .offset(y: size * 0.02)
-                .shadow(color: .black.opacity(0.35), radius: size * 0.04, y: size * 0.03)
         }
         .frame(width: size, height: size)
     }
 }
 
-/// Coach Ola's badge: a gold disc with a headset. She's the voice on the other end of your headset.
+/// A crown row: filled for rounds won.
+struct Crowns: View {
+    let count: Int
+    var color: Color = Theme.ink
+    var body: some View {
+        HStack(spacing: 4) {
+            ForEach(0..<MatchState.roundsToWin, id: \.self) { i in
+                Image(systemName: i < count ? "crown.fill" : "crown")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundStyle(i < count ? color : Theme.ink3.opacity(0.5))
+            }
+        }
+    }
+}
+
+/// Ola, the host. A gold disc with a headset.
 struct OlaBadge: View {
     var size: CGFloat = 28
     var body: some View {
@@ -226,5 +72,57 @@ struct OlaBadge: View {
             Image(systemName: "headphones").font(.system(size: size * 0.5, weight: .black)).foregroundStyle(Theme.ink)
         }
         .frame(width: size, height: size)
+    }
+}
+
+/// Deck tile used wherever a deck is shown.
+struct DeckTile: View {
+    let deck: Deck
+    var compact = false
+
+    var body: some View {
+        ZStack(alignment: .topLeading) {
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(LinearGradient(colors: [Art.lighter(deck.color, 0.06), Art.darker(deck.color, 0.16)], startPoint: .topLeading, endPoint: .bottomTrailing))
+            GeometryReader { geo in
+                Path { p in
+                    p.move(to: CGPoint(x: geo.size.width * 0.55, y: 0))
+                    p.addLine(to: CGPoint(x: geo.size.width, y: 0))
+                    p.addLine(to: CGPoint(x: geo.size.width * 0.45, y: geo.size.height))
+                    p.addLine(to: CGPoint(x: 0, y: geo.size.height))
+                    p.closeSubpath()
+                }
+                .fill(.white.opacity(0.07))
+            }
+            VStack(alignment: .leading, spacing: 0) {
+                Image(systemName: deck.symbol).font(.system(size: compact ? 18 : 24, weight: .bold)).foregroundStyle(.white.opacity(0.95))
+                Spacer(minLength: 6)
+                Text(deck.title.uppercased()).font(.headline(compact ? 18 : 22)).foregroundStyle(.white).lineLimit(2).minimumScaleFactor(0.7)
+                if !compact {
+                    Text(deck.tagline).font(.body(12)).foregroundStyle(.white.opacity(0.8)).lineLimit(2).fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .padding(compact ? 10 : 14)
+        }
+        .frame(height: compact ? 92 : 150)
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .shadow(color: .black.opacity(0.12), radius: 8, y: 5)
+    }
+}
+
+enum Art {
+    static func lighter(_ c: Color, _ amount: CGFloat) -> Color { shift(c, amount) }
+    static func darker(_ c: Color, _ amount: CGFloat) -> Color { shift(c, -amount) }
+    private static func shift(_ c: Color, _ delta: CGFloat) -> Color {
+        var h: CGFloat = 0, s: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+        UIColor(c).getHue(&h, saturation: &s, brightness: &b, alpha: &a)
+        return Color(UIColor(hue: h, saturation: s, brightness: min(1, max(0, b + delta)), alpha: a))
+    }
+}
+
+extension Haptics {
+    static func answer(correct: Bool) {
+        if correct { UINotificationFeedbackGenerator().notificationOccurred(.success) }
+        else { UINotificationFeedbackGenerator().notificationOccurred(.error) }
     }
 }

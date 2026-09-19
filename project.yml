@@ -18,10 +18,12 @@ targets:
     info:
       path: OlaBall/Info.plist
       properties:
-        CFBundleDisplayName: Ola Ball
+        CFBundleDisplayName: Ola
         UILaunchScreen: {}
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
         ITSAppUsesNonExemptEncryption: false
+    entitlements:
+      path: OlaBall/OlaBall.entitlements
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: co.nsgsolutions.olaball

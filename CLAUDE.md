@@ -1,19 +1,23 @@
-# Ola Ball
+# Ola
 
-Native SwiftUI iOS game (iOS 17+). You coach a football team drive by drive; football's rules are taught in-context by Coach's Tips, never by quizzes. Target user: an adult who watches sports with a partner and never learned the rules.
+Native SwiftUI iOS trivia game for couples (iOS 17+). Two "worlds": His World and Her World. Each player declares the world they know; each round the challenger picks the deck their partner gets quizzed on (from the challenger's own world). Five rounds, seven questions each, difficulty escalates from Rookie to Legend, first to three crowns wins. Async on two phones through Game Center turn-based matches, or pass-and-play on one phone.
 
 ## Non-negotiables
-- **Not a quiz app.** Learning happens as a side effect of making a decision. Never add "test yourself" mechanics, lesson lists, or right/wrong grading of knowledge.
-- **Beginner voice.** Assume zero football knowledge. Define a term the first time it matters (via `Concept` + `TipDirector`), then use it freely.
-- **No real teams, players, leagues, or logos.** Fictional teams only (`Team.all`). Never mention the NFL.
-- **App Store safe.** No accounts, no network, no permissions, no third-party SDKs. Keep `PrivacyInfo.xcprivacy` accurate if storage changes.
+- **Opinionated, not generic.** The his/her framing is the identity. Ola (the host) has a voice: dry, warm, never scolding.
+- **Facts must be right.** Every question is a verifiable public fact. No opinions dressed as facts. Real people, brands, and titles are fine in trivia; keep them factual and non-defamatory.
+- **App Store safe.** No accounts of our own, no passwords, no server, no third-party SDKs. Game Center only (the `com.apple.developer.game-center` entitlement). Keep `PrivacyInfo.xcprivacy` accurate.
+- **Design system**: paper (`Theme.paper`, ink text, hairline rules) with world colors as the only accents; type is Futura Condensed ExtraBold for headlines/scores, Avenir Next for reading. No dark generic cards.
 
 ## Architecture
-- `Engine/` is pure and seedable (`SeededRNG`). Test it, don't mock it.
-- `Game/GameSession` is the single source of truth during a game. Views render it and call its methods; they hold no game logic.
-- `Content/Concepts.swift` is the Playbook. `Content/TipDirector.swift` decides which single tip fires at a moment (one per moment, fundamentals first). Every concept must be reachable; there's a test for it.
-- `Store/ProgressStore` persists to UserDefaults only.
+- `Models/`: `Deck`/`Question` (content), `MatchState` (the JSON both phones agree on), `Profile`.
+- `Content/HerWorld.swift`, `Content/HisWorld.swift`: 12 decks × 36 questions (12 per tier). Author with `Q(tier, prompt, correct, [wrong×3], fact?)`. Option order is shuffled deterministically per question id.
+- `Engine/MatchEngine.swift`: pure rules (question draw, tiers per round, scoring). `Engine/MatchController.swift`: one match's UI state machine; it talks to a `MatchTransport`.
+- `Services/GameCenterService.swift` (+ `GameCenterTransport`), `Services/LocalMatchStore.swift` (+ `PassAndPlayTransport`).
+- `Views/`: `HomeView` (match lists), `MatchView` (stage switch), `DeckPickView`, `QuestionView`, `RoundRevealView`, `MatchOverView`, `ProfileSetupView`.
+- `Audio/SoundKit.swift`: synthesized cues, no audio files.
 
 ## Workflow
-- The project is generated: edit `project.yml`, then `xcodegen generate`. Don't hand-edit the `.xcodeproj`.
-- Run tests before committing: `xcodebuild test -project OlaBall.xcodeproj -scheme OlaBall -destination 'platform=iOS Simulator,name=iPhone 16 Pro'`.
+- Project is generated: edit `project.yml`, run `xcodegen generate`. Never hand-edit the `.xcodeproj`.
+- Build/test: `xcodebuild test -project OlaBall.xcodeproj -scheme OlaBall -destination 'platform=iOS Simulator,id=22F189D4-EAEA-44E5-A62A-DFF364B638E5'` (iPhone 16 Pro). UI test plays a full pass-and-play match; set `TEST_RUNNER_OLABALL_SHOTS=<dir>` for screenshots.
+- Game Center needs a signed-in sandbox account on the simulator (Settings > Game Center) to test online; pass-and-play covers everything else.
+- The football prototype lives at tag `v1-football-draw-the-play`.

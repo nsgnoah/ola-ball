@@ -1,71 +1,55 @@
 import XCTest
 
-/// Plays a full game end-to-end (the session autoplays the user's calls) and saves screenshots to $OLABALL_SHOTS.
+/// Plays a whole pass-and-play match on one phone and saves screenshots to $OLABALL_SHOTS.
 final class PlayThroughUITests: XCTestCase {
     private var shotDir: String? { ProcessInfo.processInfo.environment["OLABALL_SHOTS"] }
 
     private func snap(_ app: XCUIApplication, _ name: String) {
         guard let shotDir else { return }
-        let png = app.screenshot().pngRepresentation
-        try? png.write(to: URL(fileURLWithPath: shotDir).appendingPathComponent("\(name).png"))
+        try? app.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: shotDir).appendingPathComponent("\(name).png"))
     }
 
-    func testFullGameAutoplay() {
-        let app = XCUIApplication()
-        app.launchArguments = ["-ui-testing-reset", "-ui-testing-autoplay"]
-        app.launch()
-
-        XCTAssertTrue(app.staticTexts["CLUB"].waitForExistence(timeout: 5))
-        app.buttons.matching(NSPredicate(format: "label CONTAINS 'Mallards'")).firstMatch.tap()
-        snap(app, "01-teampick")
-        app.buttons["lets-go"].tap()
-        XCTAssertTrue(app.buttons["kickoff"].waitForExistence(timeout: 8))
-        snap(app, "02-home")
-        app.buttons["kickoff"].tap()
-
-        let start = Date()
-        var shots: Set<String> = []
-        var ticks = 0
-        while ticks < 900 {   // up to ~7.5 minutes
-            ticks += 1
-            if app.buttons["play-again"].exists { snap(app, "09-game-over"); break }
-            if !shots.contains("presnap") && app.staticTexts["draw-hint"].exists { snap(app, "03-presnap"); shots.insert("presnap") }
-            if !shots.contains("live") && app.staticTexts["LIVE"].exists { snap(app, "04-live"); shots.insert("live") }
-            if !shots.contains("result") && app.staticTexts["result-headline"].exists { snap(app, "05-result"); shots.insert("result") }
-            if !shots.contains("driveover") && app.otherElements["drive-over"].exists { snap(app, "06-drive-over"); shots.insert("driveover") }
-            if !shots.contains("defense") && app.staticTexts["YOUR DEFENSE"].exists && app.staticTexts["LIVE"].exists == false { snap(app, "07-defense-live"); shots.insert("defense") }
-            if ticks % 40 == 0 { snap(app, "mid-\(ticks / 40)") }
-            usleep(500_000)
-        }
-        let elapsed = Date().timeIntervalSince(start)
-        print("OLABALL game length: \(Int(elapsed)) s")
-        XCTAssertTrue(app.buttons["play-again"].waitForExistence(timeout: 5), "Game never reached the final screen")
-        app.buttons["back-to-home"].tap()
-        XCTAssertTrue(app.buttons["kickoff"].waitForExistence(timeout: 15))
-        snap(app, "08-home-after-game")
-        app.buttons.matching(NSPredicate(format: "label CONTAINS 'Playbook'")).firstMatch.tap()
-        XCTAssertTrue(app.staticTexts["The Goal & Four Tries"].waitForExistence(timeout: 5))
-        snap(app, "10-playbook")
-    }
-
-    func testDrawGestureStartsAPlay() {
+    func testPassAndPlayMatch() {
         let app = XCUIApplication()
         app.launchArguments = ["-ui-testing-reset"]
         app.launch()
-        app.buttons.matching(NSPredicate(format: "label CONTAINS 'Dragons'")).firstMatch.tap()
-        app.buttons["lets-go"].tap()
-        app.buttons["kickoff"].tap()
-        XCTAssertTrue(app.staticTexts["draw-hint"].waitForExistence(timeout: 8))
-        snap(app, "11-presnap-manual")
-        // Dismiss any tip so the field is unobstructed, then drag from the backfield straight upfield.
-        if app.buttons["dismiss-tip"].exists { app.buttons["dismiss-tip"].tap() }
-        let window = app.windows.firstMatch
-        let from = window.coordinate(withNormalizedOffset: CGVector(dx: 0.645, dy: 0.645))
-        let to = window.coordinate(withNormalizedOffset: CGVector(dx: 0.55, dy: 0.34))
-        from.press(forDuration: 0.1, thenDragTo: to)
-        let live = app.staticTexts["LIVE"].waitForExistence(timeout: 3)
-        snap(app, "12-after-drag")
-        XCTAssertTrue(live || app.staticTexts["result-headline"].waitForExistence(timeout: 8), "Drag did not start a play")
-        snap(app, "13-manual-result")
+
+        // Profile
+        XCTAssertTrue(app.buttons["world-his"].waitForExistence(timeout: 5))
+        snap(app, "01-profile")
+        app.buttons["world-his"].tap()
+        let name = app.textFields["name-field"]
+        name.tap(); name.typeText("Noah")
+        app.buttons["profile-done"].tap()
+
+        // Home → new local match
+        XCTAssertTrue(app.buttons["new-local-match"].waitForExistence(timeout: 5))
+        snap(app, "02-home")
+        app.buttons["new-local-match"].tap()
+        let partner = app.textFields["partner-name"]
+        XCTAssertTrue(partner.waitForExistence(timeout: 5))
+        partner.tap(); partner.typeText("Sam")
+        app.buttons["partner-world-hers"].tap()
+        snap(app, "03-new-match")
+        app.buttons["create-local-match"].tap()
+
+        var shots: Set<String> = []
+        var steps = 0
+        while steps < 400 {
+            steps += 1
+            if app.staticTexts["match-over"].exists { snap(app, "09-match-over"); break }
+            if app.buttons["handoff-continue"].exists { if shots.insert("handoff").inserted { snap(app, "05-handoff") }; app.buttons["handoff-continue"].tap(); continue }
+            if app.buttons["start-round"].exists { if shots.insert("intro").inserted { snap(app, "06-round-intro") }; app.buttons["start-round"].tap(); continue }
+            if app.buttons["next-question"].exists { if shots.insert("answered").inserted { snap(app, "07-answered") }; app.buttons["next-question"].tap(); continue }
+            if app.buttons["option-0"].exists { if shots.insert("question").inserted { snap(app, "07-question") }; app.buttons["option-\(steps % 4)"].tap(); continue }
+            if app.buttons["reveal-continue"].exists { if shots.insert("reveal").inserted { snap(app, "08-round-reveal") }; app.buttons["reveal-continue"].tap(); continue }
+            let deckButtons = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'deck-'"))
+            if deckButtons.count > 0 { if shots.insert("pick").inserted { snap(app, "04-pick") }; deckButtons.element(boundBy: steps % deckButtons.count).tap(); continue }
+            usleep(200_000)
+        }
+        XCTAssertTrue(app.staticTexts["match-over"].waitForExistence(timeout: 5), "match never finished after \(steps) steps")
+        app.buttons["back-to-matches"].tap()
+        XCTAssertTrue(app.buttons["new-local-match"].waitForExistence(timeout: 5))
+        snap(app, "10-home-after")
     }
 }

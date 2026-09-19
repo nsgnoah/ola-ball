@@ -1,512 +1,190 @@
 import AVFoundation
 
-/// Every sound in the game is synthesized at launch. No audio files, nothing downloaded.
-enum Sound: CaseIterable {
-    case tap, snap, whistle, thud, bigHit, catchBall, kick, incomplete, firstDown, touchdown, cheer, groan, stinger
-}
+/// Every sound is synthesized at launch. No audio files.
+enum Sound: CaseIterable { case tap, tick, correct, wrong, swoosh, crown, fanfare, lose }
 
 final class SoundKit {
     static let shared = SoundKit()
-
     var isEnabled = true
 
     private let engine = AVAudioEngine()
     private let format = AVAudioFormat(standardFormatWithSampleRate: 44_100, channels: 1)!
     private var buffers: [Sound: AVAudioPCMBuffer] = [:]
     private var players: [AVAudioPlayerNode] = []
-    private var nextPlayer = 0
-    private let crowdNode = AVAudioPlayerNode()
-    private let musicNode = AVAudioPlayerNode()
-    private var musicOn = false
-    private let paNode = AVAudioPlayerNode()
-    private let paEQ = AVAudioUnitEQ(numberOfBands: 2)
-    private let paReverb = AVAudioUnitReverb()
-    private var paFormat: AVAudioFormat?
+    private var next = 0
     private var started = false
     private var ready = false
-
-    /// Crowd bed: a base level for the current scene plus a decaying excitement term.
-    private(set) var crowdBase: Float = 0
-    private var excitement: Float = 0
 
     private init() {}
 
     func start() {
         guard !started else { return }
         started = true
-        do {
-            try AVAudioSession.sharedInstance().setCategory(.ambient, options: [.mixWithOthers])
-            try AVAudioSession.sharedInstance().setActive(true)
-        } catch {
-            // Sound is a nicety; the game plays fine silent.
-        }
-        for _ in 0..<8 {
+        try? AVAudioSession.sharedInstance().setCategory(.ambient, options: [.mixWithOthers])
+        try? AVAudioSession.sharedInstance().setActive(true)
+        for _ in 0..<6 {
             let p = AVAudioPlayerNode()
             engine.attach(p)
             engine.connect(p, to: engine.mainMixerNode, format: format)
             players.append(p)
         }
-        engine.attach(crowdNode)
-        engine.connect(crowdNode, to: engine.mainMixerNode, format: format)
-        engine.attach(musicNode)
-        engine.connect(musicNode, to: engine.mainMixerNode, format: format)
-        // Stadium PA chain: tinny band-limited EQ into a big hall.
-        engine.attach(paNode)
-        engine.attach(paEQ)
-        engine.attach(paReverb)
-        paEQ.bands[0].filterType = .highPass
-        paEQ.bands[0].frequency = 380
-        paEQ.bands[0].bypass = false
-        paEQ.bands[1].filterType = .lowPass
-        paEQ.bands[1].frequency = 3600
-        paEQ.bands[1].bypass = false
-        paReverb.loadFactoryPreset(.largeHall2)
-        paReverb.wetDryMix = 48
-        engine.mainMixerNode.outputVolume = 0.9
-
         let format = self.format
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-            let rendered = Synth.renderAll(format: format)
-            let crowd = Synth.crowdLoop(format: format)
-            let drums = Synth.drumline(format: format)
+            var rendered: [Sound: AVAudioPCMBuffer] = [:]
+            for s in Sound.allCases { rendered[s] = Synth.buffer(Synth.render(s), format: format) }
             DispatchQueue.main.async {
                 guard let self else { return }
                 self.buffers = rendered
                 do { try self.engine.start() } catch { return }
                 for p in self.players { p.play() }
-                self.crowdNode.volume = 0
-                self.crowdNode.scheduleBuffer(crowd, at: nil, options: [.loops])
-                self.crowdNode.play()
-                self.musicNode.volume = self.musicOn ? 0.3 : 0
-                self.musicNode.scheduleBuffer(drums, at: nil, options: [.loops])
-                self.musicNode.play()
                 self.ready = true
-                self.applyCrowd()
             }
         }
     }
 
     func play(_ sound: Sound, volume: Float = 1) {
-        guard isEnabled, ready, engine.isRunning, let buffer = buffers[sound] else { return }
-        let p = players[nextPlayer]
-        nextPlayer = (nextPlayer + 1) % players.count
+        guard isEnabled, ready, engine.isRunning, let b = buffers[sound] else { return }
+        let p = players[next]
+        next = (next + 1) % players.count
         p.volume = volume
-        p.scheduleBuffer(buffer, at: nil, options: [.interrupts])
+        p.scheduleBuffer(b, at: nil, options: [.interrupts])
         if !p.isPlaying { p.play() }
-    }
-
-    func setScene(crowd level: Float) {
-        crowdBase = level
-        applyCrowd()
-    }
-
-    /// Play synthesized speech through the PA chain. Buffers arrive in the synthesizer's own format.
-    func playPA(_ buffers: [AVAudioPCMBuffer], volume: Float = 1.0) {
-        guard isEnabled, ready, engine.isRunning, let first = buffers.first else { return }
-        if paFormat == nil || paFormat!.sampleRate != first.format.sampleRate || paFormat!.channelCount != first.format.channelCount {
-            paFormat = first.format
-            engine.disconnectNodeOutput(paNode)
-            engine.disconnectNodeOutput(paEQ)
-            engine.disconnectNodeOutput(paReverb)
-            engine.connect(paNode, to: paEQ, format: first.format)
-            engine.connect(paEQ, to: paReverb, format: first.format)
-            engine.connect(paReverb, to: engine.mainMixerNode, format: first.format)
-        }
-        paNode.volume = volume
-        for b in buffers { paNode.scheduleBuffer(b, at: nil) }
-        if !paNode.isPlaying { paNode.play() }
-    }
-
-    /// The drumline cadence: on for the home screen, off once a game starts.
-    func setMusic(_ on: Bool) {
-        musicOn = on
-        guard ready else { return }
-        musicNode.volume = (on && isEnabled) ? 0.3 : 0
-    }
-
-    /// Bump the crowd; it settles back over a couple of seconds.
-    func excite(_ amount: Float) {
-        excitement = min(0.6, excitement + amount)
-        applyCrowd()
-    }
-
-    /// Call once per frame from whoever owns the clock.
-    func update(dt: Float) {
-        guard excitement > 0.001 else { return }
-        excitement *= exp(-dt / 1.6)
-        applyCrowd()
-    }
-
-    private func applyCrowd() {
-        guard ready else { return }
-        crowdNode.volume = isEnabled ? min(0.9, crowdBase + excitement) : 0
     }
 }
 
-// MARK: - Synthesis
-
 enum Synth {
     static let sr: Float = 44_100
-
-    static func renderAll(format: AVAudioFormat) -> [Sound: AVAudioPCMBuffer] {
-        var out: [Sound: AVAudioPCMBuffer] = [:]
-        for s in Sound.allCases {
-            out[s] = buffer(render(s), format: format)
-        }
-        return out
-    }
+    static func frames(_ s: Float) -> Int { Int(s * sr) }
 
     static func render(_ sound: Sound) -> [Float] {
         switch sound {
         case .tap: return tap()
-        case .snap: return snap()
-        case .whistle: return whistle()
-        case .thud: return thud(big: false)
-        case .bigHit: return thud(big: true)
-        case .catchBall: return catchBall()
-        case .kick: return kick()
-        case .incomplete: return groan(duration: 1.1, depth: 0.7)
-        case .firstDown: return chime()
-        case .touchdown: return fanfare()
-        case .cheer: return cheer()
-        case .groan: return groan(duration: 1.9, depth: 1.0)
-        case .stinger: return stinger()
+        case .tick: return tick()
+        case .correct: return correct()
+        case .wrong: return wrong()
+        case .swoosh: return swoosh()
+        case .crown: return crown()
+        case .fanfare: return fanfare()
+        case .lose: return lose()
         }
     }
-
-    // MARK: Building blocks
 
     static func buffer(_ samples: [Float], format: AVAudioFormat) -> AVAudioPCMBuffer {
         let buf = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: AVAudioFrameCount(samples.count))!
         buf.frameLength = AVAudioFrameCount(samples.count)
-        let ptr = buf.floatChannelData![0]
-        for i in 0..<samples.count { ptr[i] = samples[i] }
+        for i in 0..<samples.count { buf.floatChannelData![0][i] = samples[i] }
         return buf
     }
-
-    static func frames(_ seconds: Float) -> Int { Int(seconds * sr) }
 
     static func noise(_ n: Int, seed: UInt64) -> [Float] {
         var rng = SeededRNG(seed: seed)
         return (0..<n).map { _ in Float.random(in: -1...1, using: &rng) }
     }
 
-    /// One-pole low-pass with a per-sample cutoff.
-    static func lowpass(_ x: [Float], cutoff: (Int) -> Float) -> [Float] {
-        var y = [Float](repeating: 0, count: x.count)
-        var state: Float = 0
-        for i in 0..<x.count {
-            let a = 1 - exp(-2 * Float.pi * cutoff(i) / sr)
-            state += a * (x[i] - state)
-            y[i] = state
-        }
+    static func lowpass(_ x: [Float], cutoff: Float) -> [Float] {
+        var y = [Float](repeating: 0, count: x.count); var s: Float = 0
+        let a = 1 - exp(-2 * Float.pi * cutoff / sr)
+        for i in 0..<x.count { s += a * (x[i] - s); y[i] = s }
         return y
     }
 
-    static func lowpass(_ x: [Float], cutoff: Float) -> [Float] { lowpass(x) { _ in cutoff } }
+    static func decay(_ n: Int, tau: Float) -> [Float] { (0..<n).map { exp(-Float($0) / (tau * sr)) } }
 
-    static func highpass(_ x: [Float], cutoff: Float) -> [Float] {
-        let lp = lowpass(x, cutoff: cutoff)
-        return zip(x, lp).map { $0 - $1 }
-    }
-
-    /// Attack / decay envelope in seconds, with an optional hold.
-    static func envelope(_ n: Int, attack: Float, hold: Float = 0, release: Float, curve: Float = 1) -> [Float] {
+    static func envelope(_ n: Int, attack: Float, hold: Float, release: Float) -> [Float] {
         let a = max(1, frames(attack)), h = frames(hold), r = max(1, frames(release))
         return (0..<n).map { i in
-            if i < a { return pow(Float(i) / Float(a), curve) }
+            if i < a { return Float(i) / Float(a) }
             if i < a + h { return 1 }
             let t = Float(i - a - h) / Float(r)
-            return t >= 1 ? 0 : pow(1 - t, curve)
+            return t >= 1 ? 0 : 1 - t
         }
-    }
-
-    static func exponentialDecay(_ n: Int, tau: Float) -> [Float] {
-        (0..<n).map { exp(-Float($0) / (tau * sr)) }
     }
 
     static func tone(_ n: Int, frequency: (Int) -> Float, harmonics: [Float] = [1]) -> [Float] {
         var phase: Float = 0
-        var out = [Float](repeating: 0, count: n)
-        for i in 0..<n {
+        return (0..<n).map { i in
             phase += 2 * Float.pi * frequency(i) / sr
             var v: Float = 0
-            for (k, amp) in harmonics.enumerated() where amp != 0 {
-                v += amp * sin(phase * Float(k + 1))
-            }
-            out[i] = v
+            for (k, amp) in harmonics.enumerated() { v += amp * sin(phase * Float(k + 1)) }
+            return v
         }
-        return out
     }
 
     static func mix(_ layers: [[Float]]) -> [Float] {
         let n = layers.map(\.count).max() ?? 0
         var out = [Float](repeating: 0, count: n)
-        for layer in layers { for i in 0..<layer.count { out[i] += layer[i] } }
+        for l in layers { for i in 0..<l.count { out[i] += l[i] } }
         return out
     }
 
-    static func multiply(_ a: [Float], _ b: [Float]) -> [Float] { zip(a, b).map { $0 * $1 } }
+    static func mul(_ a: [Float], _ b: [Float]) -> [Float] { zip(a, b).map { $0 * $1 } }
 
-    static func normalized(_ x: [Float], peak: Float = 0.85) -> [Float] {
+    static func normalized(_ x: [Float], peak: Float = 0.8) -> [Float] {
         let m = x.map { abs($0) }.max() ?? 1
-        guard m > 0 else { return x }
-        return x.map { $0 / m * peak }
+        return m > 0 ? x.map { $0 / m * peak } : x
     }
 
-    static func delayed(_ x: [Float], by seconds: Float, total: Int) -> [Float] {
-        let d = frames(seconds)
-        var out = [Float](repeating: 0, count: total)
+    static func delayed(_ x: [Float], by s: Float, total: Int) -> [Float] {
+        let d = frames(s); var out = [Float](repeating: 0, count: total)
         for i in 0..<x.count where i + d < total { out[i + d] = x[i] }
         return out
     }
 
-    // MARK: Sounds
+    static func note(_ f: Float, length: Float, harmonics: [Float] = [1, 0.4, 0.15], tau: Float = 0.18) -> [Float] {
+        let n = frames(length)
+        return mul(tone(n, frequency: { _ in f }, harmonics: harmonics), decay(n, tau: tau))
+    }
 
     static func tap() -> [Float] {
+        let n = frames(0.04)
+        return normalized(mul(lowpass(noise(n, seed: 1), cutoff: 3800), decay(n, tau: 0.005)), peak: 0.4)
+    }
+
+    static func tick() -> [Float] {
         let n = frames(0.05)
-        let click = multiply(tone(n, frequency: { _ in 1900 }), exponentialDecay(n, tau: 0.006))
-        let body = multiply(lowpass(noise(n, seed: 1), cutoff: 4000), exponentialDecay(n, tau: 0.004))
-        return normalized(mix([click, body.map { $0 * 0.6 }]), peak: 0.5)
+        return normalized(mul(tone(n, frequency: { _ in 1500 }), decay(n, tau: 0.006)), peak: 0.35)
     }
 
-    static func snap() -> [Float] {
-        let n = frames(0.09)
-        let hit = multiply(lowpass(noise(n, seed: 2), cutoff: 2600), exponentialDecay(n, tau: 0.018))
-        let slap = multiply(tone(n, frequency: { i in 420 - Float(i) / Float(n) * 250 }), exponentialDecay(n, tau: 0.02))
-        return normalized(mix([hit, slap.map { $0 * 0.5 }]), peak: 0.7)
+    static func correct() -> [Float] {
+        let total = frames(0.6)
+        return normalized(mix([delayed(note(784, length: 0.35), by: 0, total: total), delayed(note(1175, length: 0.45), by: 0.09, total: total)]), peak: 0.6)
     }
 
-    static func whistle() -> [Float] {
-        let n = frames(0.5)
-        let f: (Int) -> Float = { i in
-            let t = Float(i) / sr
-            return 2350 + 35 * sin(2 * Float.pi * 6 * t)
-        }
-        var x = tone(n, frequency: f, harmonics: [1, 0.25, 0.08])
-        // Pea rattle: fast amplitude warble
-        for i in 0..<n {
-            let t = Float(i) / sr
-            x[i] *= 0.65 + 0.35 * sin(2 * Float.pi * 38 * t)
-        }
-        let env = envelope(n, attack: 0.012, hold: 0.32, release: 0.12, curve: 1.5)
-        return normalized(multiply(x, env), peak: 0.6)
+    static func wrong() -> [Float] {
+        let n = frames(0.35)
+        let buzz = tone(n, frequency: { i in 180 - Float(i) / Float(n) * 40 }, harmonics: [1, 0.5, 0.3, 0.2])
+        return normalized(mul(lowpass(buzz, cutoff: 900), envelope(n, attack: 0.005, hold: 0.15, release: 0.18)), peak: 0.5)
     }
 
-    static func thud(big: Bool) -> [Float] {
-        let n = frames(big ? 0.42 : 0.3)
-        let sweep = tone(n, frequency: { i in
-            let t = Float(i) / sr
-            return max(38, (big ? 170 : 140) * exp(-t / 0.09))
-        })
-        let body = multiply(sweep, exponentialDecay(n, tau: big ? 0.12 : 0.08))
-        let crack = multiply(lowpass(noise(n, seed: 3), cutoff: big ? 1400 : 900), exponentialDecay(n, tau: big ? 0.05 : 0.035))
-        return normalized(mix([body, crack.map { $0 * (big ? 0.9 : 0.6) }]), peak: 0.9)
-    }
-
-    static func catchBall() -> [Float] {
-        let n = frames(0.08)
-        let band = highpass(lowpass(noise(n, seed: 4), cutoff: 2400), cutoff: 500)
-        return normalized(multiply(band, exponentialDecay(n, tau: 0.014)), peak: 0.55)
-    }
-
-    static func kick() -> [Float] {
+    static func swoosh() -> [Float] {
         let n = frames(0.28)
-        let boom = multiply(tone(n, frequency: { i in max(45, 190 * exp(-Float(i) / sr / 0.07)) }), exponentialDecay(n, tau: 0.07))
-        let leather = multiply(lowpass(noise(n, seed: 5), cutoff: 1800), exponentialDecay(n, tau: 0.03))
-        return normalized(mix([boom, leather.map { $0 * 0.7 }]), peak: 0.85)
+        var x = noise(n, seed: 3)
+        x = lowpass(x, cutoff: 2500)
+        return normalized(mul(x, envelope(n, attack: 0.08, hold: 0.02, release: 0.17)), peak: 0.35)
     }
 
-    static func chime() -> [Float] {
-        let n = frames(0.9)
-        func note(_ f: Float, at: Float) -> [Float] {
-            let len = frames(0.7)
-            let x = multiply(tone(len, frequency: { _ in f }, harmonics: [1, 0.45, 0.2, 0.1]), exponentialDecay(len, tau: 0.22))
-            return delayed(x, by: at, total: n)
-        }
-        return normalized(mix([note(659.3, at: 0), note(987.8, at: 0.13)]), peak: 0.6)
+    static func crown() -> [Float] {
+        let total = frames(1.2)
+        return normalized(mix([
+            delayed(note(523, length: 0.3), by: 0, total: total),
+            delayed(note(659, length: 0.3), by: 0.12, total: total),
+            delayed(note(784, length: 0.3), by: 0.24, total: total),
+            delayed(note(1047, length: 0.8, tau: 0.3), by: 0.36, total: total),
+        ]), peak: 0.65)
     }
 
     static func fanfare() -> [Float] {
-        let n = frames(1.7)
-        func brass(_ f: Float, at: Float, length: Float) -> [Float] {
-            let len = frames(length)
-            let raw = tone(len, frequency: { i in f * (1 + 0.004 * sin(2 * Float.pi * 5.5 * Float(i) / sr)) },
-                           harmonics: [1, 0.7, 0.55, 0.4, 0.3, 0.22, 0.15])
-            let shaped = lowpass(raw, cutoff: 2600)
-            let env = envelope(len, attack: 0.02, hold: max(0, length - 0.22), release: 0.2, curve: 1.2)
-            return delayed(multiply(shaped, env), by: at, total: n)
+        let total = frames(1.8)
+        func brass(_ f: Float, at: Float, len: Float) -> [Float] {
+            let n = frames(len)
+            let raw = lowpass(tone(n, frequency: { _ in f }, harmonics: [1, 0.7, 0.5, 0.35, 0.25]), cutoff: 2600)
+            return delayed(mul(raw, envelope(n, attack: 0.02, hold: max(0, len - 0.22), release: 0.2)), by: at, total: total)
         }
-        let notes = mix([
-            brass(523.3, at: 0.0, length: 0.16),
-            brass(659.3, at: 0.14, length: 0.16),
-            brass(784.0, at: 0.28, length: 0.16),
-            brass(1046.5, at: 0.42, length: 1.1),
-            brass(523.3, at: 0.42, length: 1.1).map { $0 * 0.6 },
-        ])
-        return normalized(notes, peak: 0.7)
+        return normalized(mix([brass(523, at: 0, len: 0.16), brass(659, at: 0.14, len: 0.16), brass(784, at: 0.28, len: 0.16), brass(1047, at: 0.42, len: 1.2), brass(523, at: 0.42, len: 1.2).map { $0 * 0.5 }]), peak: 0.65)
     }
 
-    static func cheer() -> [Float] {
-        let n = frames(3.2)
-        let bed = lowpass(noise(n, seed: 6), cutoff: { i in 1800 + 900 * sin(Float(i) / sr * 2.1) })
-        let bright = highpass(lowpass(noise(n, seed: 7), cutoff: 6000), cutoff: 2200).map { $0 * 0.35 }
-        let env = envelope(n, attack: 0.28, hold: 1.4, release: 1.5, curve: 1.3)
-        var x = multiply(mix([bed, bright]), env)
-        for i in 0..<n {
-            let t = Float(i) / sr
-            x[i] *= 0.85 + 0.15 * sin(2 * Float.pi * 0.9 * t) * sin(2 * Float.pi * 3.3 * t)
-        }
-        return normalized(x, peak: 0.75)
+    static func lose() -> [Float] {
+        let total = frames(1.0)
+        return normalized(mix([delayed(note(392, length: 0.4, tau: 0.25), by: 0, total: total), delayed(note(330, length: 0.6, tau: 0.3), by: 0.3, total: total)]), peak: 0.5)
     }
-
-    static func groan(duration: Float, depth: Float) -> [Float] {
-        let n = frames(duration)
-        let bed = lowpass(noise(n, seed: 8), cutoff: { i in max(250, 1100 - 700 * depth * Float(i) / Float(n)) })
-        let env = envelope(n, attack: 0.12, hold: 0.15, release: duration - 0.3, curve: 1.6)
-        return normalized(multiply(bed, env), peak: 0.55)
-    }
-
-    /// Two-note PA hit for kickoff.
-    static func stinger() -> [Float] {
-        let n = frames(0.9)
-        func hit(_ f: Float, at: Float, length: Float) -> [Float] {
-            let len = frames(length)
-            let raw = lowpass(tone(len, frequency: { _ in f }, harmonics: [1, 0.6, 0.45, 0.3, 0.2]), cutoff: 2200)
-            let env = envelope(len, attack: 0.01, hold: length - 0.25, release: 0.22)
-            return delayed(multiply(raw, env), by: at, total: n)
-        }
-        return normalized(mix([hit(392, at: 0, length: 0.25), hit(523.3, at: 0.2, length: 0.65), hit(261.6, at: 0.2, length: 0.65).map { $0 * 0.6 }]), peak: 0.7)
-    }
-
-    /// A four-bar drumline cadence (bass drums, snares with a roll, a crash on the one) that loops seamlessly.
-    static func drumline(format: AVAudioFormat) -> AVAudioPCMBuffer {
-        let bpm: Float = 108
-        let step = 60 / bpm / 4                      // a sixteenth
-        let steps = 64                               // four bars
-        let n = frames(step * Float(steps))
-        var out = [Float](repeating: 0, count: n)
-        func place(_ x: [Float], at s: Int, gain: Float) {
-            let start = frames(step * Float(s))
-            for i in 0..<x.count { out[(start + i) % n] += x[i] * gain }
-        }
-        // Voices
-        let bassLen = frames(0.25)
-        let bass = normalized(multiply(tone(bassLen, frequency: { i in max(42, 130 * exp(-Float(i) / sr / 0.08)) }), exponentialDecay(bassLen, tau: 0.11)), peak: 0.9)
-        let snareLen = frames(0.18)
-        let snareBody = multiply(tone(snareLen, frequency: { _ in 185 }, harmonics: [1, 0.3]), exponentialDecay(snareLen, tau: 0.03))
-        let snareWire = multiply(highpass(lowpass(noise(snareLen, seed: 21), cutoff: 6500), cutoff: 900), exponentialDecay(snareLen, tau: 0.055))
-        let snare = normalized(mix([snareBody.map { $0 * 0.6 }, snareWire]), peak: 0.8)
-        let tickLen = frames(0.05)
-        let tick = normalized(multiply(highpass(noise(tickLen, seed: 22), cutoff: 5000), exponentialDecay(tickLen, tau: 0.012)), peak: 0.35)
-        let crashLen = frames(1.4)
-        let crash = normalized(multiply(highpass(lowpass(noise(crashLen, seed: 23), cutoff: 9000), cutoff: 2500), exponentialDecay(crashLen, tau: 0.45)), peak: 0.5)
-
-        // Patterns per bar, in sixteenths: 0 = the downbeat.
-        let bassHits: [Int] = [0, 6, 8, 14]
-        let snareAccents: [Int] = [4, 12]
-        let snareGhosts: [Int] = [2, 6, 10, 14, 15]
-        for bar in 0..<4 {
-            let base = bar * 16
-            for h in bassHits { place(bass, at: base + h, gain: 0.95) }
-            for h in snareAccents { place(snare, at: base + h, gain: 1.0) }
-            if bar < 3 {
-                for h in snareGhosts { place(snare, at: base + h, gain: 0.35) }
-            } else {
-                // Bar four: a building sixteenth-note roll into the crash.
-                for h in 8..<16 { place(snare, at: base + h, gain: 0.3 + 0.08 * Float(h - 8)) }
-                for h in snareGhosts where h < 8 { place(snare, at: base + h, gain: 0.35) }
-            }
-            for h in stride(from: 0, to: 16, by: 2) { place(tick, at: base + h, gain: 0.5) }
-        }
-        place(crash, at: 0, gain: 0.8)
-        return buffer(normalized(out, peak: 0.7), format: format)
-    }
-
-    /// Eight seconds of stadium murmur that loops seamlessly.
-    static func crowdLoop(format: AVAudioFormat) -> AVAudioPCMBuffer {
-        let n = frames(8)
-        var x = lowpass(noise(n, seed: 9), cutoff: { i in 900 + 500 * sin(Float(i) / sr * 0.7) })
-        let air = highpass(lowpass(noise(n, seed: 10), cutoff: 5000), cutoff: 1800).map { $0 * 0.18 }
-        x = mix([x, air])
-        for i in 0..<n {
-            let t = Float(i) / sr
-            x[i] *= 0.8 + 0.12 * sin(2 * Float.pi * 0.21 * t) + 0.08 * sin(2 * Float.pi * 0.067 * t + 1)
-        }
-        // Crossfade the tail into the head so the loop point is inaudible.
-        let fade = frames(0.6)
-        for i in 0..<fade {
-            let t = Float(i) / Float(fade)
-            x[n - fade + i] = x[n - fade + i] * (1 - t) + x[i] * t
-        }
-        return buffer(normalized(x, peak: 0.6), format: format)
-    }
-}
-
-
-// MARK: - PA announcer
-
-/// The stadium announcer. Lines are spoken by the system voice, rendered offline to buffers, and played
-/// through the PA chain so they echo around the bowl instead of sounding like a phone assistant.
-final class Announcer {
-    static let shared = Announcer()
-
-    private let synth = AVSpeechSynthesizer()
-    private var queue: [String] = []
-    private var busy = false
-    private lazy var voice: AVSpeechSynthesisVoice? = {
-        let voices = AVSpeechSynthesisVoice.speechVoices().filter { $0.language.hasPrefix("en") }
-        // Prefer a higher-quality voice; among equals, the deeper-sounding ones make a better PA.
-        let preferredNames = ["Aaron", "Daniel", "Evan", "Fred", "Tom", "Alex"]
-        for name in preferredNames {
-            if let v = voices.first(where: { $0.name.contains(name) && $0.quality != .default }) { return v }
-        }
-        for name in preferredNames {
-            if let v = voices.first(where: { $0.name.contains(name) }) { return v }
-        }
-        return voices.max(by: { $0.quality.rawValue < $1.quality.rawValue }) ?? AVSpeechSynthesisVoice(language: "en-US")
-    }()
-
-    private init() {}
-
-    func say(_ line: String) {
-        queue.append(line)
-        pump()
-    }
-
-    private func pump() {
-        guard !busy, !queue.isEmpty else { return }
-        let line = queue.removeFirst()
-        busy = true
-        let utterance = AVSpeechUtterance(string: line)
-        utterance.voice = voice
-        utterance.rate = 0.46
-        utterance.pitchMultiplier = 0.88
-        utterance.volume = 1
-        var chunks: [AVAudioPCMBuffer] = []
-        // Safety valve: if the synthesizer never finishes, don't jam the queue forever.
-        let token = UUID()
-        currentToken = token
-        DispatchQueue.main.asyncAfter(deadline: .now() + 8) { [weak self] in
-            guard let self, self.currentToken == token, self.busy else { return }
-            self.busy = false
-            self.pump()
-        }
-        synth.write(utterance) { [weak self] buffer in
-            guard let self else { return }
-            guard let pcm = buffer as? AVAudioPCMBuffer else { return }
-            if pcm.frameLength == 0 {
-                let done = chunks
-                DispatchQueue.main.async {
-                    SoundKit.shared.playPA(done, volume: 0.95)
-                    self.busy = false
-                    self.pump()
-                }
-            } else {
-                chunks.append(pcm)
-            }
-        }
-    }
-
-    private var currentToken = UUID()
 }

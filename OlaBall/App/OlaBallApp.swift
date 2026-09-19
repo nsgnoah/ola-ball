@@ -2,27 +2,35 @@ import SwiftUI
 
 @main
 struct OlaBallApp: App {
-    @State private var store: ProgressStore = {
-        let store = ProgressStore()
-        if CommandLine.arguments.contains("-ui-testing-reset") { store.reset() }
-        return store
-    }()
+    @State private var profiles = ProfileStore()
+    @State private var localMatches = LocalMatchStore()
+
+    init() {
+        if CommandLine.arguments.contains("-ui-testing-reset") {
+            UserDefaults.standard.removeObject(forKey: "ola.profile.v1")
+            UserDefaults.standard.removeObject(forKey: "ola.localMatches.v1")
+        }
+    }
 
     var body: some Scene {
         WindowGroup {
             RootView()
-                .environment(store)
-                .onAppear { SoundKit.shared.start() }
+                .environment(profiles)
+                .environment(localMatches)
+                .onAppear {
+                    SoundKit.shared.start()
+                    if !CommandLine.arguments.contains("-ui-testing-reset") { GameCenterService.shared.authenticate() }
+                }
         }
     }
 }
 
 struct RootView: View {
-    @Environment(ProgressStore.self) private var store
+    @Environment(ProfileStore.self) private var profiles
 
     var body: some View {
-        if store.team == nil {
-            TeamPickView()
+        if profiles.profile == nil {
+            ProfileSetupView()
         } else {
             HomeView()
         }

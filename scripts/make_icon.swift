@@ -1,54 +1,42 @@
-// Renders the 1024x1024 App Store icon. Run: swift scripts/make_icon.swift
-import Foundation
-import CoreGraphics
-import ImageIO
-import UniformTypeIdentifiers
+// Renders the 1024x1024 App Store icon (no alpha): a paper card with "HIS / HER" in condensed type.
+import AppKit
 
 let size = 1024
-let cs = CGColorSpaceCreateDeviceRGB()
-let ctx = CGContext(data: nil, width: size, height: size, bitsPerComponent: 8, bytesPerRow: 0, space: cs, bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue)!
-
-func rgb(_ r: CGFloat, _ g: CGFloat, _ b: CGFloat) -> CGColor { CGColor(colorSpace: cs, components: [r, g, b, 1])! }
-
-// Background: night-sky navy to field green gradient
-let grad = CGGradient(colorsSpace: cs, colors: [rgb(0.043, 0.071, 0.125), rgb(0.18, 0.49, 0.31)] as CFArray, locations: [0, 1])!
-ctx.drawLinearGradient(grad, start: CGPoint(x: 0, y: size), end: CGPoint(x: 0, y: 0), options: [])
-
-// Yard lines
-ctx.setStrokeColor(CGColor(colorSpace: cs, components: [1, 1, 1, 0.18])!)
-ctx.setLineWidth(10)
-for i in 1..<8 {
-    let y = CGFloat(i) * CGFloat(size) / 8 * 0.55
-    ctx.move(to: CGPoint(x: 0, y: y)); ctx.addLine(to: CGPoint(x: CGFloat(size), y: y)); ctx.strokePath()
+let image = NSImage(size: NSSize(width: size, height: size))
+image.lockFocus()
+let ctx = NSGraphicsContext.current!.cgContext
+// Paper
+ctx.setFillColor(NSColor(red: 0.957, green: 0.937, blue: 0.894, alpha: 1).cgColor)
+ctx.fill(CGRect(x: 0, y: 0, width: size, height: size))
+// Two-tone diagonal: his (cobalt) top-left, hers (rosewood) bottom-right
+let his = NSColor(red: 0.122, green: 0.247, blue: 0.561, alpha: 1)
+let hers = NSColor(red: 0.690, green: 0.196, blue: 0.361, alpha: 1)
+ctx.setFillColor(his.cgColor)
+ctx.move(to: CGPoint(x: 0, y: 1024)); ctx.addLine(to: CGPoint(x: 1024, y: 1024)); ctx.addLine(to: CGPoint(x: 0, y: 0)); ctx.closePath(); ctx.fillPath()
+ctx.setFillColor(hers.cgColor)
+ctx.move(to: CGPoint(x: 1024, y: 1024)); ctx.addLine(to: CGPoint(x: 1024, y: 0)); ctx.addLine(to: CGPoint(x: 0, y: 0)); ctx.closePath(); ctx.fillPath()
+// Paper seam
+ctx.setStrokeColor(NSColor(red: 0.957, green: 0.937, blue: 0.894, alpha: 1).cgColor)
+ctx.setLineWidth(28)
+ctx.move(to: CGPoint(x: 0, y: 0)); ctx.addLine(to: CGPoint(x: 1024, y: 1024)); ctx.strokePath()
+func draw(_ text: String, size fs: CGFloat, at p: CGPoint, color: NSColor) {
+    let font = NSFont(name: "Futura-CondensedExtraBold", size: fs) ?? NSFont.boldSystemFont(ofSize: fs)
+    let attrs: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: color]
+    let s = NSAttributedString(string: text, attributes: attrs)
+    s.draw(at: CGPoint(x: p.x - s.size().width / 2, y: p.y - s.size().height / 2))
 }
-
-// Football
-ctx.saveGState()
-ctx.translateBy(x: 512, y: 540)
-ctx.rotate(by: -.pi / 7)
-let ball = CGRect(x: -330, y: -200, width: 660, height: 400)
-ctx.setFillColor(rgb(0.55, 0.30, 0.16))
-ctx.fillEllipse(in: ball)
-ctx.setStrokeColor(rgb(0.30, 0.16, 0.08))
-ctx.setLineWidth(18)
-ctx.strokeEllipse(in: ball)
-// Laces
-ctx.setStrokeColor(rgb(1, 1, 1))
-ctx.setLineCap(.round)
-ctx.setLineWidth(22)
-ctx.move(to: CGPoint(x: -150, y: 0)); ctx.addLine(to: CGPoint(x: 150, y: 0)); ctx.strokePath()
-for x in stride(from: -100, through: 100, by: 50) {
-    ctx.move(to: CGPoint(x: CGFloat(x), y: -40)); ctx.addLine(to: CGPoint(x: CGFloat(x), y: 40)); ctx.strokePath()
-}
-ctx.restoreGState()
-
-// Gold accent stripe at the bottom (the "call" bar)
-ctx.setFillColor(rgb(0.961, 0.773, 0.259))
-ctx.fill(CGRect(x: 160, y: 130, width: 704, height: 44))
-
-let img = ctx.makeImage()!
-let url = URL(fileURLWithPath: CommandLine.arguments.count > 1 ? CommandLine.arguments[1] : "icon.png")
-let dest = CGImageDestinationCreateWithURL(url as CFURL, UTType.png.identifier as CFString, 1, nil)!
-CGImageDestinationAddImage(dest, img, nil)
-CGImageDestinationFinalize(dest)
-print("wrote \(url.path)")
+draw("HIS", size: 300, at: CGPoint(x: 300, y: 690), color: .white)
+draw("HER", size: 300, at: CGPoint(x: 724, y: 330), color: .white)
+image.unlockFocus()
+let out = CommandLine.arguments.count > 1 ? CommandLine.arguments[1] : "icon.png"
+let rep = NSBitmapImageRep(data: image.tiffRepresentation!)!
+rep.hasAlpha = false
+let png = rep.representation(using: .png, properties: [:])!
+// Strip alpha by drawing onto an opaque bitmap
+let opaque = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: size, pixelsHigh: size, bitsPerSample: 8, samplesPerPixel: 3, hasAlpha: false, isPlanar: false, colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0)!
+NSGraphicsContext.saveGraphicsState()
+NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: opaque)
+NSImage(data: png)!.draw(in: NSRect(x: 0, y: 0, width: size, height: size))
+NSGraphicsContext.restoreGraphicsState()
+try! opaque.representation(using: .png, properties: [:])!.write(to: URL(fileURLWithPath: out))
+print("wrote \(out)")
