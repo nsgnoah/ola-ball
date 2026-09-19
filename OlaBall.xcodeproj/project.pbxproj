@@ -1,0 +1,671 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		00E0CC40F632C98AEB2FBF36 /* PlaySimulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03DB1ACD49D23CCF2FBCE209 /* PlaySimulator.swift */; };
+		068E91701F94BE659E507C30 /* TipDirector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A5E07BD8B56E7E7A3EDA4B /* TipDirector.swift */; };
+		0F0EB3FA65B50257520FF7FA /* GameOverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEDCC075FBF76B439338849 /* GameOverView.swift */; };
+		10D06D4BD458493D0C0B31A7 /* OlaBallApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18F064202EEBD07686BA9389 /* OlaBallApp.swift */; };
+		1BEA5EFDFC038E5EB924DEE4 /* EngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA774E78CE553708DD4C4BBF /* EngineTests.swift */; };
+		1CFB5FB2F014FC030EC0A2A3 /* PlayThroughUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42FD7D91A6A0FB34BF0E6D81 /* PlayThroughUITests.swift */; };
+		234C55680A569ED05C1D3412 /* Concepts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BA477A9B0FE3E0A2F49580F /* Concepts.swift */; };
+		2A5F2B4999350D31789627C6 /* GameComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC6CA1CE34615BF3BF463829 /* GameComponents.swift */; };
+		3E1CCD2E39D10E1069F40B55 /* RulesEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 861E3FC7724CF424E1B71FD9 /* RulesEngine.swift */; };
+		43C960441B331674B04B9AFB /* Situation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13CB6A90355982D9B2114889 /* Situation.swift */; };
+		46A7E8A5702C0185006F3BAB /* OpponentDriveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4B51EC67FACD025E6078BBB /* OpponentDriveView.swift */; };
+		49D5F4FAE6E2900A71584780 /* SeededRNG.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9D3B4CD4B593EA3245E178B /* SeededRNG.swift */; };
+		4C125B40A0F44B31C4DBEB4A /* Narrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 951BBB41C76B2EB478CCCCE3 /* Narrator.swift */; };
+		4FCFA91930C9E3544E8FFE7C /* Play.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99DA89790D4CF872BC6A86D2 /* Play.swift */; };
+		59F765E87EC9483A42F2F1FE /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE971345D0D0B52CBD12D47E /* Theme.swift */; };
+		6B3B9870D9D2030737972384 /* GameSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23DCEB0D42474F0C63EE6453 /* GameSession.swift */; };
+		74293DC35DED01E64B324EDE /* Team.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A869CE7218F143B9181A5EB /* Team.swift */; };
+		7A515E069867340FF2C84930 /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 799C8611EB2178437DFF7F28 /* GameView.swift */; };
+		7B7C73743F1BE1C0E54AF821 /* ProgressStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F67576121C12F080CC2C3848 /* ProgressStore.swift */; };
+		864C74D06D8F225D61AA35A8 /* PlaybookView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6A1219E295AB575F75894BA /* PlaybookView.swift */; };
+		940AA0EBBFDDA52F9BA03469 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 2FB54E8A2979C8D2D7C0446D /* PrivacyInfo.xcprivacy */; };
+		94B7A39193BF596366E6FCD9 /* FieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE2C85623E712C77260FF165 /* FieldView.swift */; };
+		AD4FB65792418542A87D3C9B /* TeamPickView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C76BD28218E95DA0CCAE1DB /* TeamPickView.swift */; };
+		AE243244D6AF9900FAFC6336 /* DriveEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 211D2F22D6DF3F29B6B76A11 /* DriveEngine.swift */; };
+		B1FED55ADA19D5C5216A8512 /* OpponentCoach.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8EF0038B92B262C1B7C737E /* OpponentCoach.swift */; };
+		B2E045E814E07FC8D0D8E319 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C5E93C1F2304E6984158858B /* Assets.xcassets */; };
+		E8181DD07E823EC91DDE4C60 /* PlayCall.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28443CBBDDAF63572FC5E0AC /* PlayCall.swift */; };
+		F7355AE2664FF230153A8582 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF4E4A92D9971125574E14E3 /* HomeView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		78B6A355F99DDB3FA2A6986B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DC6B022E06D3B68B0C7814A6 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 04B398E83A1F75F72F6DEFB0;
+			remoteInfo = OlaBall;
+		};
+		F806B4EEEBAC749B30116CEE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DC6B022E06D3B68B0C7814A6 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 04B398E83A1F75F72F6DEFB0;
+			remoteInfo = OlaBall;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		03DB1ACD49D23CCF2FBCE209 /* PlaySimulator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaySimulator.swift; sourceTree = "<group>"; };
+		0E7B7B61C3E9D8589EAFA6E7 /* OlaBallTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = OlaBallTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		13CB6A90355982D9B2114889 /* Situation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Situation.swift; sourceTree = "<group>"; };
+		18F064202EEBD07686BA9389 /* OlaBallApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OlaBallApp.swift; sourceTree = "<group>"; };
+		1AC9C84534845ADF1307187A /* OlaBallUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = OlaBallUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		211D2F22D6DF3F29B6B76A11 /* DriveEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DriveEngine.swift; sourceTree = "<group>"; };
+		23DCEB0D42474F0C63EE6453 /* GameSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSession.swift; sourceTree = "<group>"; };
+		28443CBBDDAF63572FC5E0AC /* PlayCall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayCall.swift; sourceTree = "<group>"; };
+		29AE2497FBB3AE71C7F0F61F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		2BA477A9B0FE3E0A2F49580F /* Concepts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Concepts.swift; sourceTree = "<group>"; };
+		2FB54E8A2979C8D2D7C0446D /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		42FD7D91A6A0FB34BF0E6D81 /* PlayThroughUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayThroughUITests.swift; sourceTree = "<group>"; };
+		4A869CE7218F143B9181A5EB /* Team.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Team.swift; sourceTree = "<group>"; };
+		5BEDCC075FBF76B439338849 /* GameOverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameOverView.swift; sourceTree = "<group>"; };
+		5C76BD28218E95DA0CCAE1DB /* TeamPickView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamPickView.swift; sourceTree = "<group>"; };
+		799C8611EB2178437DFF7F28 /* GameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameView.swift; sourceTree = "<group>"; };
+		84A5E07BD8B56E7E7A3EDA4B /* TipDirector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TipDirector.swift; sourceTree = "<group>"; };
+		861E3FC7724CF424E1B71FD9 /* RulesEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulesEngine.swift; sourceTree = "<group>"; };
+		951BBB41C76B2EB478CCCCE3 /* Narrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Narrator.swift; sourceTree = "<group>"; };
+		99DA89790D4CF872BC6A86D2 /* Play.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Play.swift; sourceTree = "<group>"; };
+		AA774E78CE553708DD4C4BBF /* EngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineTests.swift; sourceTree = "<group>"; };
+		AE2C85623E712C77260FF165 /* FieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FieldView.swift; sourceTree = "<group>"; };
+		AF4E4A92D9971125574E14E3 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		B9D3B4CD4B593EA3245E178B /* SeededRNG.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeededRNG.swift; sourceTree = "<group>"; };
+		C5E93C1F2304E6984158858B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		D4B51EC67FACD025E6078BBB /* OpponentDriveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpponentDriveView.swift; sourceTree = "<group>"; };
+		D6A1219E295AB575F75894BA /* PlaybookView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybookView.swift; sourceTree = "<group>"; };
+		E306F19148BACBBAB5F7229E /* OlaBall.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = OlaBall.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E8EF0038B92B262C1B7C737E /* OpponentCoach.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpponentCoach.swift; sourceTree = "<group>"; };
+		EC6CA1CE34615BF3BF463829 /* GameComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameComponents.swift; sourceTree = "<group>"; };
+		EE971345D0D0B52CBD12D47E /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		F67576121C12F080CC2C3848 /* ProgressStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressStore.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		2AD2D2AE42326F87D7C6FB37 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				AE2C85623E712C77260FF165 /* FieldView.swift */,
+				EC6CA1CE34615BF3BF463829 /* GameComponents.swift */,
+				5BEDCC075FBF76B439338849 /* GameOverView.swift */,
+				799C8611EB2178437DFF7F28 /* GameView.swift */,
+				AF4E4A92D9971125574E14E3 /* HomeView.swift */,
+				D4B51EC67FACD025E6078BBB /* OpponentDriveView.swift */,
+				D6A1219E295AB575F75894BA /* PlaybookView.swift */,
+				5C76BD28218E95DA0CCAE1DB /* TeamPickView.swift */,
+				EE971345D0D0B52CBD12D47E /* Theme.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		33F21CF85FAE8A45CF2421AF /* Store */ = {
+			isa = PBXGroup;
+			children = (
+				F67576121C12F080CC2C3848 /* ProgressStore.swift */,
+			);
+			path = Store;
+			sourceTree = "<group>";
+		};
+		3A5D5037F88E8B6911E35CC5 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				C5E93C1F2304E6984158858B /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		6AAF4D1988317D3B3785D8AD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E306F19148BACBBAB5F7229E /* OlaBall.app */,
+				0E7B7B61C3E9D8589EAFA6E7 /* OlaBallTests.xctest */,
+				1AC9C84534845ADF1307187A /* OlaBallUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		735D250A5BF636CA43C8697E /* App */ = {
+			isa = PBXGroup;
+			children = (
+				18F064202EEBD07686BA9389 /* OlaBallApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		76DC5E2ED1AC42F731017D38 /* OlaBall */ = {
+			isa = PBXGroup;
+			children = (
+				29AE2497FBB3AE71C7F0F61F /* Info.plist */,
+				2FB54E8A2979C8D2D7C0446D /* PrivacyInfo.xcprivacy */,
+				735D250A5BF636CA43C8697E /* App */,
+				87900341152A40984872E5BA /* Content */,
+				842B29C4C47249846FA81739 /* Engine */,
+				A6224AD131AD2F9714C47938 /* Game */,
+				C61D468C66FF4666866FEA21 /* Models */,
+				3A5D5037F88E8B6911E35CC5 /* Resources */,
+				33F21CF85FAE8A45CF2421AF /* Store */,
+				2AD2D2AE42326F87D7C6FB37 /* Views */,
+			);
+			path = OlaBall;
+			sourceTree = "<group>";
+		};
+		842B29C4C47249846FA81739 /* Engine */ = {
+			isa = PBXGroup;
+			children = (
+				211D2F22D6DF3F29B6B76A11 /* DriveEngine.swift */,
+				951BBB41C76B2EB478CCCCE3 /* Narrator.swift */,
+				E8EF0038B92B262C1B7C737E /* OpponentCoach.swift */,
+				03DB1ACD49D23CCF2FBCE209 /* PlaySimulator.swift */,
+				861E3FC7724CF424E1B71FD9 /* RulesEngine.swift */,
+				B9D3B4CD4B593EA3245E178B /* SeededRNG.swift */,
+			);
+			path = Engine;
+			sourceTree = "<group>";
+		};
+		87900341152A40984872E5BA /* Content */ = {
+			isa = PBXGroup;
+			children = (
+				2BA477A9B0FE3E0A2F49580F /* Concepts.swift */,
+				84A5E07BD8B56E7E7A3EDA4B /* TipDirector.swift */,
+			);
+			path = Content;
+			sourceTree = "<group>";
+		};
+		8C81A8D1BB04A19F94AD82BE /* OlaBallTests */ = {
+			isa = PBXGroup;
+			children = (
+				AA774E78CE553708DD4C4BBF /* EngineTests.swift */,
+			);
+			path = OlaBallTests;
+			sourceTree = "<group>";
+		};
+		A6224AD131AD2F9714C47938 /* Game */ = {
+			isa = PBXGroup;
+			children = (
+				23DCEB0D42474F0C63EE6453 /* GameSession.swift */,
+			);
+			path = Game;
+			sourceTree = "<group>";
+		};
+		C61D468C66FF4666866FEA21 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				99DA89790D4CF872BC6A86D2 /* Play.swift */,
+				28443CBBDDAF63572FC5E0AC /* PlayCall.swift */,
+				13CB6A90355982D9B2114889 /* Situation.swift */,
+				4A869CE7218F143B9181A5EB /* Team.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		DEA24D3ABB6E5EA6CACF92C9 = {
+			isa = PBXGroup;
+			children = (
+				76DC5E2ED1AC42F731017D38 /* OlaBall */,
+				8C81A8D1BB04A19F94AD82BE /* OlaBallTests */,
+				E688752EF600ECC69FD7517C /* OlaBallUITests */,
+				6AAF4D1988317D3B3785D8AD /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		E688752EF600ECC69FD7517C /* OlaBallUITests */ = {
+			isa = PBXGroup;
+			children = (
+				42FD7D91A6A0FB34BF0E6D81 /* PlayThroughUITests.swift */,
+			);
+			path = OlaBallUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		04B398E83A1F75F72F6DEFB0 /* OlaBall */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 76740BB291A0F5EF9525EF89 /* Build configuration list for PBXNativeTarget "OlaBall" */;
+			buildPhases = (
+				8FBE724E9D9E5A127CF2448E /* Sources */,
+				4229DBC015AD3A5515CEA090 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = OlaBall;
+			packageProductDependencies = (
+			);
+			productName = OlaBall;
+			productReference = E306F19148BACBBAB5F7229E /* OlaBall.app */;
+			productType = "com.apple.product-type.application";
+		};
+		B825188479414EE42CCEFD0B /* OlaBallUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CF756DF720E2067442BBFF84 /* Build configuration list for PBXNativeTarget "OlaBallUITests" */;
+			buildPhases = (
+				693DA979899C73C688600DB4 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				122B0B679F18B49FBEBA1877 /* PBXTargetDependency */,
+			);
+			name = OlaBallUITests;
+			packageProductDependencies = (
+			);
+			productName = OlaBallUITests;
+			productReference = 1AC9C84534845ADF1307187A /* OlaBallUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		E40D2EE528F88853910DB0EE /* OlaBallTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3A883F3F98CBF92DA4FFFFB3 /* Build configuration list for PBXNativeTarget "OlaBallTests" */;
+			buildPhases = (
+				C7068BD093132EB0D453C7AE /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6F4D21888BC37D529A636EB1 /* PBXTargetDependency */,
+			);
+			name = OlaBallTests;
+			packageProductDependencies = (
+			);
+			productName = OlaBallTests;
+			productReference = 0E7B7B61C3E9D8589EAFA6E7 /* OlaBallTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		DC6B022E06D3B68B0C7814A6 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					04B398E83A1F75F72F6DEFB0 = {
+						ProvisioningStyle = Automatic;
+					};
+					B825188479414EE42CCEFD0B = {
+						ProvisioningStyle = Automatic;
+						TestTargetID = 04B398E83A1F75F72F6DEFB0;
+					};
+					E40D2EE528F88853910DB0EE = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 4955CEF4F61F44EC52E25059 /* Build configuration list for PBXProject "OlaBall" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = DEA24D3ABB6E5EA6CACF92C9;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 6AAF4D1988317D3B3785D8AD /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				04B398E83A1F75F72F6DEFB0 /* OlaBall */,
+				E40D2EE528F88853910DB0EE /* OlaBallTests */,
+				B825188479414EE42CCEFD0B /* OlaBallUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		4229DBC015AD3A5515CEA090 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B2E045E814E07FC8D0D8E319 /* Assets.xcassets in Resources */,
+				940AA0EBBFDDA52F9BA03469 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		693DA979899C73C688600DB4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1CFB5FB2F014FC030EC0A2A3 /* PlayThroughUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8FBE724E9D9E5A127CF2448E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				234C55680A569ED05C1D3412 /* Concepts.swift in Sources */,
+				AE243244D6AF9900FAFC6336 /* DriveEngine.swift in Sources */,
+				94B7A39193BF596366E6FCD9 /* FieldView.swift in Sources */,
+				2A5F2B4999350D31789627C6 /* GameComponents.swift in Sources */,
+				0F0EB3FA65B50257520FF7FA /* GameOverView.swift in Sources */,
+				6B3B9870D9D2030737972384 /* GameSession.swift in Sources */,
+				7A515E069867340FF2C84930 /* GameView.swift in Sources */,
+				F7355AE2664FF230153A8582 /* HomeView.swift in Sources */,
+				4C125B40A0F44B31C4DBEB4A /* Narrator.swift in Sources */,
+				10D06D4BD458493D0C0B31A7 /* OlaBallApp.swift in Sources */,
+				B1FED55ADA19D5C5216A8512 /* OpponentCoach.swift in Sources */,
+				46A7E8A5702C0185006F3BAB /* OpponentDriveView.swift in Sources */,
+				4FCFA91930C9E3544E8FFE7C /* Play.swift in Sources */,
+				E8181DD07E823EC91DDE4C60 /* PlayCall.swift in Sources */,
+				00E0CC40F632C98AEB2FBF36 /* PlaySimulator.swift in Sources */,
+				864C74D06D8F225D61AA35A8 /* PlaybookView.swift in Sources */,
+				7B7C73743F1BE1C0E54AF821 /* ProgressStore.swift in Sources */,
+				3E1CCD2E39D10E1069F40B55 /* RulesEngine.swift in Sources */,
+				49D5F4FAE6E2900A71584780 /* SeededRNG.swift in Sources */,
+				43C960441B331674B04B9AFB /* Situation.swift in Sources */,
+				74293DC35DED01E64B324EDE /* Team.swift in Sources */,
+				AD4FB65792418542A87D3C9B /* TeamPickView.swift in Sources */,
+				59F765E87EC9483A42F2F1FE /* Theme.swift in Sources */,
+				068E91701F94BE659E507C30 /* TipDirector.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C7068BD093132EB0D453C7AE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1BEA5EFDFC038E5EB924DEE4 /* EngineTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		122B0B679F18B49FBEBA1877 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 04B398E83A1F75F72F6DEFB0 /* OlaBall */;
+			targetProxy = 78B6A355F99DDB3FA2A6986B /* PBXContainerItemProxy */;
+		};
+		6F4D21888BC37D529A636EB1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 04B398E83A1F75F72F6DEFB0 /* OlaBall */;
+			targetProxy = F806B4EEEBAC749B30116CEE /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		52C946519A19162B8078E5CE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = co.nsgsolutions.OlaBallUITests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = OlaBall;
+			};
+			name = Debug;
+		};
+		80F6B0F5B33577664E840E5B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		8CDA900D7917BD4090203307 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		956FB48374F66DD583498446 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = co.nsgsolutions.OlaBallTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OlaBall.app/OlaBall";
+			};
+			name = Debug;
+		};
+		D13B4F50F5330D7A87EC0346 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = OlaBall/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = co.nsgsolutions.olaball;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		D8891441CFC6872936C861B8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = OlaBall/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = co.nsgsolutions.olaball;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		DC89B22208B20BB96B960E6A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = co.nsgsolutions.OlaBallTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OlaBall.app/OlaBall";
+			};
+			name = Release;
+		};
+		F81D7EA1BE470619471AA232 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = co.nsgsolutions.OlaBallUITests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = OlaBall;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		3A883F3F98CBF92DA4FFFFB3 /* Build configuration list for PBXNativeTarget "OlaBallTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				956FB48374F66DD583498446 /* Debug */,
+				DC89B22208B20BB96B960E6A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		4955CEF4F61F44EC52E25059 /* Build configuration list for PBXProject "OlaBall" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8CDA900D7917BD4090203307 /* Debug */,
+				80F6B0F5B33577664E840E5B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		76740BB291A0F5EF9525EF89 /* Build configuration list for PBXNativeTarget "OlaBall" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D13B4F50F5330D7A87EC0346 /* Debug */,
+				D8891441CFC6872936C861B8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		CF756DF720E2067442BBFF84 /* Build configuration list for PBXNativeTarget "OlaBallUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				52C946519A19162B8078E5CE /* Debug */,
+				F81D7EA1BE470619471AA232 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = DC6B022E06D3B68B0C7814A6 /* Project object */;
+}

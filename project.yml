@@ -1,0 +1,60 @@
+name: OlaBall
+options:
+  bundleIdPrefix: co.nsgsolutions
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    CODE_SIGN_STYLE: Automatic
+targets:
+  OlaBall:
+    type: application
+    platform: iOS
+    sources: [OlaBall]
+    info:
+      path: OlaBall/Info.plist
+      properties:
+        CFBundleDisplayName: Ola Ball
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        ITSAppUsesNonExemptEncryption: false
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: co.nsgsolutions.olaball
+        TARGETED_DEVICE_FAMILY: "1"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+  OlaBallTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: [OlaBallTests]
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+    dependencies:
+      - target: OlaBall
+  OlaBallUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [OlaBallUITests]
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+    dependencies:
+      - target: OlaBall
+schemes:
+  OlaBall:
+    build:
+      targets:
+        OlaBall: all
+        OlaBallTests: [test]
+        OlaBallUITests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets: [OlaBallTests, OlaBallUITests]
