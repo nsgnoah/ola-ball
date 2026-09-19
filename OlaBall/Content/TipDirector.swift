@@ -2,6 +2,8 @@ import Foundation
 
 /// Decides which single Coach's Tip (if any) to surface at a given moment.
 /// One tip per moment, fundamentals first. Anything skipped shows up next time the situation recurs.
+/// A game allows only a handful of new tips, so the order below is the priority order: the basics,
+/// then reading the defense, then downs, then everything else. Detail tips wait for a second game.
 enum TipDirector {
     struct Context {
         var situation: Situation
@@ -12,24 +14,31 @@ enum TipDirector {
         var scoreDiff: Int   // user minus opponent
     }
 
+    /// Detail tips (cornerbacks, linemen, incompletions...) wait until the player has the basics down.
+    static let detailThreshold = 8
+
     static func preSnap(_ ctx: Context, seen: Set<String>) -> Concept? {
         let s = ctx.situation
+        let details = seen.count >= detailThreshold
         var c: [String] = []
         if ctx.userOnOffense {
             if ctx.playsThisGame == 0 { c.append("objective") }
             c.append("drawThePlay")
-            if ctx.playsThisGame >= 1 { c.append("gaps") }
-            if s.down == 2 { c.append("notation") }
-            if s.down == 3 { c.append("thirdDown") }
-            if s.down == 4 { c.append("fourthDown") }
-            if s.down == 4 && s.inFieldGoalRange { c.append("fieldGoal") }
-            if s.down == 4 && !s.inFieldGoalRange { c.append("punt") }
+            // Reading the defense is the game, so it comes right after the basics.
             switch ctx.defenseCall {
             case .stackTheBox: c.append("theBox")
             case .playThePass: c.append("safeties")
             case .blitz: c.append("blitz")
             case .balanced: break
             }
+            if s.down == 2 { c.append("notation") }
+            if s.down == 3 { c.append("thirdDown") }
+            if s.down == 4 { c.append("fourthDown") }
+            if s.down == 4 && s.inFieldGoalRange { c.append("fieldGoal") }
+            if s.down == 4 && !s.inFieldGoalRange { c.append("punt") }
+            if ctx.playsThisGame >= 1 { c.append("gaps") }
+            if s.isGoalToGo { c.append("goalToGo") }
+            if s.inRedZone && !s.isGoalToGo { c.append("redZone") }
             if ctx.isFourthQuarter {
                 switch ctx.scoreDiff {
                 case ..<(-8): c.append("twoScores")
@@ -39,19 +48,18 @@ enum TipDirector {
                 default: break
                 }
             }
-            if s.isGoalToGo { c.append("goalToGo") }
-            if s.inRedZone && !s.isGoalToGo { c.append("redZone") }
-            if ctx.playsThisGame >= 3 { c.append("cornerbacks") }
-            if ctx.playsThisGame >= 5 { c.append("linemen") }
+            if details && ctx.playsThisGame >= 3 { c.append("cornerbacks") }
+            if details && ctx.playsThisGame >= 5 { c.append("linemen") }
         } else {
             c.append("defenseCalls")
-            if s.down == 3 && s.yardsToGo >= 7 { c.append("safeties") }
             if s.yardsToGo <= 2 { c.append("theBox") }
+            if s.down == 3 && s.yardsToGo >= 7 { c.append("safeties") }
         }
         return first(c, notIn: seen)
     }
 
     static func postPlay(_ play: Play, events: [PlaySim.Event], userOnOffense: Bool, seen: Set<String>) -> Concept? {
+        let details = seen.count >= detailThreshold
         var c: [String] = []
         if let ending = play.ending {
             switch ending {
@@ -67,12 +75,12 @@ enum TipDirector {
         guard userOnOffense else { return first(c, notIn: seen) }
         if play.gainedFirstDown && play.ending == nil { c.append("firstDown") }
         if events.contains(.sack) { c.append("sack") }
-        if events.contains(.incomplete) { c.append("incomplete") }
-        if events.contains(.outOfBounds) { c.append("sideline") }
-        if events.contains(where: { if case .caught = $0 { return true } else { return false } }) { c.append("separation") }
         if events.contains(.handoff) { c.append("runPlay") }
         if events.contains(.throwStart) { c.append("passPlay") }
         if play.call == .run && !events.contains(.handoff) && events.contains(.snap) { c.append("keeper") }
+        if events.contains(where: { if case .caught = $0 { return true } else { return false } }) { c.append("separation") }
+        if details && events.contains(.incomplete) { c.append("incomplete") }
+        if details && events.contains(.outOfBounds) { c.append("sideline") }
         return first(c, notIn: seen)
     }
 

@@ -27,10 +27,10 @@ struct Concept: Identifiable, Hashable {
                 body: "Move the ball into the far end zone for a touchdown. You get 4 plays, called downs, to gain 10 yards. Make it and you get 4 more. Fall short and the other team takes over.",
                 category: .basics, unlockHint: "Start your first game."),
         Concept(id: "drawThePlay", title: "Draw the Play", symbol: "hand.draw.fill",
-                body: "The players with a glowing ring can get the ball. Drag from one of them to draw where they should run. Let go, and the ball is snapped. Where you draw is where they go.",
+                body: "The players with a gold ring can take the ball: the quarterback (QB), the running back (RB) behind him, and the receivers (WR, TE) out wide. Drag from one to draw where they go. Let go, and the ball is snapped.",
                 category: .basics, unlockHint: "Line up for your first play."),
         Concept(id: "defense", title: "Now You're on Defense", symbol: "shield.lefthalf.filled",
-                body: "The other team has the ball. Pick how your defense lines up, then watch. Stop them within 4 downs and you get the ball back.",
+                body: "The other team has the ball now. Pick how your defense lines up, then watch the play. Stop them within 4 downs and you get the ball back.",
                 category: .basics, unlockHint: "Finish your first drive."),
         Concept(id: "kickoff", title: "Kickoff & the 25", symbol: "arrow.up.forward",
                 body: "After a score, the other team gets the ball back with a kickoff. Usually the returner kneels in the end zone, called a touchback, and the drive starts at the 25-yard line.",
@@ -47,13 +47,13 @@ struct Concept: Identifiable, Hashable {
 
         // Reading the defense
         Concept(id: "theBox", title: "The Box", symbol: "rectangle.stack.fill",
-                body: "The box is the area right in front of the ball where the big guys stand. Count the defenders in it. 8 in the box means they expect a run, and there's less help deep. That's when you throw.",
+                body: "The box is the area right in front of the ball: the big linemen (DL) and the linebackers (LB) a few steps behind them. Count them. 8 in the box means they expect a run, and there's less help deep. That's when you throw.",
                 category: .reading, unlockHint: "Face a stacked box."),
         Concept(id: "safeties", title: "Safeties: the Deep Help", symbol: "umbrella.fill",
-                body: "The two defenders way in the back are safeties. They stop long passes. When both are deep, throws downfield are risky, but there are fewer bodies near the line, so runs work.",
+                body: "The defenders way in the back are safeties (S). Their job is to stop long passes. When both are deep, throws downfield are risky, but there are fewer bodies near the line, so runs work.",
                 category: .reading, unlockHint: "Face two safeties deep."),
         Concept(id: "cornerbacks", title: "Cornerbacks", symbol: "person.2.fill",
-                body: "The defenders lined up across from your wide receivers are cornerbacks. Each one shadows a receiver. A sharp cut in your route makes them a step late, and a step is all you need.",
+                body: "The defenders lined up across from your wide receivers are cornerbacks (CB). Each one shadows a receiver. A sharp cut in your route makes them a step late, and a step is all you need.",
                 category: .reading, unlockHint: "Draw a route for a wide receiver."),
         Concept(id: "blitz", title: "The Blitz", symbol: "bolt.fill",
                 body: "A blitz sends extra defenders after the quarterback. Long routes get you sacked. Beat it with a quick, short throw, or a run away from where they're coming.",
@@ -62,7 +62,7 @@ struct Concept: Identifiable, Hashable {
                 body: "Your blockers can only hold so many defenders. Look at the line before the snap and draw the run through the side with fewer bodies. Fewer defenders at the point of attack means more yards.",
                 category: .reading, unlockHint: "Call your first run."),
         Concept(id: "linemen", title: "Blockers vs. Rushers", symbol: "figure.stand.line.dotted.figure.stand",
-                body: "The five big guys in front of the quarterback are the offensive line. They block. The defenders across from them try to get past. Blocks hold for a couple of seconds, so slow plays get caught.",
+                body: "The five big guys in front of the quarterback are the offensive line (OL). They block. The defensive linemen (DL) across from them try to get past. Blocks hold for a couple of seconds, so slow plays get caught.",
                 category: .reading, unlockHint: "Call a pass play."),
 
         // Plays
