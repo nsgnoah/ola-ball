@@ -1,5 +1,7 @@
 # Ola Ball — Status / Handoff
 
+> **FILE OWNERSHIP (from 2026-09-19 09:05):** Noah is working live with the original lead session on GRAPHICS. That session owns everything under `OlaBall/Scene/` (it is building a new renderer in `OlaBall/Scene/Stadium/` and will delete `FieldScene.swift` when it swaps over) plus `OlaBall/Views/GameView.swift`. Overnight session: do NOT spawn graphics builders or edit those paths; keep working on play balance (`OlaBall/Sim/`), tips/content, tests, and the other Gauntlet pieces. Commit your work in small commits so nothing is lost.
+
 _Updated: 2026-09-19 03:30 CDT_
 
 ## What this is now

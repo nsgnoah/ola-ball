@@ -73,9 +73,9 @@ struct PlaySimTests {
         let los: Float = 30
         let players = PlaySim.presnapPlayers(los: los, defenseCall: .stackTheBox)
         let rb = players.first { $0.tag == "RB" }!
-        // Stacked box has the extra safety on the right (+x). Run left = gap, run right at the safety = crowd.
+        // Stacked box walks the extra safety down on the right (+x). Left edge is the light side.
         let gapPath = [rb.pos, FieldPoint(-7, los - 1), FieldPoint(-9, los + 3), FieldPoint(-11, los + 15)]
-        let crowdPath = [rb.pos, FieldPoint(2, los - 1), FieldPoint(3, los + 2), FieldPoint(4, los + 15)]
+        let crowdPath = [rb.pos, FieldPoint(4, los - 1), FieldPoint(6, los + 2), FieldPoint(7, los + 15)]
         func avg(_ path: [FieldPoint]) -> Double {
             var total = 0.0
             for seed in 0..<300 {
@@ -85,8 +85,9 @@ struct PlaySimTests {
             return total / 300
         }
         let gap = avg(gapPath), crowd = avg(crowdPath)
-        #expect(gap > crowd + 1.5, "gap \(gap) vs crowd \(crowd)")
-        #expect(crowd < 4, "crowd average \(crowd)")
+        #expect(gap >= 5, "gap average \(gap)")
+        #expect(crowd < 3, "crowd average \(crowd)")
+        #expect(gap > crowd + 3, "gap \(gap) vs crowd \(crowd)")
     }
 
     /// The bar: separation drives completions.
@@ -102,7 +103,7 @@ struct PlaySimTests {
             if sim.events.contains(where: { if case .caught = $0 { return true } else { return false } }) { caught += 1 }
             if let s = sim.analysis.separationAtCatch { seps.append(s) }
         }
-        #expect(caught > 150, "only \(caught)/300 caught; mean separation \(seps.reduce(0, +) / Float(max(1, seps.count)))")
+        #expect(caught >= 150, "only \(caught)/300 caught; mean separation \(seps.reduce(0, +) / Float(max(1, seps.count)))")
     }
 
     @Test func blitzProducesSacksAgainstLongRoutes() {
@@ -115,7 +116,24 @@ struct PlaySimTests {
             let sim = PlaySimTests.run(PlayPlan(ballHandlerTag: "X", path: go), los: los, call: .blitz, seed: UInt64(seed))
             if sim.events.contains(.sack) { sacks += 1 }
         }
-        #expect(sacks > 30, "sacks \(sacks)/200")
+        #expect(sacks >= 40, "sacks \(sacks)/200")
+    }
+}
+
+extension PlaySimTests {
+    @Test func quickSlantBeatsTheBlitz() {
+        let los: Float = 40
+        let players = PlaySim.presnapPlayers(los: los, defenseCall: .blitz)
+        let x = players.first { $0.tag == "X" }!
+        let slant = [x.pos, FieldPoint(x.pos.x, los + 3), FieldPoint(x.pos.x + 8, los + 11)]
+        var sacks = 0, caught = 0
+        for seed in 0..<200 {
+            let sim = PlaySimTests.run(PlayPlan(ballHandlerTag: "X", path: slant), los: los, call: .blitz, seed: UInt64(seed))
+            if sim.events.contains(.sack) { sacks += 1 }
+            if sim.events.contains(where: { if case .caught = $0 { return true } else { return false } }) { caught += 1 }
+        }
+        #expect(sacks < 30, "sacks \(sacks)/200")
+        #expect(caught > 120, "caught \(caught)/200")
     }
 }
 

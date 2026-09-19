@@ -104,6 +104,7 @@ struct GameView: View {
             .padding(.horizontal, 14).padding(.vertical, 8)
             .background(Theme.card.opacity(0.92), in: Capsule())
             .accessibilityIdentifier("situation")
+            .allowsHitTesting(false)
     }
 
     private var presnapPanel: some View {
@@ -123,6 +124,7 @@ struct GameView: View {
                 .padding(.vertical, 10).padding(.horizontal, 14)
                 .frame(maxWidth: .infinity)
                 .background(Theme.card.opacity(0.92), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .allowsHitTesting(false)
                 if session.isFourthDown {
                     HStack(spacing: 10) {
                         Button {

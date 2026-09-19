@@ -219,18 +219,18 @@ final class GameSession {
         default: made = false; distance = 0
         }
         fieldScene.clearPath()
+        if autoplay {
+            // Don't wait on SceneKit in tests
+            kickInProgress = false
+            finishPlay(result: result, call: kind, sim: nil)
+            showResult()
+            return
+        }
         fieldScene.animateKick(from: los, distanceYards: distance, made: made, punt: kind == .punt) { [weak self] in
             guard let self else { return }
             self.kickInProgress = false
             self.finishPlay(result: result, call: kind, sim: nil)
             self.showResult()
-        }
-        if autoplay {
-            // Don't wait on SceneKit in tests
-            kickInProgress = false
-            fieldScene.clearPath()
-            finishPlay(result: result, call: kind, sim: nil)
-            showResult()
         }
     }
 

@@ -31,6 +31,7 @@ struct SimPlayer: Identifiable {
     enum State: Equatable {
         case idle
         case blocking(rusher: Int)           // offense: engaged with a defender
+        case climbing(target: Int)           // offense: moving to block a linebacker
         case running                          // following the plan path
         case decoy                            // receivers not in the plan
         case dropping                         // QB dropping back to throw

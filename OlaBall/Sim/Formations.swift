@@ -52,7 +52,7 @@ enum Role: String, Codable, Hashable, CaseIterable {
         case .runningBack: return 7.6
         case .wideReceiver: return 8.0
         case .tightEnd: return 6.8
-        case .offensiveLine: return 4.5
+        case .offensiveLine: return 5.0
         case .defensiveLine: return 5.6
         case .linebacker: return 6.8
         case .cornerback: return 7.9
@@ -120,9 +120,9 @@ struct Lineup {
         Slot(role: .tightEnd, x: 6.5, depth: -1.0, tag: "TE"),
         Slot(role: .quarterback, x: 0.0, depth: -5.5, tag: "QB"),
         Slot(role: .runningBack, x: -3.0, depth: -5.5, tag: "RB"),
-        Slot(role: .wideReceiver, x: -21.0, depth: -1.0, tag: "X"),
-        Slot(role: .wideReceiver, x: 21.0, depth: -1.0, tag: "Z"),
-        Slot(role: .wideReceiver, x: 13.0, depth: -2.0, tag: "Y"),
+        Slot(role: .wideReceiver, x: -14.0, depth: -1.0, tag: "X"),
+        Slot(role: .wideReceiver, x: 14.0, depth: -1.0, tag: "Z"),
+        Slot(role: .wideReceiver, x: 9.0, depth: -2.0, tag: "Y"),
     ])
 
     static func defense(for call: DefenseCall, goalLine: Bool) -> Lineup {
@@ -133,7 +133,7 @@ struct Lineup {
                 Slot(role: .defensiveLine, x: 5, depth: 1, tag: "DE"),
                 Slot(role: .linebacker, x: -4, depth: 3.5, tag: "LB"), Slot(role: .linebacker, x: 0, depth: 3.5, tag: "LB"),
                 Slot(role: .linebacker, x: 4, depth: 3.5, tag: "LB"),
-                Slot(role: .cornerback, x: -20, depth: 4, tag: "CB"), Slot(role: .cornerback, x: 20, depth: 4, tag: "CB"),
+                Slot(role: .cornerback, x: -14, depth: 4, tag: "CB"), Slot(role: .cornerback, x: 14, depth: 4, tag: "CB"),
                 Slot(role: .safety, x: 10, depth: 7, tag: "S"),
             ])
         }
@@ -144,7 +144,7 @@ struct Lineup {
                 Slot(role: .defensiveLine, x: 1.5, depth: 1, tag: "DT"), Slot(role: .defensiveLine, x: 5.5, depth: 1, tag: "DE"),
                 Slot(role: .linebacker, x: -5, depth: 5, tag: "LB"), Slot(role: .linebacker, x: 0, depth: 5.5, tag: "LB"),
                 Slot(role: .linebacker, x: 5, depth: 5, tag: "LB"),
-                Slot(role: .cornerback, x: -21, depth: 7, tag: "CB"), Slot(role: .cornerback, x: 21, depth: 7, tag: "CB"),
+                Slot(role: .cornerback, x: -14, depth: 7, tag: "CB"), Slot(role: .cornerback, x: 14, depth: 7, tag: "CB"),
                 Slot(role: .safety, x: -9, depth: 13, tag: "S"), Slot(role: .safety, x: 9, depth: 13, tag: "S"),
             ])
         case .stackTheBox:
@@ -154,7 +154,7 @@ struct Lineup {
                 Slot(role: .linebacker, x: -6, depth: 4, tag: "LB"), Slot(role: .linebacker, x: -1, depth: 4.5, tag: "LB"),
                 Slot(role: .linebacker, x: 4, depth: 4, tag: "LB"),
                 Slot(role: .safety, x: 8, depth: 5, tag: "S"),       // safety walked into the box
-                Slot(role: .cornerback, x: -21, depth: 6, tag: "CB"), Slot(role: .cornerback, x: 21, depth: 6, tag: "CB"),
+                Slot(role: .cornerback, x: -14, depth: 6, tag: "CB"), Slot(role: .cornerback, x: 14, depth: 6, tag: "CB"),
                 Slot(role: .safety, x: 0, depth: 15, tag: "S"),
             ])
         case .playThePass:
@@ -162,8 +162,8 @@ struct Lineup {
                 Slot(role: .defensiveLine, x: -5.5, depth: 1, tag: "DE"), Slot(role: .defensiveLine, x: -1.5, depth: 1, tag: "DT"),
                 Slot(role: .defensiveLine, x: 1.5, depth: 1, tag: "DT"), Slot(role: .defensiveLine, x: 5.5, depth: 1, tag: "DE"),
                 Slot(role: .linebacker, x: -3, depth: 6, tag: "LB"), Slot(role: .linebacker, x: 3, depth: 6, tag: "LB"),
-                Slot(role: .cornerback, x: -21, depth: 8, tag: "CB"), Slot(role: .cornerback, x: 21, depth: 8, tag: "CB"),
-                Slot(role: .cornerback, x: 13, depth: 7, tag: "NB"),
+                Slot(role: .cornerback, x: -14, depth: 8, tag: "CB"), Slot(role: .cornerback, x: 14, depth: 8, tag: "CB"),
+                Slot(role: .cornerback, x: 9, depth: 7, tag: "NB"),
                 Slot(role: .safety, x: -10, depth: 15, tag: "S"), Slot(role: .safety, x: 10, depth: 15, tag: "S"),
             ])
         case .blitz:
@@ -172,8 +172,8 @@ struct Lineup {
                 Slot(role: .defensiveLine, x: 1.5, depth: 1, tag: "DT"), Slot(role: .defensiveLine, x: 5.5, depth: 1, tag: "DE"),
                 Slot(role: .linebacker, x: -3.5, depth: 2.5, tag: "LB"), Slot(role: .linebacker, x: 3.5, depth: 2.5, tag: "LB"),
                 Slot(role: .linebacker, x: 8, depth: 3, tag: "LB"),
-                Slot(role: .cornerback, x: -21, depth: 5, tag: "CB"), Slot(role: .cornerback, x: 21, depth: 5, tag: "CB"),
-                Slot(role: .cornerback, x: 13, depth: 5, tag: "NB"),
+                Slot(role: .cornerback, x: -14, depth: 5, tag: "CB"), Slot(role: .cornerback, x: 14, depth: 5, tag: "CB"),
+                Slot(role: .cornerback, x: 9, depth: 5, tag: "NB"),
                 Slot(role: .safety, x: 0, depth: 14, tag: "S"),
             ])
         }
