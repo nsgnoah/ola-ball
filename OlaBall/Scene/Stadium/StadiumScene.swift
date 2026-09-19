@@ -106,7 +106,11 @@ final class StadiumScene {
         let dt: Float = 1.0 / 60.0
         if !ringsHidden {
             ringsHidden = true
-            for rig in rigs.values { rig.setRingVisible(false) }
+            for rig in rigs.values {
+                rig.setRingVisible(false)
+                // Linemen tags are useful pre-snap; once the ball is live they're clutter.
+                if rig.role == .offensiveLine || rig.role == .defensiveLine { rig.setTagVisible(false) }
+            }
         }
         for p in sim.players {
             rigs[p.id]?.update(pos: p.pos, facing: p.facing, state: p.state, dt: dt)

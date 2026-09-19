@@ -109,23 +109,26 @@ enum Effects {
         return ps
     }
 
+    /// A low puff of turf and dust at the tackle spot.
     static func turfBurst() -> SCNParticleSystem {
         let ps = SCNParticleSystem()
-        ps.particleImage = Art.confettiSprite()
-        ps.birthRate = 400
-        ps.emissionDuration = 0.12
-        ps.particleLifeSpan = 0.8
-        ps.particleSize = 0.12
-        ps.particleSizeVariation = 0.06
-        ps.particleVelocity = 5
-        ps.particleVelocityVariation = 3
-        ps.spreadingAngle = 70
+        ps.particleImage = Art.glowSprite()
+        ps.birthRate = 180
+        ps.emissionDuration = 0.1
+        ps.particleLifeSpan = 0.7
+        ps.particleLifeSpanVariation = 0.2
+        ps.particleSize = 0.35
+        ps.particleSizeVariation = 0.15
+        ps.particleVelocity = 2.2
+        ps.particleVelocityVariation = 1.2
+        ps.spreadingAngle = 75
         ps.emittingDirection = SCNVector3(0, 1, 0)
-        ps.acceleration = SCNVector3(0, -14, 0)
-        ps.particleColor = UIColor(red: 0.25, green: 0.45, blue: 0.2, alpha: 1)
-        ps.particleColorVariation = SCNVector4(0.1, 0.1, 0.05, 0)
+        ps.acceleration = SCNVector3(0, -3, 0)
+        ps.particleColor = UIColor(red: 0.30, green: 0.36, blue: 0.20, alpha: 0.45)
+        ps.particleColorVariation = SCNVector4(0.04, 0.04, 0.02, 0.1)
+        ps.blendMode = .alpha
         ps.isLightingEnabled = false
-        ps.emitterShape = SCNSphere(radius: 0.4)
+        ps.emitterShape = SCNSphere(radius: 0.5)
         return ps
     }
 
