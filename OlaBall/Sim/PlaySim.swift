@@ -45,6 +45,9 @@ struct PlaySim {
     private var throwTime: Float = -1
     private var throwDecisionTime: Float?
     static let throwWindup: Float = 0.35
+    /// How close a free rusher gets before this QB decides to get rid of the ball. Drawn once per play:
+    /// some snaps the QB feels the rush early, some snaps he holds it a beat too long and eats the sack.
+    private var pressureTrigger: Float = 3.4
     private var separationAtThrow: Float = 0
 
     var isOver: Bool { result != nil }
@@ -100,6 +103,7 @@ struct PlaySim {
 
         let handlerIndex = players.firstIndex { $0.tag == plan.ballHandlerTag && $0.side == .offense } ?? 0
         let qb = players.firstIndex { $0.tag == "QB" }!
+        pressureTrigger = Float.random(in: 2.8...4.4, using: &rng)
 
         // Offense roles
         for i in players.indices where players[i].side == .offense {
@@ -172,20 +176,28 @@ struct PlaySim {
         // The lineman's defender gets handed to a neighbor (a combo block), which holds a little less well.
         if plan.kind == .run, let poa = plan.path.first(where: { $0.y >= los + 0.5 }) ?? plan.path.last {
             let secondLevel = players.indices.filter { i in
-                players[i].side == .defense && !rushers.contains(i) && (players[i].role == .linebacker || players[i].role == .safety) && players[i].pos.y - los < 9
+                // Unblocked blitzers count too: the play-side blockers pick up the one nearest the hole.
+                players[i].side == .defense && (!rushers.contains(i) || leftovers.contains(i)) && (players[i].role == .linebacker || players[i].role == .safety) && players[i].pos.y - los < 9
             }.sorted { players[$0].pos.distance(to: poa) < players[$1].pos.distance(to: poa) }
-            var climbers: [Int] = []
-            if plan.ballHandlerTag != "TE", let te = players.firstIndex(where: { $0.tag == "TE" }), !assignedBlocks.values.contains(te) { climbers.append(te) }
+            // Two blockers get up to the second level: the two nearest the point of attack out of the tight end,
+            // the uncovered lineman, and the play-side linemen. A lineman who has a down lineman combos off him
+            // (the neighbor takes over the block, which holds a little less well) and climbs to the linebacker
+            // flowing to the hole. That's the play-side double-team-and-climb every zone run is built on, and
+            // only two of them ever get up - the backside is left alone. It's what separates a run into a light
+            // side from a run into a crowd.
             let linemen = players.indices.filter { players[$0].side == .offense && players[$0].role == .offensiveLine }
-            if let playSide = linemen.min(by: { abs(players[$0].pos.x - poa.x) < abs(players[$1].pos.x - poa.x) }) {
-                if let (rusher, _) = assignedBlocks.first(where: { $0.value == playSide }) {
-                    // Hand the rusher to the nearest other lineman.
-                    if let neighbor = linemen.filter({ $0 != playSide }).min(by: { abs(players[$0].pos.x - players[playSide].pos.x) < abs(players[$1].pos.x - players[playSide].pos.x) }) {
+            var candidates: [Int] = []
+            if plan.ballHandlerTag != "TE", let te = players.firstIndex(where: { $0.tag == "TE" }), !assignedBlocks.values.contains(te) { candidates.append(te) }
+            candidates += linemen
+            let climbers = Array(candidates.sorted { players[$0].pos.distance(to: poa) < players[$1].pos.distance(to: poa) }.prefix(2))
+            for climber in climbers {
+                if let (rusher, _) = assignedBlocks.first(where: { $0.value == climber }) {
+                    if let neighbor = linemen.filter({ !climbers.contains($0) })
+                        .min(by: { abs(players[$0].pos.x - players[climber].pos.x) < abs(players[$1].pos.x - players[climber].pos.x) }) {
                         assignedBlocks[rusher] = neighbor
                         if case .blocked(let until) = players[rusher].state { players[rusher].state = .blocked(until: until * 0.7) }
                     }
                 }
-                climbers.append(playSide)
             }
             // Each second-level defender (nearest to the point of attack first) gets the closest free blocker.
             var free = climbers
@@ -259,7 +271,15 @@ struct PlaySim {
                     }
                     players[i].state = .blocking(rusher: lb)
                 } else {
-                    move(i, toward: players[lb].pos, dt: dt, speedScale: 1.15)
+                    // Climb to where the linebacker is going, not where he is: a lineman who chases a
+                    // faster defender's current spot never gets a hand on him once he starts to flow.
+                    let h = players[lb].history
+                    var aim = players[lb].pos
+                    if let first = h.first, h.count >= 6 {
+                        let velocity = (players[lb].pos - first) / (Float(h.count) / 30)
+                        aim += velocity * 0.6
+                    }
+                    move(i, toward: aim, dt: dt, speedScale: 1.15)
                 }
             default: break
             }
@@ -269,9 +289,11 @@ struct PlaySim {
     private mutating func moveAlongPath(_ i: Int, dt: Float) {
         let speed = players[i].role.speed * min(1, 0.35 + time / 1.1)
         if ballInAir, intendedReceiver == i {
-            // Go get the ball and settle under it.
+            // Run to the catch point, pacing so the ball is caught in stride rather than waited on.
             let d = players[i].pos.distance(to: ballTarget)
-            if d > 0.25 { move(i, toward: ballTarget, dt: dt) } else { players[i].pos = ballTarget }
+            let remainingFlight = max(0.05, ballFlightTime - ballFlightElapsed)
+            let pace = min(1, (d / remainingFlight) / players[i].role.speed)
+            if d > 0.25 { move(i, toward: ballTarget, dt: dt, speedScale: max(0.35, pace)) } else { players[i].pos = ballTarget }
             return
         }
         var remaining = speed * dt
@@ -335,20 +357,30 @@ struct PlaySim {
         let routeDone = remainingRoute <= 0.01
         let pressure = nearestDefender(to: players[qb].pos)?.dist ?? 99
         // A blitzer closing fast forces an early decision even if the route hasn't developed yet.
-        let mustThrow = pressure < 3.2 && routeProgress > 0.12
+        let mustThrow = pressure < pressureTrigger && routeProgress > 0.12
         // Real panic: someone is about to sack the QB right now. Get rid of it no matter what.
         let panic = pressure < 1.7
-        let ready = routeProgress >= 0.6 || routeDone
+        // Throw on the break: once the receiver has made their last cut and taken a couple of steps into it,
+        // the ball goes - that's what makes a quick slant quick. Long single-leg routes wait for 60%.
+        let onFinalLeg = players[receiver].pathIndex >= plan.path.count - 1
+        let ready = routeProgress >= 0.6 || routeDone || (onFinalLeg && finalLegIsACut && routeProgress >= 0.35)
         let tooLong = time > 3.4
-        guard ready || mustThrow || panic || tooLong else { return }
+        // Deciding to throw and getting the ball out are different moments: the throwing motion takes a beat,
+        // and a rusher who arrives during the windup still gets the sack. This is where blitz sacks come from.
+        if throwDecisionTime == nil {
+            guard ready || mustThrow || panic || tooLong else { return }
+            throwDecisionTime = time
+        }
+        guard time >= throwDecisionTime! + PlaySim.throwWindup - 0.001 else { return }
 
         analysis.underPressure = (mustThrow || panic) && !ready
         analysis.timeToThrow = time
 
         // Throwaway: under real panic with the route nowhere close to developed and nobody closer to open,
         // a QB eats an incompletion instead of a sack. This is the "escape valve" - sacks shouldn't dominate.
-        // A QB who is already being wrapped up (a free rusher within a stride) doesn't get the throwaway.
-        if panic && pressure > 1.1 && routeProgress < 0.6 {
+        // The throwaway needs the drop to be finished and the rusher not already on the QB; an unblocked
+        // blitzer arriving in the first second and a half is a sack.
+        if panic && pressure > 1.1 && time > 1.6 && routeProgress < 0.6 {
             let sep = nearestDefender(to: players[receiver].pos)?.dist ?? 10
             if sep > 2.5 {
                 // Receiver's actually open enough to still throw it - fall through to a real throw below.
@@ -398,6 +430,17 @@ struct PlaySim {
         }
     }
 
+    /// Does the route's last leg break at least ~30 degrees off the one before it? A slant or an out does;
+    /// a go route that just drifts a little doesn't - the QB waits on those instead of throwing on the "break".
+    private var finalLegIsACut: Bool {
+        let n = plan.path.count
+        guard n >= 3 else { return false }
+        let a = (plan.path[n - 2] - plan.path[n - 3]).normalized
+        let b = (plan.path[n - 1] - plan.path[n - 2]).normalized
+        guard a != .zero, b != .zero else { return false }
+        return simd_dot(a, b) < 0.87
+    }
+
     private func remainingPathLength(_ i: Int) -> Float {
         var total: Float = 0
         var last = players[i].pos
@@ -443,7 +486,7 @@ struct PlaySim {
 
     private mutating func resolveCatch() {
         ballInAir = false
-        guard let r = intendedReceiver else { result = .incomplete; return }
+        guard let r = intendedReceiver else { events.append(.incomplete); result = .incomplete; return }   // throwaway
         let receiverDist = players[r].pos.distance(to: ballTarget)
         let nearest = nearestDefender(to: players[r].pos, excludingBlocked: true)
         let actualSeparation = nearest?.dist ?? 10
@@ -484,7 +527,7 @@ struct PlaySim {
         } else {
             // Interceptions should be rare, and essentially never happen on a ball thrown to real separation.
             // Only a genuinely smothered throw (defender right on top of the catch point) has real pick risk.
-            let pInt: Float = separation < 1 ? 0.14 : (separation < 2 ? 0.045 : 0.008)
+            let pInt: Float = separation < 1 ? 0.1 : (separation < 2 ? 0.035 : 0.006)
             if Float.random(in: 0..<1, using: &rng) < pInt {
                 events.append(.interception)
                 result = .interception
@@ -545,7 +588,8 @@ struct PlaySim {
                     // matter how open the catch was at release. Keep the break realistically slower.
                     if time > throwTime + 0.35 && intendedReceiver == r { move(i, toward: ballTarget, dt: dt, speedScale: 0.87); continue }
                 }
-                if runIsOn && ballCrossedLine && time > 0.8 { players[i].state = .pursuing; continue }
+                // Corners are eyeing their receiver; they're late to a run and have to shed a block first.
+                if runIsOn && ballCrossedLine && time > 1.3 { players[i].state = .pursuing; continue }
                 // Follow the receiver with reaction lag, keeping a cushion on the deep side.
                 // A real cornerback plays with a cushion pre-snap and it only closes gradually - it
                 // shouldn't be shadow-tight within a second of the snap on every route.
@@ -575,26 +619,28 @@ struct PlaySim {
                 let lead = dist < 2.5 ? .zero : players[c].facing * players[c].role.speed * leadTime * 0.6
                 // Leverage: a defender on the far side of the play has to run the alley down and across,
                 // not just forward - they shouldn't beat a well-aimed cut to the opposite gap for free.
+                // This is a run-fit effect at the line of scrimmage; once the carrier is in the open field
+                // everybody just runs to the ball.
                 let lateralGap = abs(players[i].pos.x - players[c].pos.x)
                 var leverageScale: Float = 1.0
-                if lateralGap > 4 {
-                    leverageScale -= min(0.3, (lateralGap - 4) * 0.03)
+                if lateralGap > 3 && players[c].pos.y < los + 6 {
+                    leverageScale -= min(0.4, (lateralGap - 3) * 0.06)
                 }
-                leverageScale = max(0.7, leverageScale)
-                move(i, toward: players[c].pos + lead, dt: dt, speedScale: 1.06 * leverageScale)
+                leverageScale = max(0.6, leverageScale)
+                move(i, toward: players[c].pos + lead, dt: dt, speedScale: 1.1 * leverageScale)
             default: break
             }
         }
     }
 
-    /// Did this player change direction by more than ~50 degrees within the last ~0.4 s?
+    /// Did this player change direction by more than ~40 degrees within the last ~0.4 s?
     private func receiverJustCut(_ r: Int) -> Bool {
         let h = players[r].history
         guard h.count >= 12 else { return false }
         let old = (h[h.count / 2] - h[0]).normalized
         let new = (players[r].pos - h[h.count / 2]).normalized
         guard old != .zero, new != .zero else { return false }
-        return simd_dot(old, new) < 0.64
+        return simd_dot(old, new) < 0.77
     }
 
     private func nearestReceiver(to p: FieldPoint) -> (index: Int, pos: FieldPoint, dist: Float)? {

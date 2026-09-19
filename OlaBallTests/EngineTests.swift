@@ -188,3 +188,17 @@ struct GameSessionTests {
         #expect(counts[3] > counts[0])
     }
 }
+
+extension PlaySimTests {
+    /// The blitz tip promises "a run away from where they're coming" works. Keep it true.
+    @Test func edgeRunBeatsTheBlitz() {
+        let los: Float = 30
+        let rb = PlaySim.presnapPlayers(los: los, defenseCall: .blitz).first { $0.tag == "RB" }!
+        let path = [rb.pos, FieldPoint(-7, los - 1), FieldPoint(-9, los + 3), FieldPoint(-11, los + 15)]
+        var total = 0
+        for seed in 0..<300 {
+            total += PlaySimTests.run(PlayPlan(ballHandlerTag: "RB", path: path), los: los, call: .blitz, seed: UInt64(seed)).result?.yards ?? 0
+        }
+        #expect(Double(total) / 300 >= 3, "edge run vs blitz averaged \(Double(total) / 300)")
+    }
+}
