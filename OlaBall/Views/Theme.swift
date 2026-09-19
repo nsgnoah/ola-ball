@@ -1,29 +1,37 @@
 import SwiftUI
 
-/// Two palettes: the night stadium (field HUD) and paper (menus, cards, Ola's notes).
+/// Game palette: saturated world colors, white chunky panels, gold crowns.
 enum Theme {
-    // Night: the field and its HUD
-    static let background = Color(hex: "0B1220")
-    static let card = Color(hex: "16203A")
-    static let cardElevated = Color(hex: "1E2A4A")
-    static let gold = Color(hex: "F0B429")
-    static let grass = Color(hex: "2E7D4F")
-    static let grassDark = Color(hex: "27693F")
-    static let textPrimary = Color.white
-    static let textSecondary = Color.white.opacity(0.72)
-    static let good = Color(hex: "3DDC84")
-    static let bad = Color(hex: "FF5C5C")
-    static let firstDownYellow = Color(hex: "FFE45C")
+    static let his = Color(hex: "2F62FF")
+    static let hisDeep = Color(hex: "1B3FC9")
+    static let hers = Color(hex: "FF3F8E")
+    static let hersDeep = Color(hex: "C4136A")
+    static let night = Color(hex: "1A1B4B")
+    static let nightDeep = Color(hex: "0E0F2E")
+    static let violet = Color(hex: "6C3BFF")
+    static let violetDeep = Color(hex: "3E1FB5")
+    static let gold = Color(hex: "FFC93C")
+    static let goldDeep = Color(hex: "E09A00")
+    static let good = Color(hex: "22C55E")
+    static let goodDeep = Color(hex: "15803D")
+    static let bad = Color(hex: "FF4757")
+    static let badDeep = Color(hex: "C0263A")
+    static let ink = Color(hex: "1B1B2F")
+    static let ink2 = Color(hex: "5B5E7A")
+    static let ink3 = Color(hex: "9A9DB8")
+    static let panel = Color.white
+    static let panelEdge = Color(hex: "D8DAEA")
+    static let cream = Color(hex: "FFF6E5")
 
-    // Paper: menus and cards
+    // Kept for old call sites.
     static let paper = Color(hex: "F4EFE4")
     static let paperCard = Color.white
-    static let ink = Color(hex: "12141A")
-    static let ink2 = Color(hex: "5C6169")
-    static let ink3 = Color(hex: "9A9FA8")
     static let rule = Color(hex: "E3DCCD")
-    static let goodInk = Color(hex: "1D8A4E")
-    static let badInk = Color(hex: "C8322B")
+    static let goodInk = Color(hex: "15803D")
+    static let badInk = Color(hex: "C0263A")
+    static let background = night
+    static let textPrimary = Color.white
+    static let textSecondary = Color.white.opacity(0.75)
 }
 
 extension Color {
@@ -37,75 +45,73 @@ extension Color {
     }
 }
 
-/// Type system, all from faces that ship with iOS (no font files, no network):
-/// Futura Condensed ExtraBold for headlines and scores, Avenir Next Condensed for labels, Avenir Next for reading.
+/// Type: Futura Condensed ExtraBold for the loud stuff, rounded system for everything you read.
 extension Font {
     static func headline(_ size: CGFloat) -> Font { .custom("Futura-CondensedExtraBold", size: size) }
     static func score(_ size: CGFloat) -> Font { .custom("Futura-CondensedExtraBold", size: size) }
     static func condensed(_ size: CGFloat) -> Font { .custom("AvenirNextCondensed-Bold", size: size) }
-    static func condensedMedium(_ size: CGFloat) -> Font { .custom("AvenirNextCondensed-DemiBold", size: size) }
     static func display(_ size: CGFloat) -> Font { .custom("Futura-CondensedExtraBold", size: size) }
-    static func label(_ size: CGFloat = 13) -> Font { .custom("AvenirNextCondensed-Bold", size: size) }
-    static func body(_ size: CGFloat = 17) -> Font { .custom("AvenirNext-Medium", size: size) }
-    static func bodyRegular(_ size: CGFloat = 17) -> Font { .custom("AvenirNext-Regular", size: size) }
-    static func bodyBold(_ size: CGFloat = 17) -> Font { .custom("AvenirNext-DemiBold", size: size) }
+    static func label(_ size: CGFloat = 13) -> Font { .system(size: size, weight: .heavy, design: .rounded) }
+    static func body(_ size: CGFloat = 17) -> Font { .system(size: size, weight: .semibold, design: .rounded) }
+    static func bodyRegular(_ size: CGFloat = 17) -> Font { .system(size: size, weight: .medium, design: .rounded) }
+    static func bodyBold(_ size: CGFloat = 17) -> Font { .system(size: size, weight: .bold, design: .rounded) }
 }
 
-struct CardBackground: ViewModifier {
-    var color: Color = Theme.card
-    func body(content: Content) -> some View {
-        content.background(color, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+/// A chunky game button: solid face over a darker "edge" that compresses when pressed.
+struct ChunkyButtonStyle: ButtonStyle {
+    var color: Color = Theme.gold
+    var edge: Color? = nil
+    var ink: Color = Theme.ink
+    var height: CGFloat = 60
+    var fontSize: CGFloat = 26
+
+    func makeBody(configuration: Configuration) -> some View {
+        let pressed = configuration.isPressed
+        let edgeColor = edge ?? color.mix(with: .black, by: 0.3)
+        return configuration.label
+            .font(.headline(fontSize))
+            .tracking(0.5)
+            .textCase(.uppercase)
+            .foregroundStyle(ink)
+            .frame(maxWidth: .infinity)
+            .frame(height: height)
+            .background(
+                ZStack {
+                    RoundedRectangle(cornerRadius: 18, style: .continuous).fill(edgeColor).offset(y: pressed ? 2 : 7)
+                    RoundedRectangle(cornerRadius: 18, style: .continuous).fill(color)
+                    RoundedRectangle(cornerRadius: 18, style: .continuous).fill(LinearGradient(colors: [.white.opacity(0.25), .clear], startPoint: .top, endPoint: .center))
+                }
+            )
+            .offset(y: pressed ? 5 : 0)
+            .animation(.spring(duration: 0.15), value: pressed)
+    }
+}
+
+// Old name, new look.
+typealias InkButtonStyle = ChunkyButtonStyle
+
+extension Color {
+    func mix(with other: Color, by amount: Double) -> Color {
+        let a = UIColor(self), b = UIColor(other)
+        var r1: CGFloat = 0, g1: CGFloat = 0, b1: CGFloat = 0, a1: CGFloat = 0
+        var r2: CGFloat = 0, g2: CGFloat = 0, b2: CGFloat = 0, a2: CGFloat = 0
+        a.getRed(&r1, green: &g1, blue: &b1, alpha: &a1)
+        b.getRed(&r2, green: &g2, blue: &b2, alpha: &a2)
+        let t = CGFloat(amount)
+        return Color(UIColor(red: r1 + (r2 - r1) * t, green: g1 + (g2 - g1) * t, blue: b1 + (b2 - b1) * t, alpha: 1))
     }
 }
 
 extension View {
-    func card(_ color: Color = Theme.card) -> some View { modifier(CardBackground(color: color)) }
-
-    /// A white paper card with a hairline rule and a soft shadow.
-    func paperCard(padding: CGFloat = 16, radius: CGFloat = 16) -> some View {
+    /// White chunky panel with a soft edge, the game's card.
+    func panel(padding: CGFloat = 16, radius: CGFloat = 22) -> some View {
         self.padding(padding)
-            .background(Theme.paperCard, in: RoundedRectangle(cornerRadius: radius, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: radius, style: .continuous).stroke(Theme.rule, lineWidth: 1))
-            .shadow(color: .black.opacity(0.06), radius: 12, y: 6)
+            .background(Theme.panel, in: RoundedRectangle(cornerRadius: radius, style: .continuous))
+            .background(RoundedRectangle(cornerRadius: radius, style: .continuous).fill(Theme.panelEdge).offset(y: 5))
     }
-}
 
-/// Primary action: ink block, paper type. Secondary: paper with an ink rule.
-struct InkButtonStyle: ButtonStyle {
-    var fill: Color = Theme.ink
-    var foreground: Color = Theme.paper
-    var outlined = false
-
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .font(.headline(24))
-            .tracking(1)
-            .textCase(.uppercase)
-            .foregroundStyle(outlined ? Theme.ink : foreground)
-            .frame(maxWidth: .infinity)
-            .frame(height: 58)
-            .background(outlined ? Color.clear : fill, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(Theme.ink, lineWidth: outlined ? 2 : 0))
-            .scaleEffect(configuration.isPressed ? 0.97 : 1)
-            .opacity(configuration.isPressed ? 0.9 : 1)
-            .animation(.spring(duration: 0.2), value: configuration.isPressed)
-    }
-}
-
-// Kept for older call sites.
-struct BigButtonStyle: ButtonStyle {
-    var fill: Color = Theme.gold
-    var foreground: Color = Color(hex: "0B1220")
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .font(.headline(22))
-            .foregroundStyle(foreground)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 16)
-            .background(fill, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-            .scaleEffect(configuration.isPressed ? 0.97 : 1)
-            .animation(.spring(duration: 0.2), value: configuration.isPressed)
-    }
+    // Old name, new look.
+    func paperCard(padding: CGFloat = 16, radius: CGFloat = 22) -> some View { panel(padding: padding, radius: radius) }
 }
 
 enum Haptics {
@@ -113,4 +119,6 @@ enum Haptics {
     static func heavy() { UIImpactFeedbackGenerator(style: .heavy).impactOccurred(); SoundKit.shared.play(.tap, volume: 0.9) }
     static func success() { UINotificationFeedbackGenerator().notificationOccurred(.success) }
     static func failure() { UINotificationFeedbackGenerator().notificationOccurred(.error) }
+    static func answer(correct: Bool) { correct ? success() : failure() }
+    static func tick() { UISelectionFeedbackGenerator().selectionChanged() }
 }

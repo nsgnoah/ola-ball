@@ -27,12 +27,7 @@ enum World: String, Codable, CaseIterable, Identifiable {
         }
     }
 
-    var color: Color {
-        switch self {
-        case .hers: return Color(hex: "B0325C")
-        case .his: return Color(hex: "1F3F8F")
-        }
-    }
+    var color: Color { self == .hers ? Theme.hers : Theme.his }
 
     var other: World { self == .hers ? .his : .hers }
 }

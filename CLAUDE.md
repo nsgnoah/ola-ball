@@ -6,7 +6,7 @@ Native SwiftUI iOS trivia game for couples (iOS 17+). Two "worlds": His World an
 - **Opinionated, not generic.** The his/her framing is the identity. Ola (the host) has a voice: dry, warm, never scolding.
 - **Facts must be right.** Every question is a verifiable public fact. No opinions dressed as facts. Real people, brands, and titles are fine in trivia; keep them factual and non-defamatory.
 - **App Store safe.** No accounts of our own, no passwords, no server, no third-party SDKs. Game Center only (the `com.apple.developer.game-center` entitlement). Keep `PrivacyInfo.xcprivacy` accurate.
-- **Design system**: paper (`Theme.paper`, ink text, hairline rules) with world colors as the only accents; type is Futura Condensed ExtraBold for headlines/scores, Avenir Next for reading. No dark generic cards.
+- **Design system (game register, like Trivia Crack)**: saturated world-colored striped backgrounds (`GameBackground`), white chunky panels with a bottom edge (`.panel()`), 3D `ChunkyButtonStyle` buttons, gold crowns, a `Mascot` per deck with moods, a spinning `WheelView` for picks, `TimerRing`, `ConfettiBurst`. Type: Futura Condensed ExtraBold for loud text, rounded system for reading. Never revert to a flat text/paper interface.
 
 ## Architecture
 - `Models/`: `Deck`/`Question` (content), `MatchState` (the JSON both phones agree on), `Profile`.

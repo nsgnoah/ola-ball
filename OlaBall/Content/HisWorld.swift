@@ -4,7 +4,7 @@ import Foundation
 enum HisWorld {
     static let decks: [Deck] = [football, ballsports, cars, grill, nerd, gear]
 
-    static let football = Deck(id: "football", world: .his, title: "Football 101", tagline: "Downs, the red zone, and why everyone's yelling.", symbol: "football.fill", colorHex: "2E7D4F", specs: [
+    static let football = Deck(id: "football", world: .his, title: "Football 101", tagline: "Downs, the red zone, and why everyone's yelling.", symbol: "football.fill", colorHex: "2FA562", specs: [
         Q(1, "How many points is a touchdown worth (before the extra point)?", "6", ["7", "3", "1"]),
         Q(1, "How many downs does a team get to gain 10 yards?", "4", ["3", "2", "5"]),
         Q(1, "Who throws the ball on most plays?", "The quarterback", ["The kicker", "The running back", "The center"]),
@@ -43,7 +43,7 @@ enum HisWorld {
         Q(3, "What is the Lambeau Leap?", "Packers players jumping into the stands after a touchdown", ["A quarterback sneak", "A goal-line dive", "A kickoff-return move"]),
     ])
 
-    static let ballsports = Deck(id: "ballsports", world: .his, title: "Ball Sports Grab Bag", tagline: "Hoops, baseball, hockey, soccer, golf. One deck, no mercy.", symbol: "basketball.fill", colorHex: "D97706", specs: [
+    static let ballsports = Deck(id: "ballsports", world: .his, title: "Ball Sports Grab Bag", tagline: "Hoops, baseball, hockey, soccer, golf. One deck, no mercy.", symbol: "basketball.fill", colorHex: "F59E0B", specs: [
         Q(1, "A basketball shot from beyond the arc is worth how much?", "3 points", ["2 points", "1 point", "4 points"]),
         Q(1, "A standard baseball game has how many innings?", "9", ["7", "10", "12"]),
         Q(1, "A home run happens in which sport?", "Baseball", ["Basketball", "Hockey", "Golf"]),
@@ -82,7 +82,7 @@ enum HisWorld {
         Q(3, "Which NBA star is nicknamed the Greek Freak?", "Giannis Antetokounmpo", ["Nikola Jokić", "Luka Dončić", "Joel Embiid"]),
     ])
 
-    static let cars = Deck(id: "cars", world: .his, title: "Cars & Engines", tagline: "Horsepower, torque, and what that light means.", symbol: "car.fill", colorHex: "475569", specs: [
+    static let cars = Deck(id: "cars", world: .his, title: "Cars & Engines", tagline: "Horsepower, torque, and what that light means.", symbol: "car.fill", colorHex: "5B6B8C", specs: [
         Q(1, "MPG stands for what?", "Miles per gallon", ["Motor power gauge", "Maximum pressure gauge", "Miles per gear"]),
         Q(1, "In an automatic car, which pedal is on the right?", "The gas pedal", ["The brake", "The clutch", "The parking brake"]),
         Q(1, "A check-engine light usually means what?", "The car's computer found a problem", ["Oil is low", "The tank is full", "The tires need air"]),
@@ -121,7 +121,7 @@ enum HisWorld {
         Q(3, "In Formula 1, DRS stands for what?", "Drag reduction system", ["Direct racing signal", "Driver response system", "Dual rear suspension"]),
     ])
 
-    static let grill = Deck(id: "grill", world: .his, title: "Grilling, Beer & Whiskey", tagline: "Low and slow, neat or on the rocks.", symbol: "flame.fill", colorHex: "B45309", specs: [
+    static let grill = Deck(id: "grill", world: .his, title: "Grilling, Beer & Whiskey", tagline: "Low and slow, neat or on the rocks.", symbol: "flame.fill", colorHex: "E0632A", specs: [
         Q(1, "BBQ is short for what?", "Barbecue", ["Big beef quantity", "Bar brew queue", "Beef brisket quarter"]),
         Q(1, "A lager is a kind of what?", "Beer", ["Whiskey", "Wine", "Cider"]),
         Q(1, "The classic burger is made from what?", "Ground beef", ["Brisket", "Ribeye", "Flank steak"]),
@@ -160,7 +160,7 @@ enum HisWorld {
         Q(3, "Which BBQ style is known for thick, sweet tomato-and-molasses sauce?", "Kansas City", ["Carolina vinegar", "Central Texas", "Memphis dry rub"]),
     ])
 
-    static let nerd = Deck(id: "nerd", world: .his, title: "Games & Superheroes", tagline: "Respawns, Wakanda, and what GG means.", symbol: "gamecontroller.fill", colorHex: "7C3AED", specs: [
+    static let nerd = Deck(id: "nerd", world: .his, title: "Games & Superheroes", tagline: "Respawns, Wakanda, and what GG means.", symbol: "gamecontroller.fill", colorHex: "7C4DFF", specs: [
         Q(1, "Bruce Wayne is which hero?", "Batman", ["Superman", "Spider-Man", "Iron Man"]),
         Q(1, "Mario's brother is who?", "Luigi", ["Wario", "Toad", "Yoshi"]),
         Q(1, "Which company makes the PlayStation?", "Sony", ["Microsoft", "Nintendo", "Sega"]),
@@ -199,7 +199,7 @@ enum HisWorld {
         Q(3, "Speedrunning is what?", "Finishing a game as fast as possible", ["Playing on the hardest mode", "Racing games only", "Playing while running"]),
     ])
 
-    static let gear = Deck(id: "gear", world: .his, title: "Tools, Gear & Outdoors", tagline: "Torque wrenches, bowlines, and why the cooler is a Yeti.", symbol: "wrench.and.screwdriver.fill", colorHex: "3F6212", specs: [
+    static let gear = Deck(id: "gear", world: .his, title: "Tools, Gear & Outdoors", tagline: "Torque wrenches, bowlines, and why the cooler is a Yeti.", symbol: "wrench.and.screwdriver.fill", colorHex: "5FA31B", specs: [
         Q(1, "Which tool drives screws?", "A screwdriver", ["A hammer", "A wrench", "Pliers"]),
         Q(1, "A Phillips screwdriver has what shape of tip?", "A cross", ["A flat blade", "A star", "A hexagon"]),
         Q(1, "You measure length with what?", "A tape measure", ["A level", "A wrench", "A chisel"]),

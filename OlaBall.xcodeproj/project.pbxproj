@@ -30,6 +30,7 @@
 		AF9902D84797CBA9A9FC2B80 /* MatchEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4619BF5131B14EB8A4306BE4 /* MatchEngine.swift */; };
 		B2E045E814E07FC8D0D8E319 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C5E93C1F2304E6984158858B /* Assets.xcassets */; };
 		D7E3C04DF212C13959FC1C7A /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = C44153EE6927EBB33629DF2C /* Profile.swift */; };
+		E90EF8B91330ABF193F06F77 /* Wheel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07EB47EFDE6EABBA063374A5 /* Wheel.swift */; };
 		F7355AE2664FF230153A8582 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF4E4A92D9971125574E14E3 /* HomeView.swift */; };
 		F982AE5B23AACCDD88171FEE /* MatchOverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5751958A7551636AA25EBDFF /* MatchOverView.swift */; };
 /* End PBXBuildFile section */
@@ -53,6 +54,7 @@
 
 /* Begin PBXFileReference section */
 		054E7DDEEDE5959AAB629146 /* LocalMatchStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalMatchStore.swift; sourceTree = "<group>"; };
+		07EB47EFDE6EABBA063374A5 /* Wheel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Wheel.swift; sourceTree = "<group>"; };
 		0E7B7B61C3E9D8589EAFA6E7 /* OlaBallTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = OlaBallTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		18F064202EEBD07686BA9389 /* OlaBallApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OlaBallApp.swift; sourceTree = "<group>"; };
 		1AC9C84534845ADF1307187A /* OlaBallUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = OlaBallUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -97,6 +99,7 @@
 				E4DC20F9EC8D03260CB9287F /* QuestionView.swift */,
 				D400A2356E1140F41DF35565 /* RoundRevealView.swift */,
 				EE971345D0D0B52CBD12D47E /* Theme.swift */,
+				07EB47EFDE6EABBA063374A5 /* Wheel.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -370,6 +373,7 @@
 				25F13FEE646A886BB9C96A49 /* SeededRNG.swift in Sources */,
 				09237C79004E7B8431416AF6 /* SoundKit.swift in Sources */,
 				59F765E87EC9483A42F2F1FE /* Theme.swift in Sources */,
+				E90EF8B91330ABF193F06F77 /* Wheel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

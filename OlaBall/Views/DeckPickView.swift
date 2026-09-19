@@ -1,42 +1,33 @@
 import SwiftUI
 
-/// You pick the deck your partner has to answer. From your world, naturally.
+/// You pick the deck your partner has to answer. Spin, or just tap the slice you want.
 struct DeckPickView: View {
     let controller: MatchController
     let round: Int
-    private let columns = [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)]
 
     var body: some View {
         let myWorld = controller.state.player(controller.me)?.world ?? .his
         let decks = Decks.decks(in: myWorld)
         let who = controller.partner?.name ?? "your partner"
-        ScrollView(showsIndicators: false) {
-            VStack(alignment: .leading, spacing: 14) {
-                MatchHeader(controller: controller)
-                Kicker("ROUND \(round) · \(MatchEngine.roundLabel(round))", color: Theme.ink3).padding(.top, 6)
-                Text("WHAT DOES \(who.uppercased()) GET?").font(.headline(40)).foregroundStyle(Theme.ink).lineLimit(2).minimumScaleFactor(0.6).padding(.top, -6)
-                HStack(spacing: 8) {
-                    OlaBadge(size: 22)
-                    Text("Pick from \(myWorld.title.lowercased()). Be kind, or don't.").font(.body(14)).foregroundStyle(Theme.ink2)
-                }
-                LazyVGrid(columns: columns, spacing: 12) {
-                    ForEach(decks) { deck in
-                        Button {
-                            Haptics.heavy()
-                            controller.pick(deck)
-                        } label: {
-                            DeckTile(deck: deck)
-                        }
-                        .buttonStyle(.plain)
-                        .accessibilityIdentifier("deck-\(deck.id)")
-                        .disabled(controller.isSubmitting)
+        ZStack {
+            GameBackground(world: myWorld)
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 14) {
+                    MatchHeader(controller: controller)
+                    VStack(spacing: 4) {
+                        Kicker("ROUND \(round) · \(MatchEngine.roundLabel(round))")
+                        Text("WHAT DOES \(who.uppercased()) GET?")
+                            .font(.headline(38)).foregroundStyle(.white)
+                            .multilineTextAlignment(.center).lineLimit(2).minimumScaleFactor(0.6)
+                            .shadow(color: .black.opacity(0.25), radius: 0, y: 2)
                     }
+                    .padding(.top, 6)
+                    WheelView(decks: decks, onPick: { controller.pick($0) }, enabled: !controller.isSubmitting)
+                    OlaSays(text: "Spin for a suggestion, or tap the slice you want. Be kind. Or don't.")
+                    if controller.isSubmitting { ProgressView().tint(.white) }
                 }
-                if controller.isSubmitting {
-                    HStack { Spacer(); ProgressView().tint(Theme.ink); Spacer() }
-                }
+                .padding(20)
             }
-            .padding(20)
         }
     }
 }

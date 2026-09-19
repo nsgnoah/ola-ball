@@ -11,7 +11,7 @@ struct MatchView: View {
 
     var body: some View {
         ZStack {
-            Theme.paper.ignoresSafeArea()
+            GameBackground(top: Theme.violet, bottom: Theme.violetDeep)
             switch controller.stage {
             case .handoff(let name):
                 HandoffView(name: name) { controller.continueAfterHandoff() }
@@ -29,11 +29,9 @@ struct MatchView: View {
                 MatchOverView(controller: controller) { dismiss() }
             }
         }
-        .navigationBarBackButtonHidden(true)
-        .toolbar(.hidden, for: .navigationBar)
-        .preferredColorScheme(.light)
+        .preferredColorScheme(.dark)
         .onAppear { controller.start(announce: true) }
-        .animation(.easeOut(duration: 0.2), value: controller.stage)
+        .animation(.easeOut(duration: 0.25), value: controller.stage)
     }
 }
 
@@ -51,32 +49,29 @@ struct MatchHeader: View {
             Button {
                 if let onClose { onClose() } else { dismiss() }
             } label: {
-                Image(systemName: "xmark").font(.system(size: 13, weight: .black)).foregroundStyle(Theme.ink)
-                    .frame(width: 34, height: 34)
-                    .background(Theme.paperCard, in: Circle())
-                    .overlay(Circle().stroke(Theme.rule, lineWidth: 1))
+                Image(systemName: "xmark").font(.system(size: 14, weight: .black)).foregroundStyle(.white)
+                    .frame(width: 36, height: 36)
+                    .background(.white.opacity(0.2), in: Circle())
             }
             .accessibilityIdentifier("close-match")
-            if let mine {
-                side(mine, leading: true)
-            }
-            Text("VS").font(.condensed(12)).tracking(2).foregroundStyle(Theme.ink3)
+            if let mine { side(mine, leading: true) }
+            Text("VS").font(.headline(18)).foregroundStyle(Theme.gold)
             if let them {
                 side(them, leading: false)
             } else {
-                Text("Waiting for partner").font(.body(12)).foregroundStyle(Theme.ink3)
+                Text("Waiting for partner").font(.body(12)).foregroundStyle(.white.opacity(0.7))
             }
         }
     }
 
     private func side(_ p: MatchPlayer, leading: Bool) -> some View {
         HStack(spacing: 6) {
-            if leading { Avatar(name: p.name, world: p.world, size: 28) }
+            if leading { Avatar(name: p.name, world: p.world, size: 32) }
             VStack(alignment: leading ? .leading : .trailing, spacing: 1) {
-                Text(p.name.uppercased()).font(.condensed(13)).tracking(1).foregroundStyle(Theme.ink).lineLimit(1)
-                Crowns(count: controller.crowns(p.id), color: p.world.color)
+                Text(p.name.uppercased()).font(.label(12)).foregroundStyle(.white).lineLimit(1)
+                Crowns(count: controller.crowns(p.id), size: 12)
             }
-            if !leading { Avatar(name: p.name, world: p.world, size: 28) }
+            if !leading { Avatar(name: p.name, world: p.world, size: 32) }
         }
         .frame(maxWidth: .infinity, alignment: leading ? .leading : .trailing)
     }
@@ -85,18 +80,22 @@ struct MatchHeader: View {
 struct HandoffView: View {
     let name: String
     let onContinue: () -> Void
+    @State private var bounce = false
 
     var body: some View {
         VStack(spacing: 18) {
             Spacer()
             Image(systemName: "iphone.gen3.radiowaves.left.and.right")
-                .font(.system(size: 54, weight: .bold)).foregroundStyle(Theme.ink)
-            Kicker("HAND THE PHONE TO", color: Theme.ink3)
-            Text(name.uppercased()).font(.headline(64)).foregroundStyle(Theme.ink).lineLimit(1).minimumScaleFactor(0.5)
-            Text("No peeking. Their questions are next.").font(.body(15)).foregroundStyle(Theme.ink2)
+                .font(.system(size: 64, weight: .bold)).foregroundStyle(.white)
+                .rotationEffect(.degrees(bounce ? 8 : -8))
+                .onAppear { withAnimation(.easeInOut(duration: 0.4).repeatForever(autoreverses: true)) { bounce = true } }
+            Kicker("HAND THE PHONE TO")
+            Text(name.uppercased()).font(.headline(72)).foregroundStyle(.white).lineLimit(1).minimumScaleFactor(0.5)
+                .shadow(color: .black.opacity(0.3), radius: 0, y: 3)
+            OlaSays(text: "No peeking. Their questions are next.")
             Spacer()
             Button("I'm \(name), let's go") { Haptics.tap(); onContinue() }
-                .buttonStyle(InkButtonStyle())
+                .buttonStyle(ChunkyButtonStyle(color: Theme.gold))
                 .accessibilityIdentifier("handoff-continue")
         }
         .padding(20)
@@ -108,30 +107,33 @@ struct RoundIntroView: View {
     let round: Int
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            MatchHeader(controller: controller)
-            Spacer()
-            Kicker("ROUND \(round) OF \(MatchState.maxRounds) · \(MatchEngine.roundLabel(round))", color: Theme.ink3)
-            if let deck = controller.deck {
-                Text(deck.title.uppercased()).font(.headline(52)).foregroundStyle(deck.color).lineLimit(2).minimumScaleFactor(0.6)
-                    .padding(.top, -6)
-                HStack(spacing: 8) {
-                    OlaBadge(size: 22)
-                    Text(introLine(deck)).font(.body(15)).foregroundStyle(Theme.ink2).fixedSize(horizontal: false, vertical: true)
+        let deck = controller.deck
+        ZStack {
+            if let deck { GameBackground(top: deck.color, bottom: deck.color.mix(with: .black, by: 0.35)) }
+            VStack(spacing: 14) {
+                MatchHeader(controller: controller)
+                Spacer()
+                if let deck {
+                    Mascot(deck: deck, mood: .think, size: 170)
+                    Kicker("ROUND \(round) OF \(MatchState.maxRounds) · \(MatchEngine.roundLabel(round))")
+                    Text(deck.title.uppercased()).font(.headline(50)).foregroundStyle(.white)
+                        .multilineTextAlignment(.center).lineLimit(2).minimumScaleFactor(0.6)
+                        .shadow(color: .black.opacity(0.3), radius: 0, y: 3)
+                        .padding(.top, -6)
+                    OlaSays(text: introLine(deck))
                 }
-                DeckTile(deck: deck)
+                HStack(spacing: 10) {
+                    fact("\(MatchState.questionsPerRound)", "QUESTIONS")
+                    fact("\(Int(MatchEngine.secondsPerQuestion))s", "EACH")
+                    fact(MatchEngine.tierName(MatchEngine.tiers(forRound: round).max() ?? 1), "TOP TIER")
+                }
+                Spacer()
+                Button("Start round \(round)") { Haptics.heavy(); controller.beginAnswering() }
+                    .buttonStyle(ChunkyButtonStyle(color: Theme.gold))
+                    .accessibilityIdentifier("start-round")
             }
-            HStack(spacing: 14) {
-                fact("\(MatchState.questionsPerRound)", "QUESTIONS")
-                fact("\(Int(MatchEngine.secondsPerQuestion))s", "EACH")
-                fact(MatchEngine.tierName(MatchEngine.tiers(forRound: round).max() ?? 1), "TOP TIER")
-            }
-            Spacer()
-            Button("Start round \(round)") { Haptics.heavy(); controller.beginAnswering() }
-                .buttonStyle(InkButtonStyle())
-                .accessibilityIdentifier("start-round")
+            .padding(20)
         }
-        .padding(20)
     }
 
     private func introLine(_ deck: Deck) -> String {
@@ -144,12 +146,12 @@ struct RoundIntroView: View {
     }
 
     private func fact(_ v: String, _ l: String) -> some View {
-        VStack(spacing: 1) {
-            Text(v).font(.score(24)).foregroundStyle(Theme.ink)
-            Text(l).font(.condensed(10)).tracking(1.4).foregroundStyle(Theme.ink3)
+        VStack(spacing: 0) {
+            Text(v).font(.score(26)).foregroundStyle(Theme.ink)
+            Text(l).font(.label(10)).tracking(1).foregroundStyle(Theme.ink3)
         }
         .frame(maxWidth: .infinity)
-        .paperCard(padding: 10, radius: 12)
+        .panel(padding: 10, radius: 14)
     }
 }
 
@@ -158,20 +160,21 @@ struct WaitingView: View {
     let onClose: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(spacing: 16) {
             MatchHeader(controller: controller, onClose: onClose)
             Spacer()
-            OlaBadge(size: 44)
-            Kicker("THEIR MOVE", color: Theme.ink3)
-            Text("\(controller.partner?.name.uppercased() ?? "YOUR PARTNER")'S TURN").font(.headline(44)).foregroundStyle(Theme.ink).lineLimit(2).minimumScaleFactor(0.6)
-            Text(controller.transport.isPassAndPlay ? "Hand the phone over when they're ready." : "You'll get a notification when they've played. Go live your life.")
-                .font(.body(15)).foregroundStyle(Theme.ink2)
+            if let deck = Decks.all.randomElement() { Mascot(deck: deck, mood: .think, size: 130) }
+            Kicker("THEIR MOVE")
+            Text("\(controller.partner?.name.uppercased() ?? "YOUR PARTNER")'S TURN").font(.headline(44)).foregroundStyle(.white)
+                .multilineTextAlignment(.center).lineLimit(2).minimumScaleFactor(0.6)
+            OlaSays(text: controller.transport.isPassAndPlay ? "Hand the phone over when they're ready." : "You'll get a notification when they've played. Go live your life.")
             if let err = controller.error {
-                Text(err).font(.body(13)).foregroundStyle(Theme.badInk)
+                Text(err).font(.body(13)).foregroundStyle(Theme.gold)
             }
             RoundHistory(controller: controller)
             Spacer()
-            Button("Back to matches") { onClose() }.buttonStyle(InkButtonStyle(outlined: true))
+            Button("Back to matches") { onClose() }
+                .buttonStyle(ChunkyButtonStyle(color: .white, edge: Theme.panelEdge, ink: Theme.ink))
         }
         .padding(20)
     }
@@ -184,17 +187,17 @@ struct RoundHistory: View {
     var body: some View {
         let s = controller.state
         VStack(alignment: .leading, spacing: 8) {
-            Kicker("SCORECARD", color: Theme.ink2)
+            Kicker("SCORECARD", color: Theme.ink2, size: 11)
             ForEach(s.rounds, id: \.number) { r in
                 HStack(spacing: 8) {
-                    Text("R\(r.number)").font(.condensed(13)).foregroundStyle(Theme.ink3).frame(width: 28, alignment: .leading)
+                    Text("R\(r.number)").font(.label(12)).foregroundStyle(Theme.ink3).frame(width: 28, alignment: .leading)
                     ForEach(s.players) { p in
                         let deck = r.picks[p.id].flatMap(Decks.byID)
                         let res = r.results[p.id]
                         HStack(spacing: 6) {
                             if let deck { Image(systemName: deck.symbol).font(.system(size: 11, weight: .bold)).foregroundStyle(deck.color) }
-                            Text(res.map { "\($0.score)" } ?? (deck == nil ? "—" : "…")).font(.score(18)).foregroundStyle(Theme.ink)
-                            if s.roundWinner(r) == p.id { Image(systemName: "crown.fill").font(.system(size: 11)).foregroundStyle(p.world.color) }
+                            Text(res.map { "\($0.score)" } ?? (deck == nil ? "—" : "…")).font(.score(20)).foregroundStyle(Theme.ink)
+                            if s.roundWinner(r) == p.id { Image(systemName: "crown.fill").font(.system(size: 11, weight: .black)).foregroundStyle(Theme.gold) }
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                     }
@@ -202,6 +205,6 @@ struct RoundHistory: View {
             }
             if s.rounds.isEmpty { Text("No rounds yet.").font(.body(13)).foregroundStyle(Theme.ink3) }
         }
-        .paperCard(padding: 14)
+        .panel(padding: 14)
     }
 }

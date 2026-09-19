@@ -4,7 +4,7 @@ import Foundation
 enum HerWorld {
     static let decks: [Deck] = [skincare, fashion, romcoms, reality, divas, weddings]
 
-    static let skincare = Deck(id: "skincare", world: .hers, title: "Skincare & Beauty", tagline: "Serums, SPF, and why the order matters.", symbol: "drop.fill", colorHex: "D96C8A", specs: [
+    static let skincare = Deck(id: "skincare", world: .hers, title: "Skincare & Beauty", tagline: "Serums, SPF, and why the order matters.", symbol: "drop.fill", colorHex: "FF6FA5", specs: [
         Q(1, "What does SPF stand for?", "Sun Protection Factor", ["Skin Protection Formula", "Solar Prevention Filter", "Sun Proof Finish"]),
         Q(1, "Which product goes on first in a typical skincare routine?", "Cleanser", ["Moisturizer", "Sunscreen", "Serum"]),
         Q(1, "Mascara is applied to what?", "Eyelashes", ["Eyebrows", "Lips", "Cheeks"]),
@@ -43,7 +43,7 @@ enum HerWorld {
         Q(3, "With lash extensions, a 'volume set' means what compared to 'classic'?", "Several fine lashes on each natural lash instead of one", ["Longer lashes only", "Colored lashes", "Bottom lashes only"]),
     ])
 
-    static let fashion = Deck(id: "fashion", world: .hers, title: "Fashion & Style", tagline: "Houses, hemlines, and the bag everyone knows.", symbol: "handbag.fill", colorHex: "8B5CF6", specs: [
+    static let fashion = Deck(id: "fashion", world: .hers, title: "Fashion & Style", tagline: "Houses, hemlines, and the bag everyone knows.", symbol: "handbag.fill", colorHex: "9B5CFF", specs: [
         Q(1, "What is a clutch?", "A small handbag with no strap", ["A type of shoe", "A jacket", "A hat"]),
         Q(1, "Stilettos are what?", "High heels with a thin heel", ["Flat sandals", "Rain boots", "Sneakers"]),
         Q(1, "What does LBD stand for?", "Little black dress", ["Long blue denim", "Light beige blazer", "Lace bridal dress"]),
@@ -82,7 +82,7 @@ enum HerWorld {
         Q(3, "Miu Miu is the sister brand of which house?", "Prada", ["Gucci", "Fendi", "Versace"], "It's Miuccia Prada's childhood nickname."),
     ])
 
-    static let romcoms = Deck(id: "romcoms", world: .hers, title: "Rom-Coms & Love Stories", tagline: "The lines, the leads, and the letters she never sent.", symbol: "heart.fill", colorHex: "E0435E", specs: [
+    static let romcoms = Deck(id: "romcoms", world: .hers, title: "Rom-Coms & Love Stories", tagline: "The lines, the leads, and the letters she never sent.", symbol: "heart.fill", colorHex: "FF4D6D", specs: [
         Q(1, "In 'The Notebook,' the couple is named what?", "Noah and Allie", ["Jack and Rose", "Ross and Rachel", "Edward and Bella"]),
         Q(1, "Who wrote 'Pride and Prejudice'?", "Jane Austen", ["Charlotte Brontë", "Emily Brontë", "Mary Shelley"]),
         Q(1, "In 'Titanic,' the two leads are who?", "Jack and Rose", ["Noah and Allie", "Danny and Sandy", "Harry and Sally"]),
@@ -121,7 +121,7 @@ enum HerWorld {
         Q(3, "In 'The Princess Bride,' 'As you wish' really means what?", "I love you", ["Goodbye", "Thank you", "I'm sorry"]),
     ])
 
-    static let reality = Deck(id: "reality", world: .hers, title: "Reality TV", tagline: "Roses, pods, villas, and the tribe that has spoken.", symbol: "tv.fill", colorHex: "F26D3D", specs: [
+    static let reality = Deck(id: "reality", world: .hers, title: "Reality TV", tagline: "Roses, pods, villas, and the tribe that has spoken.", symbol: "tv.fill", colorHex: "FF7A3D", specs: [
         Q(1, "On 'The Bachelor,' what does the lead hand out to keep people around?", "Roses", ["Rings", "Keys", "Tickets"]),
         Q(1, "'Keeping Up with the Kardashians' followed which family?", "The Kardashian-Jenners", ["The Osbournes", "The Hiltons", "The Hadids"]),
         Q(1, "Which show has singles 'coupling up' in a villa?", "Love Island", ["Big Brother", "Survivor", "The Voice"]),
@@ -160,7 +160,7 @@ enum HerWorld {
         Q(3, "Andy Cohen hosts which late-night Bravo show?", "Watch What Happens Live", ["Late Night Bravo", "The Andy Show", "After Hours"]),
     ])
 
-    static let divas = Deck(id: "divas", world: .hers, title: "Pop Divas & Their Eras", tagline: "Swifties, the Beyhive, and who wrote what.", symbol: "music.mic", colorHex: "C026D3", specs: [
+    static let divas = Deck(id: "divas", world: .hers, title: "Pop Divas & Their Eras", tagline: "Swifties, the Beyhive, and who wrote what.", symbol: "music.mic", colorHex: "D63AE8", specs: [
         Q(1, "Taylor Swift's fans call themselves what?", "Swifties", ["Little Monsters", "The Beyhive", "Arianators"]),
         Q(1, "Whose fans are the Beyhive?", "Beyoncé", ["Rihanna", "Adele", "Lady Gaga"]),
         Q(1, "Fenty Beauty was founded by whom?", "Rihanna", ["Beyoncé", "Selena Gomez", "Kylie Jenner"]),
@@ -199,7 +199,7 @@ enum HerWorld {
         Q(3, "Whose 'Eras Tour' concert film hit theaters in October 2023?", "Taylor Swift", ["Beyoncé", "Olivia Rodrigo", "Adele"]),
     ])
 
-    static let weddings = Deck(id: "weddings", world: .hers, title: "Wedding Season", tagline: "Registries, mimosas, and what your rising sign means.", symbol: "sparkles", colorHex: "0EA5A4", specs: [
+    static let weddings = Deck(id: "weddings", world: .hers, title: "Wedding Season", tagline: "Registries, mimosas, and what your rising sign means.", symbol: "sparkles", colorHex: "19B8B5", specs: [
         Q(1, "What does RSVP on an invitation mean?", "Please reply", ["Bring a gift", "Dress formally", "Arrive early"], "From the French 'répondez s'il vous plaît.'"),
         Q(1, "Who traditionally stands beside the bride at the ceremony?", "The maid of honor", ["The best man", "The officiant", "The ring bearer"]),
         Q(1, "What is a bridal shower?", "A pre-wedding party where the bride gets gifts", ["The bride's morning routine", "The rehearsal", "A spa day on the honeymoon"]),
