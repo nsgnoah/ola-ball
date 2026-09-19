@@ -691,7 +691,7 @@ struct PlaySim {
             return
         }
         events.append(.tackle(by: tackler, broken: false))
-        if Float.random(in: 0..<1, using: &rng) < 0.015 {
+        if Float.random(in: 0..<1, using: &rng) < 0.006 {
             events.append(.fumble)
             result = .fumble
             return

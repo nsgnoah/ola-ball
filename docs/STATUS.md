@@ -2,7 +2,7 @@
 
 > **FILE OWNERSHIP (from 2026-09-19 09:05):** Noah is working live with the original lead session on GRAPHICS. That session owns everything under `OlaBall/Scene/` (it is building a new renderer in `OlaBall/Scene/Stadium/` and will delete `FieldScene.swift` when it swaps over) plus `OlaBall/Views/GameView.swift`. Overnight session: do NOT spawn graphics builders or edit those paths; keep working on play balance (`OlaBall/Sim/`), tips/content, tests, and the other Gauntlet pieces. Commit your work in small commits so nothing is lost.
 
-_Updated: 2026-09-19 03:30 CDT_
+_Updated: 2026-09-19 09:30 CDT_
 
 ## What this is now
 "Draw the Play": a 3D (SceneKit) football game. Pre-snap you see the defense and a callout ("Defense shows 8 in the box"); you drag from a glowing offensive player to draw the ball carrier's path or receiver's route; the play simulates live (blocking, pursuit, man coverage with reaction lag, passes resolved by separation, tackles). On defense you pick a call (Stack the Box / Balanced / Play the Pass / Blitz) and watch. Kicks use a tap-timing meter. Coach's Tips (max 8 new per game) fill the Playbook. The old menu-driven prototype is tagged `v0-menu-prototype`; do not go back to it.
@@ -18,9 +18,25 @@ _Updated: 2026-09-19 03:30 CDT_
 - A command-line balance harness: `build/simlab/main.swift` compiled with `swiftc` against the Sim files (see the swiftc command in PROGRESS.md) prints average yards / completions / sacks per play type. Use it to tune `PlaySim` fast without Xcode.
 
 ## In progress
-- **Play balance** (`OlaBall/Sim/PlaySim.swift`): after fixing pass leading (receiver now runs to the ball) and pursuit (defenders aim straight at the carrier when close), runs are now over-stuffed (~0 yd avg) and passes complete ~35%. Targets from docs/BAR.md: runs into a gap ≥ 5 yd, into a crowd < 3 yd; open receiver (3+ yd separation) ≥ 85% caught; covered (< 1 yd) < 35%. Knobs: pursuit speedScale (1.1), tackle radius (1.5), LB run reaction (0.35 s), coverage lag (12 frames) and cushion, throw trigger (60% route progress).
-- **Graphics**: a builder is rebuilding `OlaBall/Scene/` to shippable quality (articulated players, stadium, grass texture, framing fix so the QB/RB are not under the HUD). Owner's verdict on the capsule version: "slop".
-- **Drag gesture UI test** (`testDrawGestureStartsAPlay`) fails: the pre-snap camera puts the QB/RB at the bottom edge under the HUD panels, so the test's drag misses. Fix comes with the camera framing; the HUD's non-interactive panels should also pass touches through.
+- **Graphics** (live session with Noah): new renderer in `OlaBall/Scene/Stadium/` replacing `FieldScene.swift`; `GameSession.swift` already points at `StadiumScene`. Uncommitted in the working tree as of 09:30. The UI tests (`testFullGameAutoplay`, `testDrawGestureStartsAPlay`) have NOT been re-run since the swap began; run the full suite once it lands.
+
+## Done overnight (2026-09-19, commits db995e3, 31d5d37, 2efa975 + this one)
+- **Play balance** meets the BAR run targets and is fair on passes. Harness (`build/simlab`): light-side run vs stacked box 6.5 yd, crowd 0.7; outs/slants ~65% caught at ~1 yd separation; go route 69% vs single-high, 19% vs two deep; deep route vs blitz sacked 48%, quick slant vs blitz 83% caught; edge run vs blitz 5+ yd (was -3 every time). Fumbles 1.5% -> 0.6% per tackle. 2000 AI drives (`build/simlab/drives`): 1.4 points/drive, 59% punts, 15% TD, 12% FG, 9% turnovers.
+- Coach's Tip priorities (fundamentals first inside the 8-per-game cap) and "why" lines that always name a next-time adjustment.
+- Unit tests: 17/17 pass (`-only-testing:OlaBallTests`), including new `quickSlantBeatsTheBlitz` and `edgeRunBeatsTheBlitz`.
+- App icon verified: 1024 px, no alpha.
+
+## Open
+- AI offense is mediocre by design (random route vs the look), so opponents score ~5-6 a game. If games feel too easy, make `AIPlaycaller.offensePlan` pick routes against the called defense more often.
+- Gauntlet rounds not yet run on: kick meter feel, defense-call experience, onboarding first 60 seconds, game-over/Home polish, touchdown camera hold (needs Scene/, owned by the graphics session).
+- The builder subagents hit the account session limit (resets 1:30 pm CDT), so rounds 2-3 were done by the lead alone without a separate critic.
+
+## Suggested next features
+1. Touchdown camera hold + scoreboard count-up (after the renderer swap).
+2. Smarter AI offense that attacks the user's defensive call.
+3. Kick meter: wind/arc preview and a slower needle on the first-ever kick.
+4. "Replay that play" button on the result banner.
+5. Season mode: 5 games, rising opponent difficulty.
 
 ## Not started
 - Gauntlet Loop rounds (builder/critic per piece) against docs/BAR.md.
