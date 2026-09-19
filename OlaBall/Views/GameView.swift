@@ -37,7 +37,7 @@ struct GameView: View {
                 ConfettiView().allowsHitTesting(false).transition(.opacity)
             }
         }
-        .animation(.spring(duration: 0.35), value: session.phase)
+        .animation(.easeOut(duration: 0.18), value: session.phase)
         .onChange(of: session.lastPlay?.id) { _, _ in
             guard let play = session.lastPlay else { return }
             if play.ending == .touchdown { celebrate() }

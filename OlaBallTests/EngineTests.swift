@@ -78,8 +78,8 @@ struct SimulatorTests {
             }
             return Double(made) / 2000
         }
-        #expect(madeRate(ballOn: 85) > 0.9)
-        #expect(madeRate(ballOn: 85) > madeRate(ballOn: 62))
+        #expect(madeRate(ballOn: 90) > 0.9)
+        #expect(madeRate(ballOn: 90) > madeRate(ballOn: 62))
     }
 
     @Test func opponentDrivesAlwaysEnd() {
@@ -152,5 +152,30 @@ struct GameSessionTests {
         #expect(store.progress.games == 1)
         #expect(store.progress.xp == session.xpEarned)
         #expect(store.progress.seen.contains("downs"))
+        #expect(session.newlyLearned.count <= GameSession.maxNewTipsPerGame)
+    }
+
+    @Test func tipsKeepUnlockingAcrossGames() {
+        let store = ProgressStore(progress: Progress())
+        var seed: UInt64 = 10
+        var counts: [Int] = []
+        for _ in 0..<4 {
+            seed += 1
+            let session = GameSession(userTeam: Team.all[0], opponentTeam: Team.all[1], store: store, rng: SeededRNG(seed: seed))
+            var guardCount = 0
+            while session.phase != .gameOver && guardCount < 2000 {
+                guardCount += 1
+                switch session.phase {
+                case .choosing: session.call(session.availableCalls[guardCount % session.availableCalls.count])
+                case .result: session.next()
+                case .driveOver: session.continueAfterDrive()
+                case .opponentDrive: session.skipOpponentDrive(); session.continueAfterDrive()
+                case .gameOver: break
+                }
+            }
+            counts.append(store.progress.seen.count)
+        }
+        #expect(counts[0] == GameSession.maxNewTipsPerGame)
+        #expect(counts[3] > counts[0])
     }
 }

@@ -18,10 +18,8 @@ struct ScoreboardView: View {
     private func teamPill(_ team: Team, score: Int, hasBall: Bool) -> some View {
         HStack(spacing: 8) {
             Text(team.emoji).font(.system(size: 20))
-            VStack(alignment: .leading, spacing: 0) {
-                Text(team.abbreviation).font(.label(12)).foregroundStyle(Theme.textSecondary)
-                Text(team.name).font(.label(12)).foregroundStyle(Theme.textPrimary).lineLimit(1)
-            }
+            Text(team.name).font(.label(13)).foregroundStyle(Theme.textPrimary)
+                .lineLimit(1).minimumScaleFactor(0.7)
             Spacer(minLength: 4)
             Text("\(score)")
                 .font(.display(26)).foregroundStyle(Theme.textPrimary)
@@ -117,6 +115,7 @@ struct CallButton: View {
             .background(Theme.card, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier("call-\(call.rawValue)")
     }
 }
 

@@ -238,13 +238,20 @@ final class GameSession {
         return TipDirector.preCall(ctx, seen: seenConcepts)
     }
 
+    /// Spread learning across games: after this many new tips, unseen tips wait for the next game.
+    static let maxNewTipsPerGame = 8
+
     private func setTip(_ concept: Concept?) {
-        tip = concept
-        guard let concept else { return }
-        if store.markSeen(concept.id) {
-            newlyLearned.append(concept)
-            xpEarned += 15
+        guard let concept else { tip = nil; return }
+        if seenConcepts.contains(concept.id) {
+            tip = concept
+            return
         }
+        guard newlyLearned.count < Self.maxNewTipsPerGame else { tip = nil; return }
+        store.markSeen(concept.id)
+        newlyLearned.append(concept)
+        xpEarned += 15
+        tip = concept
     }
 
     private func finishGame() {

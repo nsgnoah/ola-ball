@@ -57,22 +57,22 @@ final class PlayThroughUITests: XCTestCase {
             if app.buttons["Now the other team's turn"].exists {
                 app.buttons["Now the other team's turn"].tap(); continue
             }
-            if app.buttons["Field Goal"].exists {
+            if app.buttons["call-fieldGoal"].exists {
                 if !shotsTaken.contains("fourth") { snap(app, "07-fourth-down"); shotsTaken.insert("fourth") }
-                app.buttons["Field Goal"].tap(); continue
+                app.buttons["call-fieldGoal"].tap(); continue
             }
-            if app.buttons["Punt"].exists {
+            if app.buttons["call-punt"].exists {
                 if !shotsTaken.contains("fourth") { snap(app, "07-fourth-down"); shotsTaken.insert("fourth") }
-                app.buttons["Punt"].tap(); continue
+                app.buttons["call-punt"].tap(); continue
             }
-            if app.buttons["Deep Pass"].exists && taps % 3 == 0 {
-                app.buttons["Deep Pass"].tap(); continue
+            if app.buttons["call-deepPass"].exists && taps % 3 == 0 {
+                app.buttons["call-deepPass"].tap(); continue
             }
-            if app.buttons["Short Pass"].exists && taps % 2 == 0 {
-                app.buttons["Short Pass"].tap(); continue
+            if app.buttons["call-shortPass"].exists && taps % 2 == 0 {
+                app.buttons["call-shortPass"].tap(); continue
             }
-            if app.buttons["Run"].exists {
-                app.buttons["Run"].tap(); continue
+            if app.buttons["call-run"].exists {
+                app.buttons["call-run"].tap(); continue
             }
             // Nothing tappable: let animations settle
             sleep(1)
