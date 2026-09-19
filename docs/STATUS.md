@@ -1,6 +1,6 @@
 # Ola — Status / Handoff
 
-_Updated: 2026-09-19 11:20 CDT_
+_Updated: 2026-09-19 16:30 CDT_
 
 ## What this is now
 A couples trivia game: His World vs Her World. Each player declares the world they know; the challenger picks the deck their partner is quizzed on each round; five rounds, escalating difficulty, first to three crowns. Async over Game Center turn-based matches, or pass-and-play on one phone. Pivoted from the 3D football game on 2026-09-19 (that build is tagged `v1-football-draw-the-play`).
@@ -10,7 +10,7 @@ A couples trivia game: His World vs Her World. Each player declares the world th
 - Engine: deterministic question draw from the match seed, time/streak scoring, tier escalation, crown logic, JSON match state.
 - Pass-and-play end to end; Game Center service and transport (sign-in, match list, matchmaker, turn events, submit, rematch).
 - Screens: profile setup, home with both match lists, deck pick, question play with timer, round reveal, match over, hand-off.
-- Paper-and-ink design system carried over; new icon.
+- Front end rebuilt in a game register (Trivia Crack-like): striped world-colored backgrounds, chunky 3D buttons, a drawn mascot per deck with moods, a spin wheel for picks, countdown ring, confetti and shake feedback. New icon.
 
 ## Fixed during the first live walkthrough
 - Pass-and-play hand-off named the wrong player (the transport's active player flips on submit; the name is now captured first).
