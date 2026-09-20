@@ -21,7 +21,8 @@ Tests: `⌘U`, or `xcodebuild test -project OlaBall.xcodeproj -scheme OlaBall -d
 - No accounts, passwords, or network of our own. Game Center handles identity and match storage.
 - Privacy manifest declares no tracking and no collected data; UserDefaults use is declared.
 - No permissions requested. Portrait iPhone only. Encryption export flag set. 1024×1024 icon with no alpha.
-- Before submitting: enable Game Center for the app in App Store Connect, add a privacy policy URL (`docs/privacy-policy.md`) and support URL, and fill the age rating (no objectionable content).
+- Game Center entitlement in `OlaBall/OlaBall.entitlements`. Dynamic Type, Reduce Motion, and 44pt targets throughout.
+- The full submission checklist (App Store Connect setup, age rating, review notes, screenshots via `scripts/store_shots.sh`, archive and upload commands) is in `docs/APP-STORE.md`.
 
 ## History
 

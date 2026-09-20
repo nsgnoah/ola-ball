@@ -24,6 +24,8 @@ targets:
         ITSAppUsesNonExemptEncryption: false
     entitlements:
       path: OlaBall/OlaBall.entitlements
+      properties:
+        com.apple.developer.game-center: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: co.nsgsolutions.olaball
