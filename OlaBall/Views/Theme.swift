@@ -1,34 +1,34 @@
 import SwiftUI
 
-/// Game palette: saturated world colors, white chunky panels, gold crowns.
+/// Game-show palette: saturated primaries, cream paper, navy ink, brass gold.
 enum Theme {
-    static let his = Color(hex: "2F62FF")
-    static let hisDeep = Color(hex: "1B3FC9")
-    static let hers = Color(hex: "FF3F8E")
-    static let hersDeep = Color(hex: "C4136A")
+    static let his = Color(hex: "2F56BF")
+    static let hisDeep = Color(hex: "1A3579")
+    static let hers = Color(hex: "D6406F")
+    static let hersDeep = Color(hex: "962352")
     static let night = Color(hex: "1A1B4B")
     static let nightDeep = Color(hex: "0E0F2E")
-    static let violet = Color(hex: "6C3BFF")
-    static let violetDeep = Color(hex: "3E1FB5")
-    static let gold = Color(hex: "FFC93C")
-    static let goldDeep = Color(hex: "E09A00")
-    static let good = Color(hex: "22C55E")
-    static let goodDeep = Color(hex: "15803D")
-    static let bad = Color(hex: "FF4757")
-    static let badDeep = Color(hex: "C0263A")
-    static let ink = Color(hex: "1B1B2F")
-    static let ink2 = Color(hex: "5B5E7A")
-    static let ink3 = Color(hex: "9A9DB8")
-    static let panel = Color.white
-    static let panelEdge = Color(hex: "D8DAEA")
-    static let cream = Color(hex: "FFF6E5")
+    static let violet = Color(hex: "4F3DB0")
+    static let violetDeep = Color(hex: "33267A")
+    static let gold = Color(hex: "EDB240")
+    static let goldDeep = Color(hex: "B97F0C")
+    static let good = Color(hex: "2AA35C")
+    static let goodDeep = Color(hex: "157A3D")
+    static let bad = Color(hex: "D9463F")
+    static let badDeep = Color(hex: "B0271F")
+    static let ink = Color(hex: "1D1A33")
+    static let ink2 = Color(hex: "5A5670")
+    static let ink3 = Color(hex: "9793A8")
+    static let panel = Color(hex: "FFFBF1")
+    static let panelEdge = Color(hex: "E0D2B4")
+    static let cream = Color(hex: "FFF3D9")
 
     // Kept for old call sites.
     static let paper = Color(hex: "F4EFE4")
-    static let paperCard = Color.white
+    static let paperCard = Color(hex: "FFFBF1")
     static let rule = Color(hex: "E3DCCD")
-    static let goodInk = Color(hex: "15803D")
-    static let badInk = Color(hex: "C0263A")
+    static let goodInk = Color(hex: "157A3D")
+    static let badInk = Color(hex: "B0271F")
     static let background = night
     static let textPrimary = Color.white
     static let textSecondary = Color.white.opacity(0.75)
@@ -45,16 +45,21 @@ extension Color {
     }
 }
 
-/// Type: Futura Condensed ExtraBold for the loud stuff, rounded system for everything you read.
+/// Type: Rockwell (slab serif) for anything loud or read, DIN Condensed for scoreboard numbers and labels.
+/// Both ship with iOS; nothing is bundled or downloaded.
 extension Font {
-    static func headline(_ size: CGFloat) -> Font { .custom("Futura-CondensedExtraBold", size: size) }
-    static func score(_ size: CGFloat) -> Font { .custom("Futura-CondensedExtraBold", size: size) }
-    static func condensed(_ size: CGFloat) -> Font { .custom("AvenirNextCondensed-Bold", size: size) }
-    static func display(_ size: CGFloat) -> Font { .custom("Futura-CondensedExtraBold", size: size) }
-    static func label(_ size: CGFloat = 13) -> Font { .system(size: size, weight: .heavy, design: .rounded) }
-    static func body(_ size: CGFloat = 17) -> Font { .system(size: size, weight: .semibold, design: .rounded) }
-    static func bodyRegular(_ size: CGFloat = 17) -> Font { .system(size: size, weight: .medium, design: .rounded) }
-    static func bodyBold(_ size: CGFloat = 17) -> Font { .system(size: size, weight: .bold, design: .rounded) }
+    // `relativeTo` lets the phone's text-size setting scale everything (capped at xxLarge in RootView);
+    // the floors keep reading text legible for older eyes even where a layout asked for something tiny.
+    static func headline(_ size: CGFloat) -> Font { .custom("Rockwell-Bold", size: size, relativeTo: .headline) }
+    static func score(_ size: CGFloat) -> Font { .custom("DINCondensed-Bold", size: size * 1.12, relativeTo: .title) }
+    static func condensed(_ size: CGFloat) -> Font { .custom("DINCondensed-Bold", size: size * 1.15, relativeTo: .headline) }
+    static func display(_ size: CGFloat) -> Font { .custom("Rockwell-Bold", size: size, relativeTo: .largeTitle) }
+    static func label(_ size: CGFloat = 13) -> Font { .custom("DINCondensed-Bold", size: max(size, 12) * 1.15, relativeTo: .caption) }
+    static func body(_ size: CGFloat = 17) -> Font { .custom("Rockwell", size: max(size, 15), relativeTo: .body) }
+    static func bodyRegular(_ size: CGFloat = 17) -> Font { .custom("Rockwell", size: max(size, 14), relativeTo: .body) }
+    static func bodyBold(_ size: CGFloat = 17) -> Font { .custom("Rockwell-Bold", size: max(size, 15), relativeTo: .body) }
+    /// Logo type: the wordmark and other fixed-frame art must not scale with the text-size setting.
+    static func logo(_ size: CGFloat) -> Font { .custom("Rockwell-Bold", fixedSize: size) }
 }
 
 /// A chunky game button: solid face over a darker "edge" that compresses when pressed.

@@ -4,10 +4,10 @@ import SwiftUI
 
 /// The app's five text sizes. Nothing else.
 enum TypeScale {
-    static let display: CGFloat = 60   // one word on a screen
-    static let title: CGFloat = 40     // screen titles
-    static let heading: CGFloat = 26   // card headings, questions
-    static let button: CGFloat = 22
+    static let display: CGFloat = 50   // one word on a screen
+    static let title: CGFloat = 34     // screen titles
+    static let heading: CGFloat = 24   // card headings, questions
+    static let button: CGFloat = 20
     static let label: CGFloat = 13
 }
 
@@ -35,10 +35,13 @@ struct StickerText: View {
 
 // MARK: - Backgrounds
 
-/// Saturated world-colored background: vertical gradient, faint diagonal stripes, a soft glow at the top.
+/// Game-show backdrop: a solid color, sunburst rays turning slowly from above the top edge,
+/// a halftone dot band rising from the bottom, paper grain over everything.
 struct GameBackground: View {
     var top: Color
     var bottom: Color
+    @State private var spin = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     init(world: World) {
         top = world == .his ? Theme.his : Theme.hers
@@ -47,31 +50,80 @@ struct GameBackground: View {
 
     init(top: Color, bottom: Color) { self.top = top; self.bottom = bottom }
 
+    /// Full-bleed color is pulled toward night so a whole screen of it reads as a stage, not a highlighter.
+    private var base: Color { top.mix(with: Theme.night, by: 0.34) }
+
     var body: some View {
         ZStack {
-            LinearGradient(colors: [top, bottom], startPoint: .top, endPoint: .bottom)
-            Stripes().fill(.white.opacity(0.045))
-            RadialGradient(colors: [.white.opacity(0.16), .clear], center: UnitPoint(x: 0.5, y: -0.1), startRadius: 0, endRadius: 460)
+            base
+            Sunburst()
+                .fill(.white.opacity(0.07))
+                .rotationEffect(.degrees(spin ? 360 : 0), anchor: UnitPoint(x: 0.5, y: -0.08))
+                .onAppear { if !reduceMotion { withAnimation(.linear(duration: 90).repeatForever(autoreverses: false)) { spin = true } } }
+            Halftone().fill(Theme.nightDeep.opacity(0.28))
+            Image(uiImage: Grain.image).resizable(resizingMode: .tile).opacity(0.12).blendMode(.overlay)
+            RadialGradient(colors: [.clear, Theme.nightDeep.opacity(0.45)], center: .center, startRadius: 160, endRadius: 640)
         }
         .ignoresSafeArea()
     }
 }
 
-struct Stripes: Shape {
+struct Sunburst: Shape {
+    var rays = 18
     func path(in rect: CGRect) -> Path {
         var p = Path()
-        let step: CGFloat = 54
-        var x: CGFloat = -rect.height
-        while x < rect.width + rect.height {
-            p.move(to: CGPoint(x: x, y: rect.maxY))
-            p.addLine(to: CGPoint(x: x + rect.height, y: rect.minY))
-            p.addLine(to: CGPoint(x: x + rect.height + step / 2, y: rect.minY))
-            p.addLine(to: CGPoint(x: x + step / 2, y: rect.maxY))
+        let c = CGPoint(x: rect.midX, y: rect.minY - rect.height * 0.08)
+        let radius = rect.height * 2.4
+        let n = rays * 2
+        let a = 2 * Double.pi / Double(n)
+        for i in stride(from: 0, to: n, by: 2) {
+            let a0 = Double(i) * a, a1 = a0 + a
+            p.move(to: c)
+            p.addLine(to: CGPoint(x: c.x + radius * cos(a0), y: c.y + radius * sin(a0)))
+            p.addLine(to: CGPoint(x: c.x + radius * cos(a1), y: c.y + radius * sin(a1)))
             p.closeSubpath()
-            x += step
         }
         return p
     }
+}
+
+struct Halftone: Shape {
+    func path(in rect: CGRect) -> Path {
+        var p = Path()
+        let spacing: CGFloat = 13
+        let startY = rect.height * 0.58
+        var y = startY
+        var row = 0
+        while y < rect.maxY + spacing {
+            let t = (y - startY) / max(1, rect.maxY - startY)
+            let r = 0.5 + 4.6 * t * t
+            var x: CGFloat = row % 2 == 0 ? 0 : spacing / 2
+            while x < rect.maxX + spacing {
+                p.addEllipse(in: CGRect(x: x - r, y: y - r, width: 2 * r, height: 2 * r))
+                x += spacing
+            }
+            y += spacing * 0.87
+            row += 1
+        }
+        return p
+    }
+}
+
+/// Paper grain, generated once and tiled.
+enum Grain {
+    static let image: UIImage = {
+        let n = 96
+        var rng = SeededRNG(seed: 99)
+        return UIGraphicsImageRenderer(size: CGSize(width: n, height: n)).image { ctx in
+            for y in 0..<n {
+                for x in 0..<n where Int.random(in: 0..<3, using: &rng) == 0 {
+                    let white = Float.random(in: 0..<1, using: &rng) > 0.5
+                    ctx.cgContext.setFillColor(UIColor(white: white ? 1 : 0, alpha: CGFloat(Float.random(in: 0.25...1, using: &rng))).cgColor)
+                    ctx.cgContext.fill(CGRect(x: x, y: y, width: 1, height: 1))
+                }
+            }
+        }
+    }()
 }
 
 // MARK: - Small pieces
@@ -126,25 +178,25 @@ struct Crowns: View {
     let count: Int
     var color: Color = Theme.gold
     var size: CGFloat = 16
+    var empty: Color = Theme.ink.opacity(0.18)
     var body: some View {
         HStack(spacing: 3) {
             ForEach(0..<MatchState.roundsToWin, id: \.self) { i in
-                Image(systemName: i < count ? "crown.fill" : "crown")
-                    .font(.system(size: size, weight: .black))
-                    .foregroundStyle(i < count ? Theme.gold : .white.opacity(0.45))
+                CrownIcon(filled: i < count, size: size + 4, empty: empty)
             }
         }
     }
 }
 
-/// Ola, the host.
+/// Ola, the host: a brass disc with her initial.
 struct OlaBadge: View {
     var size: CGFloat = 28
     var body: some View {
         ZStack {
             Circle().fill(Theme.goldDeep).offset(y: size * 0.07)
             Circle().fill(Theme.gold)
-            Image(systemName: "headphones").font(.system(size: size * 0.5, weight: .black)).foregroundStyle(Theme.ink)
+            Circle().stroke(Theme.goldDeep, lineWidth: max(1, size * 0.06)).padding(size * 0.12)
+            Text("O").font(.headline(size * 0.56)).foregroundStyle(Theme.ink).offset(y: size * 0.02)
         }
         .frame(width: size, height: size)
     }
@@ -180,6 +232,8 @@ struct Mascot: View {
     @State private var blink = false
     @State private var glance: CGFloat = 0
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     var body: some View {
         let body = deck.color
         let dark = body.mix(with: .black, by: 0.3)
@@ -204,9 +258,9 @@ struct Mascot: View {
                 // Icon badge, pinned bottom-right
                 ZStack {
                     Circle().fill(.white)
-                    Image(systemName: deck.symbol).font(.system(size: size * 0.12, weight: .black)).foregroundStyle(dark)
+                    DeckIcon(deck: deck, fill: .white, ink: dark).padding(size * 0.035)
                 }
-                .frame(width: size * 0.26, height: size * 0.26)
+                .frame(width: size * 0.28, height: size * 0.28)
                 .overlay(Circle().stroke(dark.opacity(0.2), lineWidth: 1))
                 .offset(x: size * 0.28, y: size * 0.28)
             }
@@ -217,7 +271,7 @@ struct Mascot: View {
         }
         .frame(width: size, height: size * 1.15)
         .onAppear {
-            withAnimation(.easeInOut(duration: mood == .happy ? 0.3 : 1.6).repeatForever(autoreverses: true)) { breathe = true }
+            if !reduceMotion { withAnimation(.easeInOut(duration: mood == .happy ? 0.3 : 1.6).repeatForever(autoreverses: true)) { breathe = true } }
             scheduleBlink()
             scheduleGlance()
         }
@@ -349,8 +403,13 @@ struct ConfettiBurst: View {
         Particle(angle: .random(in: 0...(2 * .pi)), speed: .random(in: 180...420), size: .random(in: 6...12), hue: .random(in: 0...1), spin: .random(in: -6...6), delay: .random(in: 0...0.15))
     }
     private let start = Date()
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
+        if reduceMotion { EmptyView() } else { burst }
+    }
+
+    private var burst: some View {
         TimelineView(.animation) { timeline in
             Canvas { ctx, size in
                 let t = timeline.date.timeIntervalSince(start)
@@ -399,8 +458,8 @@ struct Wordmark: View {
             ZStack {
                 Circle().fill(Theme.goldDeep).offset(y: 3 * scale)
                 Circle().fill(Theme.gold)
-                Circle().stroke(.white, lineWidth: 3 * scale)
-                Text("VS").font(.headline(20 * scale)).foregroundStyle(Theme.ink)
+                Circle().stroke(Theme.ink, lineWidth: 3 * scale)
+                Text("VS").font(.logo(18 * scale)).foregroundStyle(Theme.ink)
             }
             .frame(width: 48 * scale, height: 48 * scale)
             .rotationEffect(.degrees(-8))
@@ -412,8 +471,9 @@ struct Wordmark: View {
             RoundedRectangle(cornerRadius: 18 * scale, style: .continuous).fill(color.mix(with: .black, by: 0.3)).offset(y: 6 * scale)
             RoundedRectangle(cornerRadius: 18 * scale, style: .continuous).fill(color)
             RoundedRectangle(cornerRadius: 18 * scale, style: .continuous)
-                .fill(LinearGradient(colors: [.white.opacity(0.22), .clear], startPoint: .top, endPoint: .center))
-            Text(text).font(.headline(40 * scale)).foregroundStyle(.white)
+                .fill(LinearGradient(colors: [.white.opacity(0.18), .clear], startPoint: .top, endPoint: .center))
+            RoundedRectangle(cornerRadius: 18 * scale, style: .continuous).stroke(Theme.ink, lineWidth: 3 * scale)
+            Text(text).font(.logo(36 * scale)).foregroundStyle(.white)
         }
         .frame(width: 270 * scale, height: 66 * scale)
     }

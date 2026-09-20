@@ -12,6 +12,9 @@ A couples trivia game: His World vs Her World. Each player declares the world th
 - Pass-and-play end to end; Game Center service and transport (sign-in, match list, matchmaker, turn events, submit, rematch).
 - Screens: profile setup, home with both match lists, deck pick, question play with timer, round reveal, match over, hand-off.
 - Front end rebuilt in a game register (Trivia Crack-like): striped world-colored backgrounds, chunky 3D buttons, a drawn mascot per deck with moods, a spin wheel for picks, countdown ring, confetti and shake feedback. New icon.
+- Visual identity pass (Sep 19, late): Rockwell slab + DIN Condensed type, sunburst/halftone/grain backgrounds instead of gradients, and 18 deck icons plus every UI glyph drawn from scratch in `Views/Icons.swift` (no SF Symbols). Icon contact sheet via `IconSheetTests`.
+- All-ages pass (Sep 19, late): Dynamic Type scaling with a legibility floor, higher-contrast secondary text, 44pt close/trash/menu targets, bigger answer rows, Reduce Motion honored for sunburst spin, mascot idle, hand-off wobble and confetti.
+- Palette calmed (Sep 19, late): world/deck colors pulled toward night for full-bleed backgrounds (`GameBackground.base`), quieter rays and dots, wheel slices inked 14%, less neon his/hers/violet/gold/good/bad values. Feedback was "the colors are a bit much".
 
 ## Fixed during the first live walkthrough
 - Pass-and-play hand-off named the wrong player (the transport's active player flips on submit; the name is now captured first).

@@ -21,10 +21,7 @@ struct RoundRevealView: View {
                 Spacer()
                 Kicker("ROUND \(round) · \(MatchEngine.roundLabel(round))")
                 if winner != nil {
-                    ZStack {
-                        Image(systemName: "crown.fill").font(.system(size: 64, weight: .black)).foregroundStyle(Theme.goldDeep).offset(y: 4)
-                        Image(systemName: "crown.fill").font(.system(size: 64, weight: .black)).foregroundStyle(Theme.gold)
-                    }
+                    CrownIcon(size: 84)
                         .scaleEffect(crownPop ? 1 : 0.2).rotationEffect(.degrees(crownPop ? 0 : -30))
                 }
                 StickerText(headline(winner: winner, me: me), size: TypeScale.title)
@@ -41,7 +38,7 @@ struct RoundRevealView: View {
                                     let res = r.results[m.id]
                                     let deck = r.picks[m.id].flatMap(Decks.byID)
                                     HStack(spacing: 5) {
-                                        if let deck { Image(systemName: deck.symbol).font(.system(size: 10, weight: .bold)).foregroundStyle(deck.color) }
+                                        if let deck { DeckIcon(deck: deck, fill: .white, ink: deck.color).frame(width: 14, height: 14) }
                                         Text(m.name).font(.bodyBold(11)).foregroundStyle(Theme.ink).lineLimit(1)
                                         Spacer(minLength: 2)
                                         Text(res.map { "\($0.score)" } ?? "—").font(.score(14)).foregroundStyle(Theme.ink2)

@@ -20,10 +20,7 @@ struct MatchOverView: View {
                 MatchHeader(controller: controller, onClose: onClose)
                 Spacer()
                 Kicker("FINAL")
-                ZStack {
-                    Image(systemName: "trophy.fill").font(.system(size: 76, weight: .black)).foregroundStyle(Theme.goldDeep).offset(y: 5)
-                    Image(systemName: "trophy.fill").font(.system(size: 76, weight: .black)).foregroundStyle(Theme.gold)
-                }
+                TrophyIcon(size: 96)
                     .scaleEffect(pop ? 1 : 0.2).rotationEffect(.degrees(pop ? 0 : 20))
                 StickerText(winner == nil ? "IT'S A TIE" : (iWon ? "YOU WIN" : "\(s.player(winner!)?.name.uppercased() ?? "THEY") WINS"), size: TypeScale.display)
                     .padding(.top, -8)
@@ -35,7 +32,7 @@ struct MatchOverView: View {
                             Text(p.name.uppercased()).font(.label(13)).foregroundStyle(Theme.ink).lineLimit(1).minimumScaleFactor(0.6)
                             Crowns(count: s.crowns(for: p.id), size: 15)
                             Text("\(controller.total(p.id))").font(.score(36)).foregroundStyle(Theme.ink)
-                            Kicker("TOTAL POINTS", color: Theme.ink3, size: 10)
+                            Kicker("TOTAL POINTS", color: Theme.ink2, size: 10)
                         }
                         .frame(maxWidth: .infinity)
                         .panel(padding: 14)

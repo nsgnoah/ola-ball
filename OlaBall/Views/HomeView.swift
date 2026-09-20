@@ -137,7 +137,7 @@ struct HomeView: View {
                     showMatchmaker = true
                 } label: {
                     HStack(spacing: 10) {
-                        Image(systemName: "paperplane.fill").font(.system(size: 16, weight: .black))
+                        Glyph(kind: .send, size: 20, color: Theme.ink)
                         Text("Challenge your partner")
                     }
                 }
@@ -148,7 +148,7 @@ struct HomeView: View {
                     showMyTeam = true
                 } label: {
                     HStack(spacing: 10) {
-                        Image(systemName: "person.2.wave.2.fill").font(.system(size: 16, weight: .black))
+                        Glyph(kind: .people, size: 22, color: Theme.ink)
                         Text("Challenge another couple")
                     }
                 }
@@ -157,7 +157,7 @@ struct HomeView: View {
             } else {
                 VStack(alignment: .leading, spacing: 10) {
                     HStack(spacing: 10) {
-                        Image(systemName: "gamecontroller.fill").font(.system(size: 15, weight: .black)).foregroundStyle(.white)
+                        Glyph(kind: .controller, size: 20)
                             .frame(width: 32, height: 32).background(Theme.his, in: Circle())
                         Text("Play from two phones").font(.headline(TypeScale.heading)).foregroundStyle(Theme.ink)
                     }
@@ -189,8 +189,8 @@ struct HomeView: View {
                         Button {
                             localMatches.delete(id)
                         } label: {
-                            Image(systemName: "trash.fill").font(.system(size: 14, weight: .bold)).foregroundStyle(.white)
-                                .frame(width: 40, height: 40)
+                            Glyph(kind: .trash, size: 17)
+                                .frame(width: 44, height: 44)
                                 .background(.white.opacity(0.2), in: Circle())
                         }
                         .accessibilityLabel("Delete match")
@@ -202,7 +202,7 @@ struct HomeView: View {
                 showNewLocal = true
             } label: {
                 HStack(spacing: 10) {
-                    Image(systemName: "person.2.fill").font(.system(size: 16, weight: .black))
+                    Glyph(kind: .people, size: 22, color: Theme.ink)
                     Text("New pass & play")
                 }
             }
@@ -260,10 +260,8 @@ struct HomeView: View {
             Menu {
                 Button("Start over", role: .destructive) { showResetConfirm = true }
             } label: {
-                Image(systemName: "ellipsis")
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundStyle(.white)
-                    .frame(width: 42, height: 42)
+                Glyph(kind: .more, size: 18)
+                    .frame(width: 44, height: 44)
                     .background(.white.opacity(0.2), in: Circle())
             }
             .accessibilityLabel("More")

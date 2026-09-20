@@ -1,7 +1,7 @@
 import Foundation
 
 extension HisWorld {
-    static let actionmovies = Deck(id: "actionmovies", world: .his, title: "Action Movies & Dad TV", tagline: "Yippee-ki-yay, Nakatomi Plaza, and every Dutton.", symbol: "film.fill", colorHex: "0D9488", specs: [
+    static let actionmovies = Deck(id: "actionmovies", world: .his, title: "Action Movies & Dad TV", tagline: "Yippee-ki-yay, Nakatomi Plaza, and every Dutton.", colorHex: "0D9488", specs: [
         Q(1, "Who plays John McClane in 'Die Hard'?", "Bruce Willis", ["Mel Gibson", "Arnold Schwarzenegger", "Harrison Ford"]),
         Q(1, "James Bond's code number is what?", "007", ["001", "009", "077"]),
         Q(1, "'Rocky' is about a what?", "Boxer", ["Race car driver", "Wrestler", "Football coach"]),
@@ -40,7 +40,7 @@ extension HisWorld {
         Q(3, "Who plays Furiosa in 'Mad Max: Fury Road'?", "Charlize Theron", ["Anya Taylor-Joy", "Scarlett Johansson", "Emily Blunt"]),
     ])
 
-    static let tech = Deck(id: "tech", world: .his, title: "Tech & Gadgets", tagline: "Routers, chips, and why he needs a third monitor.", symbol: "cpu.fill", colorHex: "0EA5E9", specs: [
+    static let tech = Deck(id: "tech", world: .his, title: "Tech & Gadgets", tagline: "Routers, chips, and why he needs a third monitor.", colorHex: "0EA5E9", specs: [
         Q(1, "Which company makes the iPhone?", "Apple", ["Samsung", "Google", "Microsoft"]),
         Q(1, "What does Wi-Fi let a device do?", "Connect to a network wirelessly", ["Charge faster", "Take better photos", "Block ads"]),
         Q(1, "Bluetooth is mostly used for what?", "Short-range wireless connections, like headphones", ["Long-distance calls", "Satellite TV", "Charging"]),
@@ -79,7 +79,7 @@ extension HisWorld {
         Q(3, "GitHub is a site for hosting what?", "Code", ["Photos", "Music", "Recipes"]),
     ])
 
-    static let fightnight = Deck(id: "fightnight", world: .his, title: "Fight Night", tagline: "The Octagon, the sweet science, and WrestleMania.", symbol: "figure.boxing", colorHex: "DC2626", specs: [
+    static let fightnight = Deck(id: "fightnight", world: .his, title: "Fight Night", tagline: "The Octagon, the sweet science, and WrestleMania.", colorHex: "DC2626", specs: [
         Q(1, "UFC stands for what?", "Ultimate Fighting Championship", ["United Fight Club", "Universal Fighting Circuit", "Ultimate Fight Company"]),
         Q(1, "MMA stands for what?", "Mixed martial arts", ["Modern martial arts", "Major muscle athletics", "Mixed match association"]),
         Q(1, "UFC fights take place in an eight-sided cage called what?", "The Octagon", ["The Cage", "The Ring", "The Hexagon"]),

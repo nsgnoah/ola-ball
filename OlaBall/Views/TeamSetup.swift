@@ -38,7 +38,7 @@ struct TeamSetupFields: View {
             memberRow(name: $draft.name1, lane: $draft.lane1, placeholder: placeholder1, id: "\(title)-1")
             memberRow(name: $draft.name2, lane: $draft.lane2, placeholder: placeholder2, id: "\(title)-2")
             Text("Tap the pill to change which questions each person answers.")
-                .font(.bodyRegular(11)).foregroundStyle(Theme.ink3)
+                .font(.bodyRegular(11)).foregroundStyle(Theme.ink2)
         }
         .panel(padding: 14)
     }
@@ -99,8 +99,8 @@ struct JoinTeamView: View {
             VStack(spacing: 14) {
                 HStack {
                     Button { onClose() } label: {
-                        Image(systemName: "xmark").font(.system(size: 14, weight: .black)).foregroundStyle(.white)
-                            .frame(width: 36, height: 36).background(.white.opacity(0.2), in: Circle())
+                        Glyph(kind: .close, size: 15, weight: 18)
+                            .frame(width: 44, height: 44).background(.white.opacity(0.2), in: Circle())
                     }
                     Spacer()
                 }

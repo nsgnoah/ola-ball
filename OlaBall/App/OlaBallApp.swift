@@ -46,10 +46,13 @@ struct RootView: View {
     @Environment(ProfileStore.self) private var profiles
 
     var body: some View {
-        if profiles.profile == nil {
-            ProfileSetupView()
-        } else {
-            HomeView()
+        Group {
+            if profiles.profile == nil {
+                ProfileSetupView()
+            } else {
+                HomeView()
+            }
         }
+        .dynamicTypeSize(...DynamicTypeSize.xxLarge)
     }
 }

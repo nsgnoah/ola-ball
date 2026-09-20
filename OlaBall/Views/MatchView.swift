@@ -51,8 +51,8 @@ struct MatchHeader: View {
             Button {
                 if let onClose { onClose() } else { dismiss() }
             } label: {
-                Image(systemName: "xmark").font(.system(size: 14, weight: .black)).foregroundStyle(.white)
-                    .frame(width: 36, height: 36)
+                Glyph(kind: .close, size: 15, weight: 18)
+                    .frame(width: 44, height: 44)
                     .background(.white.opacity(0.2), in: Circle())
             }
             .accessibilityIdentifier("close-match")
@@ -71,7 +71,7 @@ struct MatchHeader: View {
             if leading { SideAvatars(player: p, size: 30) }
             VStack(alignment: leading ? .leading : .trailing, spacing: 1) {
                 Text(p.name.uppercased()).font(.label(11)).foregroundStyle(.white).lineLimit(1).minimumScaleFactor(0.7)
-                Crowns(count: controller.crowns(p.id), size: 12)
+                Crowns(count: controller.crowns(p.id), size: 12, empty: .white.opacity(0.5))
             }
             if !leading { SideAvatars(player: p, size: 30) }
         }
@@ -83,14 +83,14 @@ struct HandoffView: View {
     let name: String
     let onContinue: () -> Void
     @State private var bounce = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         VStack(spacing: 18) {
             Spacer()
-            Image(systemName: "iphone.gen3.radiowaves.left.and.right")
-                .font(.system(size: 64, weight: .bold)).foregroundStyle(.white)
-                .rotationEffect(.degrees(bounce ? 8 : -8))
-                .onAppear { withAnimation(.easeInOut(duration: 0.4).repeatForever(autoreverses: true)) { bounce = true } }
+            HandoffIcon(size: 96)
+                .rotationEffect(.degrees(bounce ? 6 : -6))
+                .onAppear { if !reduceMotion { withAnimation(.easeInOut(duration: 0.4).repeatForever(autoreverses: true)) { bounce = true } } }
             Kicker("HAND THE PHONE TO")
             StickerText(name.uppercased(), size: TypeScale.display)
             OlaSays(text: "No peeking. Their questions are next.")
@@ -150,7 +150,7 @@ struct RoundIntroView: View {
     private func fact(_ v: String, _ l: String) -> some View {
         VStack(spacing: 0) {
             Text(v).font(.score(26)).foregroundStyle(Theme.ink)
-            Text(l).font(.label(10)).tracking(1).foregroundStyle(Theme.ink3)
+            Text(l).font(.label(10)).tracking(1).foregroundStyle(Theme.ink2)
         }
         .frame(maxWidth: .infinity)
         .panel(padding: 10, radius: 14)
@@ -191,24 +191,24 @@ struct RoundHistory: View {
             Kicker("SCORECARD", color: Theme.ink2, size: 11)
             ForEach(s.rounds, id: \.number) { r in
                 HStack(spacing: 8) {
-                    Text("R\(r.number)").font(.label(12)).foregroundStyle(Theme.ink3).frame(width: 28, alignment: .leading)
+                    Text("R\(r.number)").font(.label(12)).foregroundStyle(Theme.ink2).frame(width: 28, alignment: .leading)
                     ForEach(s.players) { p in
                         let picked = p.members.contains { r.picks[$0.id] != nil }
                         let done = p.members.allSatisfy { r.results[$0.id] != nil }
                         HStack(spacing: 6) {
                             ForEach(p.members) { m in
                                 if let deck = r.picks[m.id].flatMap(Decks.byID) {
-                                    Image(systemName: deck.symbol).font(.system(size: 11, weight: .bold)).foregroundStyle(deck.color)
+                                    DeckIcon(deck: deck, fill: .white, ink: deck.color).frame(width: 16, height: 16)
                                 }
                             }
                             Text(done ? "\(r.score(for: p))" : (picked ? "…" : "—")).font(.score(20)).foregroundStyle(Theme.ink)
-                            if s.roundWinner(r) == p.id { Image(systemName: "crown.fill").font(.system(size: 11, weight: .black)).foregroundStyle(Theme.gold) }
+                            if s.roundWinner(r) == p.id { CrownIcon(size: 15) }
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
             }
-            if s.rounds.isEmpty { Text("No rounds yet.").font(.body(13)).foregroundStyle(Theme.ink3) }
+            if s.rounds.isEmpty { Text("No rounds yet.").font(.body(13)).foregroundStyle(Theme.ink2) }
         }
         .panel(padding: 14)
     }

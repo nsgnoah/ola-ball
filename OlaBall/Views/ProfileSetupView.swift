@@ -55,7 +55,7 @@ struct ProfileSetupView: View {
                     } label: {
                         HStack(spacing: 10) {
                             Text("Let's play")
-                            Image(systemName: "arrow.right").font(.system(size: 18, weight: .black))
+                            Glyph(kind: .arrowRight, size: 18, color: Theme.ink, weight: 16)
                         }
                     }
                     .buttonStyle(ChunkyButtonStyle(color: Theme.gold))
@@ -85,7 +85,7 @@ struct ProfileSetupView: View {
         return ZStack(alignment: .bottomLeading) {
             RoundedRectangle(cornerRadius: 22, style: .continuous).fill(w.color.mix(with: .black, by: 0.3)).offset(y: 7)
             RoundedRectangle(cornerRadius: 22, style: .continuous).fill(w.color)
-            Stripes().fill(.white.opacity(0.07)).clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+            Sunburst(rays: 12).fill(.white.opacity(0.10)).clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
             VStack(alignment: .leading, spacing: 0) {
                 HStack(spacing: -18) {
                     ForEach(decks.prefix(3)) { d in Mascot(deck: d, size: 46) }
@@ -100,7 +100,7 @@ struct ProfileSetupView: View {
             }
             .padding(12)
             if selected {
-                Image(systemName: "checkmark.circle.fill").font(.system(size: 26, weight: .black)).foregroundStyle(.white, Theme.good)
+                Glyph(kind: .check, size: 14, weight: 20).frame(width: 28, height: 28).background(Theme.good, in: Circle()).overlay(Circle().stroke(.white, lineWidth: 2.5))
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing).padding(10)
             }
         }

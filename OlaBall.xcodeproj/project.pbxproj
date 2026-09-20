@@ -30,10 +30,12 @@
 		AF9902D84797CBA9A9FC2B80 /* MatchEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4619BF5131B14EB8A4306BE4 /* MatchEngine.swift */; };
 		AFE961669EEB581F969FA896 /* HerWorldMore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EE4CDAAEF5AE6ED2B95A9E0 /* HerWorldMore.swift */; };
 		B2E045E814E07FC8D0D8E319 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C5E93C1F2304E6984158858B /* Assets.xcassets */; };
+		C0EC44E247ACF29E9929905C /* IconSheetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32D1360B80554459203E8CBE /* IconSheetTests.swift */; };
 		D7E3C04DF212C13959FC1C7A /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = C44153EE6927EBB33629DF2C /* Profile.swift */; };
 		DFD2564878AA95D3CE147BF1 /* HisWorldMore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 493AAD598997A2CDF0026970 /* HisWorldMore.swift */; };
 		E3EACA8395E6DDE4BF2D0752 /* TeamSetup.swift in Sources */ = {isa = PBXBuildFile; fileRef = E35EDA48BB1E9EE05F2C1577 /* TeamSetup.swift */; };
 		E90EF8B91330ABF193F06F77 /* Wheel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07EB47EFDE6EABBA063374A5 /* Wheel.swift */; };
+		F37C6E311E1FE27790FBA843 /* Icons.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F80EF042798C435582E3B7 /* Icons.swift */; };
 		F7355AE2664FF230153A8582 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF4E4A92D9971125574E14E3 /* HomeView.swift */; };
 		F982AE5B23AACCDD88171FEE /* MatchOverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5751958A7551636AA25EBDFF /* MatchOverView.swift */; };
 /* End PBXBuildFile section */
@@ -65,6 +67,7 @@
 		26EF87EC98B16EA70A371B33 /* Deck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Deck.swift; sourceTree = "<group>"; };
 		29AE2497FBB3AE71C7F0F61F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		2FB54E8A2979C8D2D7C0446D /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		32D1360B80554459203E8CBE /* IconSheetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconSheetTests.swift; sourceTree = "<group>"; };
 		3444FB08B7B10BEBCA817D62 /* MatchState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchState.swift; sourceTree = "<group>"; };
 		42FD7D91A6A0FB34BF0E6D81 /* PlayThroughUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayThroughUITests.swift; sourceTree = "<group>"; };
 		4619BF5131B14EB8A4306BE4 /* MatchEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchEngine.swift; sourceTree = "<group>"; };
@@ -89,6 +92,7 @@
 		E4DC20F9EC8D03260CB9287F /* QuestionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionView.swift; sourceTree = "<group>"; };
 		EE971345D0D0B52CBD12D47E /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		F9D4B2E720D06CDAA1BCD334 /* SeededRNG.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeededRNG.swift; sourceTree = "<group>"; };
+		F9F80EF042798C435582E3B7 /* Icons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Icons.swift; sourceTree = "<group>"; };
 		FF129FB9BE919EA90D155D6F /* GameCenterService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCenterService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -99,6 +103,7 @@
 				BEC18DC118B64D620B3C4C41 /* DeckPickView.swift */,
 				AF4E4A92D9971125574E14E3 /* HomeView.swift */,
 				C73634D2584CBC365EF159CD /* HUD.swift */,
+				F9F80EF042798C435582E3B7 /* Icons.swift */,
 				5751958A7551636AA25EBDFF /* MatchOverView.swift */,
 				E203D87F0E7CB5372D1FD009 /* MatchView.swift */,
 				8E47798CBA90DB12389ACE19 /* ProfileSetupView.swift */,
@@ -189,6 +194,7 @@
 			isa = PBXGroup;
 			children = (
 				AA774E78CE553708DD4C4BBF /* EngineTests.swift */,
+				32D1360B80554459203E8CBE /* IconSheetTests.swift */,
 			);
 			path = OlaBallTests;
 			sourceTree = "<group>";
@@ -370,6 +376,7 @@
 				74CB55D11BAB7D198CB16C02 /* HisWorld.swift in Sources */,
 				DFD2564878AA95D3CE147BF1 /* HisWorldMore.swift in Sources */,
 				F7355AE2664FF230153A8582 /* HomeView.swift in Sources */,
+				F37C6E311E1FE27790FBA843 /* Icons.swift in Sources */,
 				A1785D359D2A584230BDDF12 /* LocalMatchStore.swift in Sources */,
 				1E36B0C4B4373ED30B1851A6 /* MatchController.swift in Sources */,
 				AF9902D84797CBA9A9FC2B80 /* MatchEngine.swift in Sources */,
@@ -394,6 +401,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1BEA5EFDFC038E5EB924DEE4 /* EngineTests.swift in Sources */,
+				C0EC44E247ACF29E9929905C /* IconSheetTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

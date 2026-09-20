@@ -57,7 +57,6 @@ struct Deck: Identifiable, Hashable {
     let world: World
     let title: String
     let tagline: String
-    let symbol: String
     let colorHex: String
     let questions: [Question]
 
@@ -67,12 +66,11 @@ struct Deck: Identifiable, Hashable {
     func hash(into hasher: inout Hasher) { hasher.combine(id) }
 
     /// Build a deck from compact question specs.
-    init(id: String, world: World, title: String, tagline: String, symbol: String, colorHex: String, specs: [QSpec]) {
+    init(id: String, world: World, title: String, tagline: String, colorHex: String, specs: [QSpec]) {
         self.id = id
         self.world = world
         self.title = title
         self.tagline = tagline
-        self.symbol = symbol
         self.colorHex = colorHex
         self.questions = specs.enumerated().map { i, q in
             Question(id: "\(id)-\(i + 1)", deckID: id, tier: q.tier, prompt: q.prompt, correct: q.correct, wrong: q.wrong, fact: q.fact)

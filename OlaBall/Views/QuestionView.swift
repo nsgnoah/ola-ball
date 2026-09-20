@@ -65,7 +65,7 @@ struct QuestionView: View {
         HStack(spacing: 10) {
             if let deck {
                 HStack(spacing: 8) {
-                    Image(systemName: deck.symbol).font(.system(size: 13, weight: .black)).foregroundStyle(deck.color)
+                    DeckIcon(deck: deck, fill: .white, ink: deck.color).padding(4)
                         .frame(width: 26, height: 26).background(.white, in: Circle())
                     Text(controller.state.mode == .teams ? (controller.currentMember?.name.uppercased() ?? "") : deck.title.uppercased())
                         .font(.label(TypeScale.label)).tracking(0.8).foregroundStyle(.white).lineLimit(1).minimumScaleFactor(0.7)
@@ -75,7 +75,7 @@ struct QuestionView: View {
             HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Text("\(controller.runningScore)").font(.score(26)).foregroundStyle(Theme.ink)
                     .contentTransition(.numericText()).animation(.spring(duration: 0.4), value: controller.runningScore)
-                Text("PTS").font(.label(10)).foregroundStyle(Theme.ink3)
+                Text("PTS").font(.label(10)).foregroundStyle(Theme.ink2)
             }
             .padding(.horizontal, 12).frame(height: 34)
             .background(.white, in: Capsule())
@@ -162,14 +162,14 @@ struct QuestionView: View {
         let ink: Color = lit ? .white : Theme.ink
         return HStack(spacing: 12) {
             Text(["A", "B", "C", "D"][i])
-                .font(.headline(17))
+                .font(.headline(18))
                 .foregroundStyle(lit ? face : Theme.ink)
-                .frame(width: 30, height: 30)
+                .frame(width: 34, height: 34)
                 .background(lit ? .white : Theme.cream, in: Circle())
-            Text(text).font(.bodyBold(16)).foregroundStyle(ink).multilineTextAlignment(.leading).fixedSize(horizontal: false, vertical: true)
+            Text(text).font(.bodyBold(18)).foregroundStyle(ink).multilineTextAlignment(.leading).fixedSize(horizontal: false, vertical: true)
             Spacer(minLength: 0)
             if lit {
-                Image(systemName: isCorrect ? "checkmark" : "xmark").font(.system(size: 15, weight: .black)).foregroundStyle(.white)
+                Glyph(kind: isCorrect ? .check : .close, size: 16, weight: 18)
             }
         }
         .padding(.horizontal, 12).padding(.vertical, 12)

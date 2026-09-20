@@ -1,7 +1,7 @@
 import Foundation
 
 extension HerWorld {
-    static let bookclub = Deck(id: "bookclub", world: .hers, title: "Book Club", tagline: "BookTok, bestsellers, and the TBR pile that never shrinks.", symbol: "books.vertical.fill", colorHex: "5B5BD6", specs: [
+    static let bookclub = Deck(id: "bookclub", world: .hers, title: "Book Club", tagline: "BookTok, bestsellers, and the TBR pile that never shrinks.", colorHex: "5B5BD6", specs: [
         Q(1, "BookTok is a community of readers on which app?", "TikTok", ["Instagram", "Facebook", "Snapchat"]),
         Q(1, "What does a TBR pile mean?", "To Be Read", ["Totally Boring Reads", "Top Bestseller Ranking", "The Best Reviews"]),
         Q(1, "Who wrote the Harry Potter books?", "J.K. Rowling", ["Stephenie Meyer", "Suzanne Collins", "Rick Riordan"]),
@@ -40,7 +40,7 @@ extension HerWorld {
         Q(3, "Who wrote 'Wuthering Heights'?", "Emily Brontë", ["Charlotte Brontë", "Anne Brontë", "Mary Shelley"]),
     ])
 
-    static let wellness = Deck(id: "wellness", world: .hers, title: "Wellness & Self-Care", tagline: "Pilates, matcha, cold plunges, and eight hours of sleep.", symbol: "leaf.fill", colorHex: "3DBF8A", specs: [
+    static let wellness = Deck(id: "wellness", world: .hers, title: "Wellness & Self-Care", tagline: "Pilates, matcha, cold plunges, and eight hours of sleep.", colorHex: "3DBF8A", specs: [
         Q(1, "Pilates is best known for building what?", "Core strength and control", ["Sprinting speed", "Vertical jump", "Grip strength"]),
         Q(1, "Matcha is what?", "Powdered green tea", ["Ground coffee", "A mushroom powder", "Cocoa"]),
         Q(1, "What is a cold plunge?", "Dipping into ice-cold water", ["A face mask", "A chilled smoothie", "A frozen dessert"]),
@@ -79,7 +79,7 @@ extension HerWorld {
         Q(3, "Alo Yoga is headquartered in which city?", "Los Angeles", ["New York", "Vancouver", "Miami"]),
     ])
 
-    static let gossip = Deck(id: "gossip", world: .hers, title: "Celebrity Couples & Gossip", tagline: "Who's dating, who's engaged, and who conscious-uncoupled.", symbol: "star.bubble.fill", colorHex: "FFB020", specs: [
+    static let gossip = Deck(id: "gossip", world: .hers, title: "Celebrity Couples & Gossip", tagline: "Who's dating, who's engaged, and who conscious-uncoupled.", colorHex: "FFB020", specs: [
         Q(1, "Beyoncé is married to which rapper?", "Jay-Z", ["Drake", "Kanye West", "Diddy"]),
         Q(1, "'Bennifer' is the nickname for Jennifer Lopez and whom?", "Ben Affleck", ["Ben Stiller", "Benedict Cumberbatch", "Ben Platt"]),
         Q(1, "Prince Harry is married to whom?", "Meghan Markle", ["Kate Middleton", "Pippa Middleton", "Zara Tindall"]),

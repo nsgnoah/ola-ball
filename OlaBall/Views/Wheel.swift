@@ -29,7 +29,7 @@ struct WheelView: View {
                 ZStack {
                     Circle().fill(Theme.ink.opacity(0.35)).frame(width: 74, height: 74).offset(y: 4)
                     Circle().fill(.white).frame(width: 74, height: 74)
-                    Image(systemName: "sparkles").font(.system(size: 24, weight: .black)).foregroundStyle(Theme.violet)
+                    Glyph(kind: .star, size: 30, color: Theme.violet)
                 }
                 .frame(maxHeight: .infinity, alignment: .center)
             }
@@ -62,7 +62,7 @@ struct WheelView: View {
                     spin()
                 } label: {
                     HStack(spacing: 10) {
-                        Image(systemName: "arrow.triangle.2.circlepath").font(.system(size: 18, weight: .black))
+                        Glyph(kind: .spin, size: 22, color: Theme.ink, weight: 14)
                         Text("Spin the wheel")
                     }
                 }
@@ -82,33 +82,38 @@ struct WheelView: View {
                 let start = Angle.degrees(Double(i) * sliceAngle - 90 - sliceAngle / 2)
                 let end = Angle.degrees(Double(i + 1) * sliceAngle - 90 - sliceAngle / 2)
                 Slice(start: start, end: end)
-                    .fill(deck.color)
+                    .fill(deck.color.mix(with: Theme.ink, by: 0.14))
                     .padding(8)
                 Slice(start: start, end: end)
                     .stroke(.white, lineWidth: 4)
                     .padding(8)
                 // Icon at the slice's mid-radius, tappable to choose outright.
-                let mid = Double(i) * sliceAngle - 90
-                let r: CGFloat = 108
-                Button {
-                    guard enabled, !spinning else { return }
-                    Haptics.heavy()
-                    onPick(deck)
-                } label: {
-                    Image(systemName: deck.symbol)
-                        .font(.system(size: 26, weight: .black))
-                        .foregroundStyle(.white)
-                        .frame(width: 64, height: 64)
-                        .contentShape(Circle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityIdentifier("deck-\(deck.id)")
-                .accessibilityLabel(deck.title)
-                .rotationEffect(.degrees(-rotation))   // counter-rotate the icon about its own center so it stays upright
-                .offset(x: r * CGFloat(cos(mid * .pi / 180)), y: r * CGFloat(sin(mid * .pi / 180)))
+                sliceButton(deck, index: i)
             }
             Circle().stroke(.white, lineWidth: 8).padding(4)
         }
+    }
+
+    private func sliceButton(_ deck: Deck, index i: Int) -> some View {
+        let mid: Double = Double(i) * sliceAngle - 90
+        let r: CGFloat = 108
+        let dx: CGFloat = r * CGFloat(cos(mid * .pi / 180))
+        let dy: CGFloat = r * CGFloat(sin(mid * .pi / 180))
+        return Button {
+            guard enabled, !spinning else { return }
+            Haptics.heavy()
+            onPick(deck)
+        } label: {
+            DeckIcon(deck: deck, fill: .white, ink: Art.darker(deck.color, 0.45))
+                .frame(width: 40, height: 40)
+                .frame(width: 64, height: 64)
+                .contentShape(Circle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("deck-\(deck.id)")
+        .accessibilityLabel(deck.title)
+        .rotationEffect(.degrees(-rotation))   // counter-rotate the icon about its own center so it stays upright
+        .offset(x: dx, y: dy)
     }
 
     private func spin() {
