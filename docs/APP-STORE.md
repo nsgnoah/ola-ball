@@ -84,7 +84,12 @@ A note on screenshot sizes: the iPhone slot wants **6.5-inch** (1242x2688 or 128
 the 6.9-inch 1320x2868 set. `./scripts/store_shots.sh <udid>` against an iPhone 14 Plus or 13 Pro Max
 simulator produces 1284x2778. The iPad slot takes 2064x2752 directly.
 
-**Build 2 supersedes build 1.** Build 1's app icon was a solid black square: the old generator
+**Build 3 is the one to submit.** It adds readable text-field placeholders on top of build 2's icon
+fix: the system placeholder is a pale grey that all but vanished on the cream fields, which Noah
+spotted on first launch on a real phone. Every field now uses `Text.placeholder` (ink2, about 6:1 on
+cream) and `.gameField()`, which also gives the field a visible edge.
+
+**Build 2 superseded build 1.** Build 1's app icon was a solid black square: the old generator
 script drew a design and then silently lost it while stripping the alpha channel. Build 2 carries a
 real icon, rendered by `OlaBallTests/AppIconTests.swift` from the app's own palette, and that test now
 fails if the icon ever comes out as one flat colour or carries alpha. Attach build 2, not build 1.

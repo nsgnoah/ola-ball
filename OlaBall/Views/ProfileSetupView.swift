@@ -37,16 +37,14 @@ struct ProfileSetupView: View {
 
                     VStack(alignment: .leading, spacing: 8) {
                         Kicker("YOUR NAME", color: Theme.ink2, size: 12)
-                        TextField("First name", text: $name)
+                        TextField("First name", text: $name, prompt: .placeholder("First name"))
                             .font(.bodyBold(20))
                             .foregroundStyle(Theme.ink)
                             .textInputAutocapitalization(.words)
                             .autocorrectionDisabled()
                             .submitLabel(.done)
                             .onSubmit { commit() }
-                            .padding(.horizontal, 14)
-                            .frame(height: 54)
-                            .background(Theme.cream, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                            .gameField()
                             .accessibilityIdentifier("name-field")
                     }
                     .panel(padding: 14)

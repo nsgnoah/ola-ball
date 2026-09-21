@@ -45,11 +45,10 @@ struct TeamSetupFields: View {
 
     private func memberRow(name: Binding<String>, lane: Binding<World>, placeholder: String, id: String) -> some View {
         HStack(spacing: 8) {
-            TextField(placeholder, text: name)
+            TextField(placeholder, text: name, prompt: .placeholder(placeholder))
                 .font(.bodyBold(17)).foregroundStyle(Theme.ink)
                 .textInputAutocapitalization(.words).autocorrectionDisabled()
-                .padding(.horizontal, 12).frame(height: 46)
-                .background(Theme.cream, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .gameField(height: 46, radius: 12)
                 .accessibilityIdentifier("team-name-\(id)")
             Button {
                 Haptics.tap()

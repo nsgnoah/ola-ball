@@ -148,6 +148,17 @@ extension Color {
 
 extension View {
     /// White chunky panel with a soft edge, the game's card.
+    /// Every text field: cream fill, a visible edge so it reads as somewhere to type, sized with the
+    /// canvas. Pair with `Text.placeholder` for the prompt: the system placeholder is a pale grey at
+    /// low opacity that all but disappears on cream, which is how "First name" became invisible.
+    func gameField(height: CGFloat = 54, radius: CGFloat = 14) -> some View {
+        self.padding(.horizontal, UI.s(14))
+            .frame(height: UI.s(height))
+            .background(Theme.cream, in: RoundedRectangle(cornerRadius: UI.s(radius), style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: UI.s(radius), style: .continuous)
+                .strokeBorder(Theme.panelEdge, lineWidth: 1.5))
+    }
+
     func panel(padding: CGFloat = 16, radius: CGFloat = 22) -> some View {
         self.padding(UI.s(padding))
             .background(Theme.panel, in: RoundedRectangle(cornerRadius: UI.s(radius), style: .continuous))
@@ -165,4 +176,10 @@ enum Haptics {
     static func failure() { UINotificationFeedbackGenerator().notificationOccurred(.error) }
     static func answer(correct: Bool) { correct ? success() : failure() }
     static func tick() { UISelectionFeedbackGenerator().selectionChanged() }
+}
+
+extension Text {
+    /// A text-field prompt people can actually read: ink2 on cream is about 6:1, against roughly
+    /// 1.6:1 for the system placeholder. Still visibly lighter than typed text, so it reads as a hint.
+    static func placeholder(_ s: String) -> Text { Text(s).foregroundStyle(Theme.ink2) }
 }

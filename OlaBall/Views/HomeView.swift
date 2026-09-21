@@ -330,11 +330,10 @@ struct NewLocalMatchSheet: View {
                         }
                     }
                     if mode == .couple {
-                        TextField("Partner's first name", text: $partnerName)
+                        TextField("Partner's first name", text: $partnerName, prompt: .placeholder("Partner's first name"))
                             .font(.bodyBold(20)).foregroundStyle(Theme.ink)
                             .textInputAutocapitalization(.words).autocorrectionDisabled()
-                            .padding(.horizontal, 14).frame(height: 54)
-                            .background(Theme.cream, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                            .gameField()
                             .accessibilityIdentifier("partner-name")
                         Kicker("THEY KNOW")
                         HStack(spacing: 10) {

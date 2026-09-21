@@ -182,16 +182,21 @@ struct Kicker: View {
     let text: String
     var color: Color = .white.opacity(0.85)
     var size: CGFloat = TypeScale.label
+    /// Only the default white kickers get the lift. They sit on whatever deck colour the round
+    /// happens to be, where a tight ink shadow keeps them readable on the pale ones. A kicker given
+    /// its own colour is on a light panel, where the same shadow just smudges the letters.
+    private let lifted: Bool
 
-    init(_ text: String, color: Color = .white.opacity(0.85), size: CGFloat = TypeScale.label) {
-        self.text = text; self.color = color; self.size = size
+    init(_ text: String, color: Color? = nil, size: CGFloat = TypeScale.label) {
+        self.text = text
+        self.color = color ?? .white.opacity(0.85)
+        self.size = size
+        self.lifted = color == nil
     }
 
     var body: some View {
         Text(text).font(.label(size)).tracking(1.1).textCase(.uppercase).foregroundStyle(color)
-            // Kickers sit on whatever deck colour the round happens to be. A tight ink shadow keeps
-            // them readable on the pale ones without dulling the colour on the dark ones.
-            .shadow(color: Theme.ink.opacity(0.45), radius: 1, y: 1)
+            .shadow(color: lifted ? Theme.ink.opacity(0.45) : .clear, radius: 1, y: 1)
     }
 }
 
