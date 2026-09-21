@@ -20,8 +20,12 @@ final class PlayThroughUITests: XCTestCase {
 
     /// Captures the whole screen rather than just the app window: `app.screenshot()` composites a
     /// rotated device wrongly and made a perfectly good landscape layout look broken.
+    ///
+    /// Waits out the entrance springs first. Several screens pop their centrepiece in from 0.2
+    /// scale, and catching the trophy or the crown mid-flight makes a useless App Store screenshot.
     private func snap(_ app: XCUIApplication, _ name: String) {
         guard let shotDir else { return }
+        Thread.sleep(forTimeInterval: 0.9)
         let url = URL(fileURLWithPath: shotDir).appendingPathComponent("\(name).png")
         do { try XCUIScreen.main.screenshot().pngRepresentation.write(to: url) }
         catch { XCTFail("could not write screenshot \(name) to \(url.path): \(error)") }

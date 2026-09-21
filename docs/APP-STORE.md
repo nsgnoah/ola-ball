@@ -17,7 +17,7 @@ Status as of September 20, 2026. The code side is ready; what remains is App Sto
 | Version 1.0, build 1 | `project.yml` (`MARKETING_VERSION`, `CURRENT_PROJECT_VERSION`; bump the build for every upload) |
 | Dynamic Type, Reduce Motion, 44pt targets | `Views/Theme.swift`, `Views/HUD.swift` |
 | iPad layout that is not a stretched phone app | `Viewport`/`UI.scale`, `Stage`/`StageScroll` (see below) |
-| Tests | 13 unit tests, 2 full UI play-throughs |
+| Tests | 14 unit tests, 2 full UI play-throughs |
 
 ## Before you upload
 
@@ -43,6 +43,12 @@ Status as of September 20, 2026. The code side is ready; what remains is App Sto
    ```bash
    ./scripts/store_shots.sh && ./scripts/store_shots.sh ipad
    ```
+
+   They land in `build/shots-store/iphone` (1320×2868) and `build/shots-store/ipad` (2064×2752),
+   ten each: home, the match list, the wheel, hand-off, round intro, a question, an answered
+   question, the round reveal, the final screen, and the home screen afterwards. Both directories
+   are gitignored; upload them straight from disk. Good picks for a listing are the wheel, a
+   question, the round reveal and the final screen, in that order.
 8. **Description** (draft):
 
    > A trivia game for two people who share a couch and not a knowledge base. Declare the world you know, His World or Her World, then pick what your partner gets quizzed on: football, cars, grilling, tech and fight night on one side; skincare, fashion, rom-coms, reality TV and pop divas on the other. Seven questions a round, fifteen seconds each, difficulty climbing from Rookie to Legend. First to three crowns wins. Play from two phones through Game Center, or pass one phone back and forth. Couples mode lets your team take on another couple.

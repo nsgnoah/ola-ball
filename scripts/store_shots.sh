@@ -27,12 +27,21 @@ xcrun simctl bootstatus "$DEVICE" -b >/dev/null
 # A clean, consistent status bar for store shots.
 xcrun simctl status_bar "$DEVICE" override --time "9:41" --cellularBars 4 --batteryState charged --batteryLevel 100 2>/dev/null || true
 
+rm -rf build/shots
+
 xcodebuild test -project OlaBall.xcodeproj -scheme OlaBall \
   -destination "platform=iOS Simulator,id=$DEVICE" \
   -derivedDataPath build/DerivedDataShots \
-  -only-testing:OlaBallUITests/PlayThroughUITests/testPassAndPlayMatch \
-  TEST_RUNNER_OLABALL_SHOTS="$DIR" 2>&1 \
+  -only-testing:OlaBallUITests/PlayThroughUITests/testPassAndPlayMatch 2>&1 \
   | grep -E "error:|Test Case .* (passed|failed)|TEST (SUCCEEDED|FAILED)"
+
+# The test writes to build/shots (xcodebuild does not reliably pass TEST_RUNNER_* through to the
+# runner, so the test falls back to a path beside its own source). Collect them here.
+mv build/shots/*.png "$DIR"/ 2>/dev/null || true
+rm -rf build/shots
+
+# Booted simulators hold memory, and on a full disk macOS answers that with swap. Let it go.
+xcrun simctl shutdown "$DEVICE" 2>/dev/null || true
 
 echo
 echo "$DIR"
