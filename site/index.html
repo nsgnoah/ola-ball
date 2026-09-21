@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ola Support</title>
+<style>
+  :root { --ink:#1D1A33; --ink2:#5A5670; --paper:#FFFBF1; --line:#E0D2B4; --violet:#5B3FD0; --his:#2A5BD7; --hers:#E93E7A; }
+  * { box-sizing: border-box; }
+  body {
+    margin:0; padding:40px 20px 80px;
+    background:var(--paper); color:var(--ink);
+    font:17px/1.6 Rockwell, "Rockwell Nova", Georgia, "Times New Roman", serif;
+  }
+  main { max-width:660px; margin:0 auto; }
+  h1 { font-size:36px; line-height:1.1; margin:0 0 6px; letter-spacing:-0.01em; }
+  h2 { font-size:21px; margin:34px 0 8px; }
+  .tagline { color:var(--ink2); margin:0 0 26px; }
+  .worlds { display:flex; gap:10px; margin:0 0 30px; flex-wrap:wrap; }
+  .chip { flex:1 1 180px; padding:12px 16px; border-radius:14px; color:#fff; font-weight:700; }
+  .his { background:var(--his); }
+  .hers { background:var(--hers); }
+  .chip small { display:block; font-weight:400; font-size:14px; opacity:.9; margin-top:3px; }
+  a { color:var(--violet); }
+  ul { padding-left:22px; }
+  li { margin:7px 0; }
+  footer { margin-top:44px; padding-top:18px; border-top:1px solid var(--line); color:var(--ink2); font-size:14px; }
+  @media (prefers-color-scheme: dark) {
+    :root { --ink:#F2EFE6; --ink2:#A9A4BC; --paper:#17162B; --line:#3A3550; --violet:#B6A6FF; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>Ola</h1>
+  <p class="tagline">A trivia game for two people who share a couch and not a knowledge base.</p>
+
+  <div class="worlds">
+    <div class="chip his">His World<small>Football, cars, grilling, tech, fight night</small></div>
+    <div class="chip hers">Her World<small>Skincare, fashion, rom-coms, reality TV, divas</small></div>
+  </div>
+
+  <p>Declare the world you know, then pick what your partner gets quizzed on. They pick yours. Seven
+  questions a round, fifteen seconds each, first to three crowns. Play from two phones through Game
+  Center, or pass one phone back and forth.</p>
+
+  <h2>Getting help</h2>
+  <p>Email <a href="mailto:noah@nsgsolutions.co">noah@nsgsolutions.co</a>. Useful things to include:
+  what you were doing, which mode you were in, and your iPhone or iPad model.</p>
+
+  <h2>Common questions</h2>
+  <ul>
+    <li><strong>Do I need an account?</strong> No. Ola has no accounts and no passwords. Playing from
+    two phones uses the Apple ID already signed in to Game Center on your device.</li>
+    <li><strong>A question has the wrong answer.</strong> Please tell us, with the question text.
+    Every question is meant to be a checkable public fact, and we will correct it.</li>
+    <li><strong>How do I start over?</strong> The menu on the home screen has &ldquo;Start
+    over&rdquo;, which clears your profile and pass-and-play matches on that device.</li>
+    <li><strong>How do I remove an online match?</strong> Once it has finished, a delete button
+    appears beside it. That removes your copy; the other player keeps theirs.</li>
+  </ul>
+
+  <h2>Privacy</h2>
+  <p>Ola collects nothing and has no servers of its own. The full policy is
+  <a href="privacy.html">here</a>, and also inside the app under &ldquo;Privacy &amp; support&rdquo;
+  in the home-screen menu.</p>
+
+  <footer>
+    Ola is made by NSG Solutions. <a href="privacy.html">Privacy policy</a>
+  </footer>
+</main>
+</body>
+</html>
