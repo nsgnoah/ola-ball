@@ -2,16 +2,35 @@ import XCTest
 
 /// Plays a whole pass-and-play match on one phone and saves screenshots to $OLABALL_SHOTS.
 final class PlayThroughUITests: XCTestCase {
-    private var shotDir: String? { ProcessInfo.processInfo.environment["OLABALL_SHOTS"] }
+    /// Where play-through screenshots land. $OLABALL_SHOTS if set (xcodebuild passes it as
+    /// TEST_RUNNER_OLABALL_SHOTS); otherwise build/shots next to this source file, so a plain
+    /// cmd-U still leaves you something to look at.
+    private var shotDir: String? {
+        if let fromEnv = ProcessInfo.processInfo.environment["OLABALL_SHOTS"] { return fromEnv }
+        let repo = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+        let dir = repo.appendingPathComponent("build/shots")
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        return dir.path
+    }
 
+    /// OLABALL_LANDSCAPE=1 rotates the device first (iPad screenshots).
+    private func orient() {
+        if ProcessInfo.processInfo.environment["OLABALL_LANDSCAPE"] == "1" { XCUIDevice.shared.orientation = .landscapeLeft }
+    }
+
+    /// Captures the whole screen rather than just the app window: `app.screenshot()` composites a
+    /// rotated device wrongly and made a perfectly good landscape layout look broken.
     private func snap(_ app: XCUIApplication, _ name: String) {
         guard let shotDir else { return }
-        try? app.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: shotDir).appendingPathComponent("\(name).png"))
+        let url = URL(fileURLWithPath: shotDir).appendingPathComponent("\(name).png")
+        do { try XCUIScreen.main.screenshot().pngRepresentation.write(to: url) }
+        catch { XCTFail("could not write screenshot \(name) to \(url.path): \(error)") }
     }
 
     func testPassAndPlayMatch() {
         let app = XCUIApplication()
         app.launchArguments = ["-ui-testing-reset", "-ui-testing-seed"]
+        orient()
         app.launch()
 
         // Home with a seeded match
@@ -49,6 +68,7 @@ final class PlayThroughUITests: XCTestCase {
     func testPassAndPlayCouplesMatch() {
         let app = XCUIApplication()
         app.launchArguments = ["-ui-testing-reset", "-ui-testing-seed"]
+        orient()
         app.launch()
         XCTAssertTrue(app.buttons["new-local-match"].waitForExistence(timeout: 8))
         let row = app.buttons["local-match-seed-teams"]

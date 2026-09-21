@@ -371,6 +371,7 @@ struct CrownIcon: View {
     var empty: Color = Theme.ink.opacity(0.18)
 
     var body: some View {
+        let size = UI.s(self.size)
         Canvas { ctx, sz in
             let s = min(sz.width, sz.height) / 100
             ctx.translateBy(x: (sz.width - 100 * s) / 2, y: (sz.height - 100 * s) / 2)
@@ -392,6 +393,7 @@ struct TrophyIcon: View {
     var size: CGFloat = 76
 
     var body: some View {
+        let size = UI.s(self.size)
         Canvas { ctx, sz in
             let s = min(sz.width, sz.height) / 100
             ctx.translateBy(x: (sz.width - 100 * s) / 2, y: (sz.height - 100 * s) / 2)
@@ -418,6 +420,7 @@ struct TrophyIcon: View {
 struct HandoffIcon: View {
     var size: CGFloat = 80
     var body: some View {
+        let size = UI.s(self.size)
         Canvas { ctx, sz in
             let s = min(sz.width, sz.height) / 100
             ctx.translateBy(x: (sz.width - 100 * s) / 2, y: (sz.height - 100 * s) / 2)
@@ -448,6 +451,7 @@ struct Glyph: View {
     var weight: CGFloat = 16   // stroke width in the 100pt space
 
     var body: some View {
+        let size = UI.s(self.size)
         Canvas { ctx, sz in
             let s = min(sz.width, sz.height) / 100
             ctx.translateBy(x: (sz.width - 100 * s) / 2, y: (sz.height - 100 * s) / 2)

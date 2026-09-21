@@ -45,21 +45,60 @@ extension Color {
     }
 }
 
+/// One dial for "how big is the surface we are drawing on". The phone layout is authored at
+/// 393x852; this reports how far it can grow (or, on an iPad only, shrink) to suit the window it
+/// actually got. Type, buttons, panels and drawn art all read it, so they grow together instead of
+/// the phone layout stranding itself in a narrow column on a big screen.
+///
+/// It tracks the WINDOW, not the device: since iPadOS 26 every app gets a resizable window, so a
+/// half-width iPad window has to look composed too, and a short landscape one must not overflow.
+@Observable
+final class Viewport {
+    static let shared = Viewport()
+    /// Seeded from the idiom so the very first frame is already right in the common full-screen
+    /// case; `Stage` corrects it from real geometry as soon as there is any.
+    var scale: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 1.3 : 1
+    var isPad: Bool = UIDevice.current.userInterfaceIdiom == .pad
+
+    static let designSize = CGSize(width: 393, height: 852)
+
+    func fit(_ size: CGSize) {
+        guard size.width > 20, size.height > 20 else { return }
+        let room = min(size.width / Self.designSize.width, size.height / Self.designSize.height)
+        // A phone never shrinks: the layout already fits the smallest iPhone and shrinking it
+        // would undercut the reading floors. An iPad may shrink a little, because 0.95 of the
+        // phone layout on an iPad is still physically larger than a phone.
+        let floor: CGFloat = isPad ? 0.9 : 1
+        let next = min(1.3, max(floor, room))
+        if abs(next - scale) > 0.005 { scale = next }
+    }
+}
+
+enum UI {
+    static var scale: CGFloat { Viewport.shared.scale }
+    static var isPad: Bool { Viewport.shared.isPad }
+    /// Scale a hand-placed size (art, avatars, ring diameters). Fonts scale in the `Font` helpers.
+    static func s(_ v: CGFloat) -> CGFloat { v * scale }
+}
+
 /// Type: Rockwell (slab serif) for anything loud or read, DIN Condensed for scoreboard numbers and labels.
 /// Both ship with iOS; nothing is bundled or downloaded.
 extension Font {
     // `relativeTo` lets the phone's text-size setting scale everything (capped at xxLarge in RootView);
     // the floors keep reading text legible for older eyes even where a layout asked for something tiny.
-    static func headline(_ size: CGFloat) -> Font { .custom("Rockwell-Bold", size: size, relativeTo: .headline) }
-    static func score(_ size: CGFloat) -> Font { .custom("DINCondensed-Bold", size: size * 1.12, relativeTo: .title) }
-    static func condensed(_ size: CGFloat) -> Font { .custom("DINCondensed-Bold", size: size * 1.15, relativeTo: .headline) }
-    static func display(_ size: CGFloat) -> Font { .custom("Rockwell-Bold", size: size, relativeTo: .largeTitle) }
-    static func label(_ size: CGFloat = 13) -> Font { .custom("DINCondensed-Bold", size: max(size, 12) * 1.15, relativeTo: .caption) }
-    static func body(_ size: CGFloat = 17) -> Font { .custom("Rockwell", size: max(size, 15), relativeTo: .body) }
-    static func bodyRegular(_ size: CGFloat = 17) -> Font { .custom("Rockwell", size: max(size, 14), relativeTo: .body) }
-    static func bodyBold(_ size: CGFloat = 17) -> Font { .custom("Rockwell-Bold", size: max(size, 15), relativeTo: .body) }
-    /// Logo type: the wordmark and other fixed-frame art must not scale with the text-size setting.
+    static func headline(_ size: CGFloat) -> Font { .custom("Rockwell-Bold", size: UI.s(size), relativeTo: .headline) }
+    static func score(_ size: CGFloat) -> Font { .custom("DINCondensed-Bold", size: UI.s(size * 1.12), relativeTo: .title) }
+    static func condensed(_ size: CGFloat) -> Font { .custom("DINCondensed-Bold", size: UI.s(size * 1.15), relativeTo: .headline) }
+    static func display(_ size: CGFloat) -> Font { .custom("Rockwell-Bold", size: UI.s(size), relativeTo: .largeTitle) }
+    static func label(_ size: CGFloat = 13) -> Font { .custom("DINCondensed-Bold", size: UI.s(max(size, 12) * 1.15), relativeTo: .caption) }
+    static func body(_ size: CGFloat = 17) -> Font { .custom("Rockwell", size: UI.s(max(size, 15)), relativeTo: .body) }
+    static func bodyRegular(_ size: CGFloat = 17) -> Font { .custom("Rockwell", size: UI.s(max(size, 14)), relativeTo: .body) }
+    static func bodyBold(_ size: CGFloat = 17) -> Font { .custom("Rockwell-Bold", size: UI.s(max(size, 15)), relativeTo: .body) }
+    /// Art type: takes FINAL points and applies no canvas scale and no Dynamic Type. For lettering
+    /// inside fixed-frame art (the wordmark, an avatar's initial, the timer's count), where the
+    /// frame has already been scaled and scaling the text again would overflow it.
     static func logo(_ size: CGFloat) -> Font { .custom("Rockwell-Bold", fixedSize: size) }
+    static func artScore(_ size: CGFloat) -> Font { .custom("DINCondensed-Bold", fixedSize: size * 1.12) }
 }
 
 /// A chunky game button: solid face over a darker "edge" that compresses when pressed.
@@ -79,12 +118,12 @@ struct ChunkyButtonStyle: ButtonStyle {
             .textCase(.uppercase)
             .foregroundStyle(ink)
             .frame(maxWidth: .infinity)
-            .frame(height: height)
+            .frame(height: max(44, UI.s(height)))   // never below the 44pt minimum target
             .background(
                 ZStack {
-                    RoundedRectangle(cornerRadius: 16, style: .continuous).fill(edgeColor).offset(y: pressed ? 2 : 6)
-                    RoundedRectangle(cornerRadius: 16, style: .continuous).fill(color)
-                    RoundedRectangle(cornerRadius: 16, style: .continuous).fill(LinearGradient(colors: [.white.opacity(0.22), .clear], startPoint: .top, endPoint: .center))
+                    RoundedRectangle(cornerRadius: UI.s(16), style: .continuous).fill(edgeColor).offset(y: pressed ? UI.s(2) : UI.s(6))
+                    RoundedRectangle(cornerRadius: UI.s(16), style: .continuous).fill(color)
+                    RoundedRectangle(cornerRadius: UI.s(16), style: .continuous).fill(LinearGradient(colors: [.white.opacity(0.22), .clear], startPoint: .top, endPoint: .center))
                 }
             )
             .offset(y: pressed ? 4 : 0)
@@ -110,9 +149,9 @@ extension Color {
 extension View {
     /// White chunky panel with a soft edge, the game's card.
     func panel(padding: CGFloat = 16, radius: CGFloat = 22) -> some View {
-        self.padding(padding)
-            .background(Theme.panel, in: RoundedRectangle(cornerRadius: radius, style: .continuous))
-            .background(RoundedRectangle(cornerRadius: radius, style: .continuous).fill(Theme.panelEdge).offset(y: 5))
+        self.padding(UI.s(padding))
+            .background(Theme.panel, in: RoundedRectangle(cornerRadius: UI.s(radius), style: .continuous))
+            .background(RoundedRectangle(cornerRadius: UI.s(radius), style: .continuous).fill(Theme.panelEdge).offset(y: UI.s(5)))
     }
 
     // Old name, new look.

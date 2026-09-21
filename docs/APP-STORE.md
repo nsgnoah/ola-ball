@@ -1,6 +1,6 @@
 # Submitting Ola to the App Store
 
-Status as of September 19, 2026. The code side is ready; what remains is App Store Connect setup, a real-device Game Center test, and the upload.
+Status as of September 20, 2026. The code side is ready; what remains is App Store Connect setup, a real-device Game Center test, and the upload.
 
 ## What the build already satisfies
 
@@ -13,9 +13,10 @@ Status as of September 19, 2026. The code side is ready; what remains is App Sto
 | No permission prompts, no third-party SDKs | nothing in `Info.plist`, no packages |
 | Export compliance | `ITSAppUsesNonExemptEncryption = false` in `Info.plist` |
 | 1024×1024 icon, no alpha | `OlaBall/Resources/Assets.xcassets/AppIcon.appiconset/icon.png` |
-| Launch screen, portrait only, iPhone only | `project.yml` |
+| Launch screen; portrait on iPhone, all orientations on iPad; universal (device family 1,2) | `project.yml` |
 | Version 1.0, build 1 | `project.yml` (`MARKETING_VERSION`, `CURRENT_PROJECT_VERSION`; bump the build for every upload) |
 | Dynamic Type, Reduce Motion, 44pt targets | `Views/Theme.swift`, `Views/HUD.swift` |
+| iPad layout that is not a stretched phone app | `Viewport`/`UI.scale`, `Stage`/`StageScroll` (see below) |
 | Tests | 13 unit tests, 2 full UI play-throughs |
 
 ## Before you upload
@@ -30,9 +31,18 @@ Status as of September 19, 2026. The code side is ready; what remains is App Sto
 2. **New app**: platform iOS, name from step 2 above, primary language English (U.S.), bundle ID `co.nsgsolutions.olaball`, SKU `olaball`.
 3. **Features > Game Center**: enable Game Center for the app. No leaderboards or achievements needed; turn-based matches work with just the toggle. Then, on the version page, under Game Center, tick it for 1.0.
 4. **App Privacy**: answer "No, we do not collect data from this app." This matches the privacy manifest. Game Center's own data is Apple's.
-5. **Age rating**: everything "None" except **Alcohol, Tobacco, or Drug Use or References → Infrequent/Mild** (the "Grilling, Beer & Whiskey" deck asks factual questions about beer and whiskey). Expect 12+. Also "Contests → None" and "Unrestricted Web Access → No".
+5. **Age rating**: App Store Connect uses the current questionnaire, which returns 4+/9+/13+/16+/18+ (there is no 12+ any more). Declare honestly:
+   - **Alcohol, Tobacco, or Drug Use or References → Infrequent/Mild.** The "Grilling, Beer & Whiskey" deck asks factual questions about beer and whiskey.
+   - **Sexual Content or Nudity / Mature or Suggestive Themes → Infrequent/Mild.** The romance, reality-TV and celebrity decks deal in dating and relationships.
+   - Everything else **None**; "Unrestricted Web Access" No, no contests, no gambling.
+
+   Both of those land the app at **13+**, so declaring them costs nothing and removes any chance of a re-rate for under-declaring. Do not trim content to chase 9+: the test suite asserts every deck holds exactly 36 questions with 12 per tier, so pulling questions means authoring tier-matched replacements.
 6. **Category**: Games > Trivia (secondary: Games > Family or Word).
-7. **Screenshots**: 6.9" iPhone is the only required size (1320×2868). `scripts/store_shots.sh` plays a match on an iPhone 16 Pro Max simulator and drops them in `build/shots-store/` (home, hand-off, wheel, question, answered, reveal, match over). Pick 3 to 6. No iPad screenshots are needed while the app is iPhone-only.
+7. **Screenshots**: the app is universal, so App Store Connect needs BOTH sizes: 6.9" iPhone (1320×2868) and 13" iPad (2064×2752). `scripts/store_shots.sh` plays a real match and saves the set (home, hand-off, wheel, round intro, question, answered, reveal, match over); pick 3 to 6 of each.
+
+   ```bash
+   ./scripts/store_shots.sh && ./scripts/store_shots.sh ipad
+   ```
 8. **Description** (draft):
 
    > A trivia game for two people who share a couch and not a knowledge base. Declare the world you know, His World or Her World, then pick what your partner gets quizzed on: football, cars, grilling, tech and fight night on one side; skincare, fashion, rom-coms, reality TV and pop divas on the other. Seven questions a round, fifteen seconds each, difficulty climbing from Rookie to Legend. First to three crowns wins. Play from two phones through Game Center, or pass one phone back and forth. Couples mode lets your team take on another couple.
@@ -64,4 +74,26 @@ codesign -d --entitlements - build/Ola.xcarchive/Products/Applications/OlaBall.a
 
 ## iPad
 
-The app targets iPhone only (`TARGETED_DEVICE_FAMILY: "1"`). On an iPad it installs and runs in a letterboxed iPhone-size window. App Review accepts that; the store listing says "Designed for iPhone". Real iPad support would mean adding device family 2, a centered max-width column in every screen, landscape handling (or `UIRequiresFullScreen`), a second set of screenshots (13"), and iPad testing. Sensible as a 1.1.
+The app ships as a universal build: `TARGETED_DEVICE_FAMILY "1,2"`, portrait on iPhone, all four
+orientations on iPad. It is not a stretched phone app.
+
+How the layout works, so it stays that way:
+- `Viewport` in `OlaBall/Views/Theme.swift` measures the window the app actually got and reports a
+  scale against the 393x852 phone design. `UI.scale` reads it; the `Font` helpers, `ChunkyButtonStyle`,
+  `.panel()` and the drawn art all multiply by it. One dial, so type, buttons, panels and icons grow
+  together. It tracks the WINDOW, not the device, because since iPadOS 26 every app gets a resizable one.
+- `Stage` (in `HUD.swift`) is the container every screen uses: the background bleeds to all four
+  edges, the content sits in a centered play column with the phone's proportions at that scale.
+  `StageScroll` is the scrolling variant, which centers content shorter than the screen.
+- Two rules when adding to a screen: never nest one `Stage` inside another (it clips the inner
+  background to the outer column, which reads as a seam down both sides of an iPad), and any
+  hand-placed padding that has to clear scaled art must be wrapped in `UI.s()`.
+
+Verified on iPad Air 11-inch in both orientations: every screen composes, nothing is clipped, and the
+full pass-and-play play-through passes. iPhone rendering is unchanged, because the scale is exactly
+1.0 at phone sizes.
+
+`UIRequiresFullScreen` is still `true`. On iPadOS 18 that keeps the app out of Split View, which is
+the conservative choice for 1.0; on iPadOS 26 and later the key is ignored and the responsive layout
+above is what carries it. Dropping the key to support Split View and Slide Over properly is a
+sensible 1.1, once narrow windows have been tested.

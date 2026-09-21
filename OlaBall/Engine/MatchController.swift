@@ -56,6 +56,12 @@ final class MatchController {
     }
 
     var me: String { transport.activePlayerID }
+    /// Who the screen on show belongs to. Normally `me`, but a pass-and-play submit flips the
+    /// transport's active side, so the reveal that follows a turn belongs to whoever just played,
+    /// not to whoever is up next. Views that say "you won" must use this.
+    var viewer: String { revealOwner ?? me }
+    /// Set only while showing a reveal that outlived its mover's turn.
+    private(set) var revealOwner: String?
     var meName: String { state.player(me)?.name ?? transport.activePlayerName }
     var partner: MatchPlayer? { state.partner(of: me) }
     var currentQuestion: Question? { index < questions.count ? questions[index] : nil }
@@ -75,6 +81,15 @@ final class MatchController {
             state.join(.solo(id: me, name: transport.activePlayerName, world: transport.activePlayerWorld))
         }
         currentMember = nil
+        // A Game Center match the moment it is created: only the creator is in the state, so there
+        // is no partner to pick a deck for and nothing to answer. Pass the turn straight over so the
+        // opponent can join and take the first move. Without this the creator lands on `.waiting`,
+        // the seed state is never submitted, and the match is dead before it starts.
+        if !transport.isPassAndPlay, state.status == .active, !state.isReady, transport.isMyTurn, !isSubmitting {
+            stage = .waiting
+            Task { await finishTurn() }
+            return
+        }
         if announce, sharesPhone, state.status == .active, state.isReady, transport.isMyTurn {
             stage = .handoff(to: handoffName())
             return
@@ -86,7 +101,7 @@ final class MatchController {
     func joinTeam(members: [(name: String, lane: World)]) {
         guard state.mode == .teams, state.player(me) == nil, members.count == 2 else { return }
         state.join(.team(id: me, members: members))
-        Task { try? await transport.save(state) }
+        saveInBackground()
         start(announce: true)
     }
 
@@ -101,6 +116,7 @@ final class MatchController {
             stage = unrevealedRound().map { .roundReveal(round: $0) } ?? .finished
             return
         }
+        revealOwner = nil
         guard transport.isMyTurn else { stage = .waiting; return }
         if let r = unrevealedRound() { stage = .roundReveal(round: r); return }
         if let next = state.pendingAnswers(for: me).first {
@@ -130,9 +146,15 @@ final class MatchController {
 
     func acknowledgeReveal() {
         guard case .roundReveal(let r) = stage else { return }
-        state.revealed[me] = max(state.revealed[me] ?? 0, r)
-        Task { try? await transport.save(state) }
-        if state.status == .finished { stage = .finished; return }
+        let owner = viewer
+        revealOwner = nil
+        state.revealed[owner] = max(state.revealed[owner] ?? 0, r)
+        saveInBackground()
+        if state.status == .finished {
+            // There may be a second reveal waiting for the other side before the final screen.
+            stage = unrevealedRound().map { .roundReveal(round: $0) } ?? .finished
+            return
+        }
         route()
         if stage == .waiting, transport.isMyTurn { Task { await finishTurn() } }
     }
@@ -219,7 +241,7 @@ final class MatchController {
             Task { await finishTurn() }
             return
         }
-        Task { try? await transport.save(state) }
+        saveInBackground()
         route()
         if stage == .waiting { Task { await finishTurn() } }
     }
@@ -240,6 +262,14 @@ final class MatchController {
 
     // MARK: Turn hand-off
 
+    /// Saves the current state without blocking the UI. The snapshot matters: `state` is a value
+    /// this class keeps mutating on the main thread, and handing it to a Task by reference would let
+    /// the save read it mid-edit.
+    private func saveInBackground() {
+        let snapshot = state
+        Task { try? await transport.save(snapshot) }
+    }
+
     @MainActor
     private func finishTurn() async {
         isSubmitting = true
@@ -251,7 +281,12 @@ final class MatchController {
             try await transport.submitTurn(state)
             currentMember = nil
             if state.status == .finished {
-                stage = unrevealedRoundFor(mover).map { .roundReveal(round: $0) } ?? .finished
+                if let r = unrevealedRoundFor(mover) {
+                    revealOwner = mover
+                    stage = .roundReveal(round: r)
+                } else {
+                    stage = .finished
+                }
             } else if transport.isPassAndPlay {
                 stage = .handoff(to: handoffName())
             } else {

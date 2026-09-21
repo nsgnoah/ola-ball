@@ -11,11 +11,10 @@ struct RoundRevealView: View {
         let s = controller.state
         let r = s.rounds[round - 1]
         let winner = s.roundWinner(r)
-        let me = controller.me
+        let me = controller.viewer   // not `me`: after a submit the active side has already flipped
         let iWon = winner == me
         let winnerWorld = winner.flatMap { s.player($0)?.world }
-        ZStack {
-            if let w = winnerWorld { GameBackground(world: w) } else { GameBackground(top: Theme.violet, bottom: Theme.violetDeep) }
+        Stage(winnerWorld.map { GameBackground(world: $0) } ?? GameBackground(top: Theme.violet, bottom: Theme.violetDeep)) {
             VStack(spacing: 14) {
                 MatchHeader(controller: controller)
                 Spacer()
@@ -25,7 +24,7 @@ struct RoundRevealView: View {
                         .scaleEffect(crownPop ? 1 : 0.2).rotationEffect(.degrees(crownPop ? 0 : -30))
                 }
                 StickerText(headline(winner: winner, me: me), size: TypeScale.title)
-                    .padding(.top, -6)
+                    .padding(.top, UI.s(-6))
                 HStack(spacing: 12) {
                     ForEach(s.players) { p in
                         VStack(spacing: 6) {

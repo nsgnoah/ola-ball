@@ -55,6 +55,16 @@ enum MatchEngine {
                 }
             }
         }
+        // A deck holds 36 questions and a round takes 7, so the sixth time a match lands on the
+        // same deck the unused pool runs dry. Rather than hand someone a short (or empty) round,
+        // let the deck repeat itself: a seen question is a far better outcome than a blank screen.
+        if out.count < MatchState.questionsPerRound {
+            let already = Set(out.map(\.id))
+            for q in deck.questions.shuffled(using: &rng) where !already.contains(q.id) {
+                out.append(q)
+                if out.count == MatchState.questionsPerRound { break }
+            }
+        }
         return out
     }
 

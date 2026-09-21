@@ -9,11 +9,11 @@ struct QuestionView: View {
     var body: some View {
         let deck = controller.deck
         let color = deck?.color ?? Theme.violet
-        ZStack {
-            GameBackground(top: color, bottom: color.mix(with: .black, by: 0.4))
+        Stage(GameBackground(top: color, bottom: color.mix(with: .black, by: 0.4))) {
             VStack(spacing: 12) {
                 header(deck: deck)
                 progressDots
+                Spacer(minLength: 0)
                 if let q = controller.currentQuestion, let deck {
                     questionCard(q, deck: deck)
                     VStack(spacing: 10) {
@@ -66,7 +66,7 @@ struct QuestionView: View {
             if let deck {
                 HStack(spacing: 8) {
                     DeckIcon(deck: deck, fill: .white, ink: deck.color).padding(4)
-                        .frame(width: 26, height: 26).background(.white, in: Circle())
+                        .frame(width: UI.s(26), height: UI.s(26)).background(.white, in: Circle())
                     Text(controller.state.mode == .teams ? (controller.currentMember?.name.uppercased() ?? "") : deck.title.uppercased())
                         .font(.label(TypeScale.label)).tracking(0.8).foregroundStyle(.white).lineLimit(1).minimumScaleFactor(0.7)
                 }
@@ -77,7 +77,7 @@ struct QuestionView: View {
                     .contentTransition(.numericText()).animation(.spring(duration: 0.4), value: controller.runningScore)
                 Text("PTS").font(.label(10)).foregroundStyle(Theme.ink2)
             }
-            .padding(.horizontal, 12).frame(height: 34)
+            .padding(.horizontal, UI.s(12)).frame(height: UI.s(34))
             .background(.white, in: Capsule())
             .background(Capsule().fill(Theme.panelEdge).offset(y: 3))
         }
@@ -100,18 +100,18 @@ struct QuestionView: View {
     private func questionCard(_ q: Question, deck: Deck) -> some View {
         ZStack(alignment: .top) {
             VStack(spacing: 8) {
-                Kicker("\(MatchEngine.tierName(q.tier)) · \(controller.index + 1) of \(controller.questions.count)", color: deck.color, size: 12)
+                Kicker("\(MatchEngine.tierName(q.tier)) · \(controller.index + 1) of \(controller.questions.count)", color: Art.darker(deck.color, 0.5), size: 12)   // the deck colour itself is too pale on cream
                 Text(q.prompt).font(.headline(TypeScale.heading)).foregroundStyle(Theme.ink)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
                     .accessibilityIdentifier("question-prompt")
             }
-            .padding(.horizontal, 18)
-            .padding(.top, 50)
-            .padding(.bottom, 18)
+            .padding(.horizontal, UI.s(18))
+            .padding(.top, UI.s(50))          // clearance for the mascot peeking over the card
+            .padding(.bottom, UI.s(18))
             .frame(maxWidth: .infinity)
             .panel(padding: 0)
-            .padding(.top, 56)
+            .padding(.top, UI.s(56))
 
             Mascot(deck: deck, mood: mascotMood, size: 84)
                 .id("\(controller.index)-\(mascotMood == .happy)-\(mascotMood == .sad)")
@@ -124,7 +124,7 @@ struct QuestionView: View {
                     TimerRing(start: controller.questionStart, duration: MatchEngine.secondsPerQuestion, size: 54, color: deck.color)
                 }
             }
-            .offset(x: -6, y: 30)
+            .offset(x: UI.s(-6), y: UI.s(30))
         }
     }
 
@@ -138,7 +138,7 @@ struct QuestionView: View {
         return Text(correct ? "+\(lastPoints)" : "✕")
             .font(.score(24))
             .foregroundStyle(.white)
-            .padding(.horizontal, 12).frame(height: 40)
+            .padding(.horizontal, UI.s(12)).frame(height: UI.s(40))
             .background(correct ? Theme.good : Theme.bad, in: Capsule())
             .background(Capsule().fill((correct ? Theme.goodDeep : Theme.badDeep)).offset(y: 3))
             .rotationEffect(.degrees(correct ? -6 : 6))
@@ -164,7 +164,7 @@ struct QuestionView: View {
             Text(["A", "B", "C", "D"][i])
                 .font(.headline(18))
                 .foregroundStyle(lit ? face : Theme.ink)
-                .frame(width: 34, height: 34)
+                .frame(width: UI.s(34), height: UI.s(34))
                 .background(lit ? .white : Theme.cream, in: Circle())
             Text(text).font(.bodyBold(18)).foregroundStyle(ink).multilineTextAlignment(.leading).fixedSize(horizontal: false, vertical: true)
             Spacer(minLength: 0)
@@ -172,7 +172,7 @@ struct QuestionView: View {
                 Glyph(kind: isCorrect ? .check : .close, size: 16, weight: 18)
             }
         }
-        .padding(.horizontal, 12).padding(.vertical, 12)
+        .padding(.horizontal, UI.s(12)).padding(.vertical, UI.s(12))
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             ZStack {

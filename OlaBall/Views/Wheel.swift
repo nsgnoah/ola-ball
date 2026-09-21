@@ -10,6 +10,7 @@ struct WheelView: View {
     @State private var spinning = false
     @State private var landed: Deck?
     @State private var tickTask: Task<Void, Never>?
+    private var k: CGFloat { UI.scale }   // the wheel grows with the canvas
 
     private var sliceAngle: Double { 360 / Double(max(1, decks.count)) }
 
@@ -29,11 +30,13 @@ struct WheelView: View {
                 ZStack {
                     Circle().fill(Theme.ink.opacity(0.35)).frame(width: 74, height: 74).offset(y: 4)
                     Circle().fill(.white).frame(width: 74, height: 74)
-                    Glyph(kind: .star, size: 30, color: Theme.violet)
+                    Glyph(kind: .star, size: 30 / UI.scale, color: Theme.violet)   // the whole wheel is already scaled by k
                 }
                 .frame(maxHeight: .infinity, alignment: .center)
             }
             .frame(width: 320, height: 320)
+            .scaleEffect(k)
+            .frame(width: 320 * k, height: 320 * k)
 
             if let landed {
                 VStack(spacing: 10) {

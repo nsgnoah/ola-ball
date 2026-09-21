@@ -30,10 +30,59 @@ struct StickerText: View {
         .multilineTextAlignment(alignment)
         .lineLimit(2)
         .minimumScaleFactor(0.5)
+        // Without this the box stays sized for the unwrapped, unshrunk line, and a negative nudge
+        // below it drags the wrapped text up through whatever is above it.
+        .fixedSize(horizontal: false, vertical: true)
     }
 }
 
 // MARK: - Backgrounds
+
+/// Every screen is a Stage: the backdrop fills the whole display, the content sits in a centered
+/// phone-width column. On iPhone the column is the screen; on iPad (either orientation) the set
+/// dressing surrounds it instead of the app shrinking into a letterboxed window.
+enum Layout {
+    /// The play column: the stage the game is composed on. Unconstrained on a phone, because there
+    /// the screen *is* the column. On an iPad it keeps the phone's proportions at the canvas scale,
+    /// so a screen that pins its header to the top and its button to the bottom composes the same
+    /// way on both, instead of stranding its middle in a half-screen of empty space. The background
+    /// still bleeds to every edge behind it.
+    static var column: CGFloat { UI.isPad ? 430 * UI.scale : .infinity }
+    static var columnHeight: CGFloat { UI.isPad ? 852 * UI.scale : .infinity }
+}
+
+struct Stage<Background: View, Content: View>: View {
+    let background: Background
+    let content: () -> Content
+    init(_ background: Background, @ViewBuilder content: @escaping () -> Content) {
+        self.background = background
+        self.content = content
+    }
+    var body: some View {
+        ZStack {
+            background
+            ZStack { content() }
+                .frame(maxWidth: Layout.column, maxHeight: Layout.columnHeight)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+    }
+}
+
+/// A scrolling screen that centers its content when the content is shorter than the screen,
+/// and scrolls normally when it is taller. Without this an iPad shows a top-heavy column
+/// above a third of a screen of dead space.
+struct StageScroll<Content: View>: View {
+    let content: () -> Content
+    init(@ViewBuilder content: @escaping () -> Content) { self.content = content }
+    var body: some View {
+        GeometryReader { geo in
+            ScrollView(showsIndicators: false) {
+                content().frame(minHeight: geo.size.height)
+            }
+        }
+    }
+}
+
 
 /// Game-show backdrop: a solid color, sunburst rays turning slowly from above the top edge,
 /// a halftone dot band rising from the bottom, paper grain over everything.
@@ -140,6 +189,9 @@ struct Kicker: View {
 
     var body: some View {
         Text(text).font(.label(size)).tracking(1.1).textCase(.uppercase).foregroundStyle(color)
+            // Kickers sit on whatever deck colour the round happens to be. A tight ink shadow keeps
+            // them readable on the pale ones without dulling the colour on the dark ones.
+            .shadow(color: Theme.ink.opacity(0.45), radius: 1, y: 1)
     }
 }
 
@@ -161,12 +213,13 @@ struct Avatar: View {
     var size: CGFloat = 40
 
     var body: some View {
+        let size = UI.s(self.size)
         ZStack {
             Circle().fill(world.color.mix(with: .black, by: 0.25)).offset(y: size * 0.06)
             Circle().fill(world.color)
             Circle().stroke(.white, lineWidth: max(2, size * 0.06))
             Text(String(name.prefix(1)).uppercased())
-                .font(.headline(size * 0.58))
+                .font(.logo(size * 0.58))
                 .foregroundStyle(.white)
                 .offset(y: size * 0.02)
         }
@@ -192,11 +245,12 @@ struct Crowns: View {
 struct OlaBadge: View {
     var size: CGFloat = 28
     var body: some View {
+        let size = UI.s(self.size)
         ZStack {
             Circle().fill(Theme.goldDeep).offset(y: size * 0.07)
             Circle().fill(Theme.gold)
             Circle().stroke(Theme.goldDeep, lineWidth: max(1, size * 0.06)).padding(size * 0.12)
-            Text("O").font(.headline(size * 0.56)).foregroundStyle(Theme.ink).offset(y: size * 0.02)
+            Text("O").font(.logo(size * 0.56)).foregroundStyle(Theme.ink).offset(y: size * 0.02)
         }
         .frame(width: size, height: size)
     }
@@ -231,10 +285,13 @@ struct Mascot: View {
     @State private var breathe = false
     @State private var blink = false
     @State private var glance: CGFloat = 0
+    /// The blink and glance timers reschedule themselves; without this they outlive the view.
+    @State private var alive = false
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
+        let size = UI.s(self.size)
         let body = deck.color
         let dark = body.mix(with: .black, by: 0.3)
         let light = body.mix(with: .white, by: 0.28)
@@ -271,10 +328,13 @@ struct Mascot: View {
         }
         .frame(width: size, height: size * 1.15)
         .onAppear {
-            if !reduceMotion { withAnimation(.easeInOut(duration: mood == .happy ? 0.3 : 1.6).repeatForever(autoreverses: true)) { breathe = true } }
+            guard !reduceMotion else { return }
+            withAnimation(.easeInOut(duration: mood == .happy ? 0.3 : 1.6).repeatForever(autoreverses: true)) { breathe = true }
+            alive = true
             scheduleBlink()
             scheduleGlance()
         }
+        .onDisappear { alive = false }
     }
 
     private func face(dark: Color) -> some View {
@@ -327,8 +387,10 @@ struct Mascot: View {
 
     private func scheduleBlink() {
         DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(Int.random(in: 2...5))) {
+            guard alive else { return }
             withAnimation(.easeInOut(duration: 0.07)) { blink = true }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                guard alive else { return }
                 withAnimation(.easeInOut(duration: 0.07)) { blink = false }
                 scheduleBlink()
             }
@@ -337,6 +399,7 @@ struct Mascot: View {
 
     private func scheduleGlance() {
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(Int.random(in: 1500...3800))) {
+            guard alive else { return }
             withAnimation(.spring(duration: 0.4)) { glance = CGFloat([-1, 0, 1, 0].randomElement()!) }
             scheduleGlance()
         }
@@ -378,6 +441,7 @@ struct TimerRing: View {
     var color: Color = Theme.gold
 
     var body: some View {
+        let size = UI.s(self.size)
         TimelineView(.animation(minimumInterval: 0.05)) { ctx in
             let elapsed = ctx.date.timeIntervalSince(start)
             let fraction = max(0, min(1, 1 - elapsed / duration))
@@ -389,7 +453,7 @@ struct TimerRing: View {
                     .stroke(fraction < 0.25 ? Theme.bad : color, style: StrokeStyle(lineWidth: size * 0.1, lineCap: .round))
                     .rotationEffect(.degrees(-90))
                     .padding(size * 0.08)
-                Text("\(left)").font(.score(size * 0.4)).foregroundStyle(Theme.ink)
+                Text("\(left)").font(.artScore(size * 0.4)).foregroundStyle(Theme.ink)
             }
             .frame(width: size, height: size)
             .background(Circle().fill(Theme.panelEdge).offset(y: 3))
@@ -448,34 +512,36 @@ struct Shake: GeometryEffect {
 /// The logo: two stacked world chips with a VS badge on the seam.
 struct Wordmark: View {
     var scale: CGFloat = 1
+    /// Geometry and lettering share this, so the chips grow with the words inside them.
+    private var k: CGFloat { scale * UI.scale }
 
     var body: some View {
         ZStack {
-            VStack(spacing: 8 * scale) {
+            VStack(spacing: 8 * k) {
                 chip("HIS WORLD", Theme.his)
                 chip("HER WORLD", Theme.hers)
             }
             ZStack {
-                Circle().fill(Theme.goldDeep).offset(y: 3 * scale)
+                Circle().fill(Theme.goldDeep).offset(y: 3 * k)
                 Circle().fill(Theme.gold)
-                Circle().stroke(Theme.ink, lineWidth: 3 * scale)
-                Text("VS").font(.logo(18 * scale)).foregroundStyle(Theme.ink)
+                Circle().stroke(Theme.ink, lineWidth: 3 * k)
+                Text("VS").font(.logo(18 * k)).foregroundStyle(Theme.ink)
             }
-            .frame(width: 48 * scale, height: 48 * scale)
+            .frame(width: 48 * k, height: 48 * k)
             .rotationEffect(.degrees(-8))
         }
     }
 
     private func chip(_ text: String, _ color: Color) -> some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 18 * scale, style: .continuous).fill(color.mix(with: .black, by: 0.3)).offset(y: 6 * scale)
-            RoundedRectangle(cornerRadius: 18 * scale, style: .continuous).fill(color)
-            RoundedRectangle(cornerRadius: 18 * scale, style: .continuous)
+            RoundedRectangle(cornerRadius: 18 * k, style: .continuous).fill(color.mix(with: .black, by: 0.3)).offset(y: 6 * k)
+            RoundedRectangle(cornerRadius: 18 * k, style: .continuous).fill(color)
+            RoundedRectangle(cornerRadius: 18 * k, style: .continuous)
                 .fill(LinearGradient(colors: [.white.opacity(0.18), .clear], startPoint: .top, endPoint: .center))
-            RoundedRectangle(cornerRadius: 18 * scale, style: .continuous).stroke(Theme.ink, lineWidth: 3 * scale)
-            Text(text).font(.logo(36 * scale)).foregroundStyle(.white)
+            RoundedRectangle(cornerRadius: 18 * k, style: .continuous).stroke(Theme.ink, lineWidth: 3 * k)
+            Text(text).font(.logo(36 * k)).foregroundStyle(.white)
         }
-        .frame(width: 270 * scale, height: 66 * scale)
+        .frame(width: 270 * k, height: 66 * k)
     }
 }
 

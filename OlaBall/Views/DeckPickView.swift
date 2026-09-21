@@ -10,9 +10,8 @@ struct DeckPickView: View {
         let world = target.answers
         let decks = Decks.decks(in: world)
         let who = target.name
-        ZStack {
-            GameBackground(world: world)
-            ScrollView(showsIndicators: false) {
+        Stage(GameBackground(world: world)) {
+            StageScroll {
                 VStack(spacing: 14) {
                     MatchHeader(controller: controller)
                     VStack(spacing: 4) {

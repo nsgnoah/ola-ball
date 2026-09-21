@@ -146,6 +146,44 @@ struct ControllerTests {
         func save(_ s: MatchState) async throws { state = s }
     }
 
+    /// An online (Game Center) transport: two separate phones, so it is nobody's "pass the phone".
+    /// `isMyTurn` is whether the local side owns the turn, exactly as GameCenterTransport reports it.
+    final class OnlineTransport: MatchTransport {
+        var state: MatchState
+        var localID: String
+        var submissions = 0
+        init(state: MatchState, localID: String) { self.state = state; self.localID = localID }
+        var activePlayerID: String { localID }
+        var activePlayerName: String { state.player(localID)?.name ?? "Noah" }
+        var activePlayerWorld: World { state.player(localID)?.world ?? .his }
+        var isMyTurn: Bool { state.turnPlayerID == nil || state.turnPlayerID == localID }
+        var isPassAndPlay: Bool { false }
+        func submitTurn(_ s: MatchState) async throws {
+            submissions += 1
+            state = s
+            // Game Center hands the turn to the other participant regardless of what the payload says.
+            state.turnPlayerID = s.players.first(where: { $0.id != localID })?.id
+        }
+        func save(_ s: MatchState) async throws { state = s }
+    }
+
+    /// The creator of an online match opens it before anyone has accepted. There is no opponent in
+    /// the state yet, so there is nothing to pick and nothing to answer: the turn has to go over so
+    /// the other side can join. Regression test for a match that was dead on arrival.
+    @MainActor
+    @Test func aNewOnlineMatchHandsTheFirstTurnOver() async throws {
+        let seed = MatchState(seed: 42, creator: .solo(id: "a", name: "Noah", world: .his))
+        let transport = OnlineTransport(state: seed, localID: "a")
+        let c = MatchController(state: seed, transport: transport)
+
+        c.start(announce: true)
+        try await Task.sleep(for: .milliseconds(150))
+
+        #expect(transport.submissions == 1, "the seed state must reach Game Center")
+        #expect(transport.state.turnPlayerID != "a", "the turn must go to the opponent")
+        #expect(c.stage == .waiting)
+    }
+
     /// Drives a controller to the end. Side "a" answers everything right; side "b" always taps option 0.
     @MainActor
     private static func playOut(_ c: MatchController) async throws -> Int {

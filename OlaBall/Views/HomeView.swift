@@ -15,9 +15,8 @@ struct HomeView: View {
     @State private var openGCMatch: GKTurnBasedMatch?
 
     var body: some View {
-        ZStack {
-            GameBackground(top: Theme.violet, bottom: Theme.violetDeep)
-            ScrollView(showsIndicators: false) {
+        Stage(GameBackground(top: Theme.violet, bottom: Theme.violetDeep)) {
+            StageScroll {
                 VStack(spacing: 18) {
                     header
                     if let p = profiles.profile { youCard(p) }
@@ -71,7 +70,16 @@ struct HomeView: View {
         .onChange(of: gc.activeMatchID) { _, id in
             guard let id, let m = gc.matches.first(where: { $0.matchID == id }) else { return }
             gc.activeMatchID = nil
-            openGCMatch = m
+            // The matchmaker is usually still on screen here, and a full-screen cover asked for
+            // from behind a sheet is silently dropped. Close the sheet first and open the match
+            // once it has actually gone, the same hand-off the team sheet does above.
+            if showMatchmaker || showMyTeam {
+                showMatchmaker = false
+                showMyTeam = false
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { openGCMatch = m }
+            } else {
+                openGCMatch = m
+            }
         }
         .confirmationDialog("Start over?", isPresented: $showResetConfirm, titleVisibility: .visible) {
             Button("Reset profile and pass-and-play matches", role: .destructive) { localMatches.reset(); profiles.reset() }
@@ -219,7 +227,7 @@ struct HomeView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text("\(a.name.uppercased()) VS \(b?.name.uppercased() ?? "?")").font(.headline(20)).foregroundStyle(Theme.ink).lineLimit(1).minimumScaleFactor(0.6)
                 Text((state.mode == .teams ? "Couples · " : "") + (state.status == .finished ? "Final · \(state.winnerID.flatMap { state.player($0)?.name }.map { "\($0) won" } ?? "Tie")" : "Round \(max(1, state.rounds.count)) · \(turnName)'s move"))
-                    .font(.body(12)).foregroundStyle(Theme.ink2).lineLimit(1).minimumScaleFactor(0.8)
+                    .font(.body(12)).foregroundStyle(Theme.ink2).lineLimit(2).minimumScaleFactor(0.7)
             }
             Spacer()
             VStack(alignment: .trailing, spacing: 3) {
@@ -288,9 +296,8 @@ struct NewLocalMatchSheet: View {
     }
 
     var body: some View {
-        ZStack {
-            GameBackground(top: Theme.violet, bottom: Theme.violetDeep)
-            ScrollView(showsIndicators: false) {
+        Stage(GameBackground(top: Theme.violet, bottom: Theme.violetDeep)) {
+            StageScroll {
                 VStack(alignment: .leading, spacing: 14) {
                     Kicker("PASS & PLAY")
                     StickerText("WHO'S PLAYING?", size: TypeScale.title, alignment: .leading)

@@ -72,13 +72,19 @@ final class PassAndPlayTransport: MatchTransport {
     var isMyTurn: Bool { true }
     var isPassAndPlay: Bool { true }
 
+    // Both of these are called from detached Tasks, so `self.state` is assigned on the main actor
+    // alongside the store write rather than on whatever thread the Task happened to get.
     func submitTurn(_ state: MatchState) async throws {
-        self.state = state
-        await MainActor.run { store.update(id, state) }
+        await MainActor.run {
+            self.state = state
+            store.update(id, state)
+        }
     }
 
     func save(_ state: MatchState) async throws {
-        self.state = state
-        await MainActor.run { store.update(id, state) }
+        await MainActor.run {
+            self.state = state
+            store.update(id, state)
+        }
     }
 }

@@ -72,14 +72,16 @@ struct SideAvatars: View {
     var size: CGFloat = 36
 
     var body: some View {
+        // Avatar scales itself, so it gets the raw size; the layout around it needs the scaled one.
+        let s = UI.s(size)
         if player.isTeam {
             ZStack {
                 ForEach(Array(player.members.enumerated()), id: \.element.id) { i, m in
                     Avatar(name: m.name, world: m.knows, size: size)
-                        .offset(x: CGFloat(i) * size * 0.55 - size * 0.27)
+                        .offset(x: CGFloat(i) * s * 0.55 - s * 0.27)
                 }
             }
-            .frame(width: size * 1.6, height: size)
+            .frame(width: s * 1.6, height: s)
         } else {
             Avatar(name: player.name, world: player.world, size: size)
         }
@@ -95,13 +97,15 @@ struct JoinTeamView: View {
 
     var body: some View {
         let challenger = controller.state.players.first
-        ScrollView(showsIndicators: false) {
+        Stage(GameBackground(top: Theme.violet, bottom: Theme.violetDeep)) {
+            StageScroll {
             VStack(spacing: 14) {
                 HStack {
                     Button { onClose() } label: {
                         Glyph(kind: .close, size: 15, weight: 18)
                             .frame(width: 44, height: 44).background(.white.opacity(0.2), in: Circle())
                     }
+                    .accessibilityLabel("Close")
                     Spacer()
                 }
                 Kicker("COUPLE VS COUPLE")
@@ -129,7 +133,8 @@ struct JoinTeamView: View {
             }
             .padding(20)
         }
-        .scrollDismissesKeyboard(.interactively)
+            .scrollDismissesKeyboard(.interactively)
+        }
         .onAppear { draft = .mine(from: profiles.profile) }
     }
 
@@ -149,8 +154,7 @@ struct MyTeamSheet: View {
     @State private var draft = TeamDraft()
 
     var body: some View {
-        ZStack {
-            GameBackground(top: Theme.violet, bottom: Theme.violetDeep)
+        Stage(GameBackground(top: Theme.violet, bottom: Theme.violetDeep)) {
             VStack(alignment: .leading, spacing: 14) {
                 Kicker("COUPLE VS COUPLE")
                 StickerText("YOUR COUPLE", size: TypeScale.title, alignment: .leading)

@@ -54,5 +54,15 @@ struct RootView: View {
             }
         }
         .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+        .background(
+            // The canvas scale is measured HERE and nowhere else. RootView is always the whole
+            // window; a Stage inside a half-height sheet is not, and letting one of those report
+            // its geometry would shrink the entire app behind the sheet and never restore it.
+            GeometryReader { geo in
+                Color.clear
+                    .onAppear { Viewport.shared.fit(geo.size) }
+                    .onChange(of: geo.size) { _, size in Viewport.shared.fit(size) }
+            }
+        )
     }
 }

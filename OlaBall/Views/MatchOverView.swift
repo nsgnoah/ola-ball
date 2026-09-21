@@ -14,8 +14,7 @@ struct MatchOverView: View {
         let winner = s.winnerID
         let iWon = winner == me
         let winnerWorld = winner.flatMap { s.player($0)?.world }
-        ZStack {
-            if let w = winnerWorld { GameBackground(world: w) } else { GameBackground(top: Theme.violet, bottom: Theme.violetDeep) }
+        Stage(winnerWorld.map { GameBackground(world: $0) } ?? GameBackground(top: Theme.violet, bottom: Theme.violetDeep)) {
             VStack(spacing: 14) {
                 MatchHeader(controller: controller, onClose: onClose)
                 Spacer()
@@ -23,7 +22,7 @@ struct MatchOverView: View {
                 TrophyIcon(size: 96)
                     .scaleEffect(pop ? 1 : 0.2).rotationEffect(.degrees(pop ? 0 : 20))
                 StickerText(winner == nil ? "IT'S A TIE" : (iWon ? "YOU WIN" : "\(s.player(winner!)?.name.uppercased() ?? "THEY") WINS"), size: TypeScale.display)
-                    .padding(.top, -8)
+                    .padding(.top, UI.s(-8))
                     .accessibilityIdentifier("match-over")
                 HStack(spacing: 12) {
                     ForEach(s.players) { p in

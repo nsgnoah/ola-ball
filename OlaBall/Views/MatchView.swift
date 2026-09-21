@@ -10,8 +10,10 @@ struct MatchView: View {
     }
 
     var body: some View {
-        ZStack {
-            GameBackground(top: Theme.violet, bottom: Theme.violetDeep)
+        // No Stage here on purpose: every screen below brings its own full-bleed Stage. Nesting one
+        // Stage inside another clips the inner background to the outer play column, which shows up
+        // on an iPad as a seam down both sides of the screen.
+        Group {
             switch controller.stage {
             case .setupTeam:
                 JoinTeamView(controller: controller) { dismiss() }
@@ -56,8 +58,10 @@ struct MatchHeader: View {
                     .background(.white.opacity(0.2), in: Circle())
             }
             .accessibilityIdentifier("close-match")
+            .accessibilityLabel("Close match")
             if let mine { side(mine, leading: true) }
             Text("VS").font(.headline(18)).foregroundStyle(Theme.gold)
+                .shadow(color: Theme.ink.opacity(0.6), radius: 1, y: 1)
             if let them {
                 side(them, leading: false)
             } else {
@@ -86,20 +90,22 @@ struct HandoffView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
-        VStack(spacing: 18) {
-            Spacer()
-            HandoffIcon(size: 96)
-                .rotationEffect(.degrees(bounce ? 6 : -6))
-                .onAppear { if !reduceMotion { withAnimation(.easeInOut(duration: 0.4).repeatForever(autoreverses: true)) { bounce = true } } }
-            Kicker("HAND THE PHONE TO")
-            StickerText(name.uppercased(), size: TypeScale.display)
-            OlaSays(text: "No peeking. Their questions are next.")
-            Spacer()
-            Button(name.contains("&") ? "We're ready" : "I'm \(name), let's go") { Haptics.tap(); onContinue() }
-                .buttonStyle(ChunkyButtonStyle(color: Theme.gold))
-                .accessibilityIdentifier("handoff-continue")
+        Stage(GameBackground(top: Theme.violet, bottom: Theme.violetDeep)) {
+            VStack(spacing: 18) {
+                Spacer()
+                HandoffIcon(size: 96)
+                    .rotationEffect(.degrees(bounce ? 6 : -6))
+                    .onAppear { if !reduceMotion { withAnimation(.easeInOut(duration: 0.4).repeatForever(autoreverses: true)) { bounce = true } } }
+                Kicker("HAND THE PHONE TO")
+                StickerText(name.uppercased(), size: TypeScale.display)
+                OlaSays(text: "No peeking. Their questions are next.")
+                Spacer()
+                Button(name.contains("&") ? "We're ready" : "I'm \(name), let's go") { Haptics.tap(); onContinue() }
+                    .buttonStyle(ChunkyButtonStyle(color: Theme.gold))
+                    .accessibilityIdentifier("handoff-continue")
+            }
+            .padding(20)
         }
-        .padding(20)
     }
 }
 
@@ -109,8 +115,7 @@ struct RoundIntroView: View {
 
     var body: some View {
         let deck = controller.deck
-        ZStack {
-            if let deck { GameBackground(top: deck.color, bottom: deck.color.mix(with: .black, by: 0.35)) }
+        Stage(GameBackground(top: deck?.color ?? Theme.violet, bottom: (deck?.color ?? Theme.violet).mix(with: .black, by: 0.35))) {
             VStack(spacing: 14) {
                 MatchHeader(controller: controller)
                 Spacer()
@@ -121,7 +126,7 @@ struct RoundIntroView: View {
                     }
                     Kicker("ROUND \(round) OF \(MatchState.maxRounds) · \(MatchEngine.roundLabel(round))")
                     StickerText(deck.title.uppercased(), size: TypeScale.title)
-                        .padding(.top, -6)
+                        .padding(.top, UI.s(-6))
                     OlaSays(text: introLine(deck))
                 }
                 HStack(spacing: 10) {
@@ -162,22 +167,24 @@ struct WaitingView: View {
     let onClose: () -> Void
 
     var body: some View {
-        VStack(spacing: 16) {
-            MatchHeader(controller: controller, onClose: onClose)
-            Spacer()
-            if let deck = Decks.all.randomElement() { Mascot(deck: deck, mood: .think, size: 130) }
-            Kicker("THEIR MOVE")
-            StickerText("\(controller.partner?.name.uppercased() ?? "YOUR PARTNER")'S TURN", size: TypeScale.title)
-            OlaSays(text: controller.transport.isPassAndPlay ? "Hand the phone over when they're ready." : "You'll get a notification when they've played. Go live your life.")
-            if let err = controller.error {
-                Text(err).font(.body(13)).foregroundStyle(Theme.gold)
+        Stage(GameBackground(top: Theme.violet, bottom: Theme.violetDeep)) {
+            VStack(spacing: 16) {
+                MatchHeader(controller: controller, onClose: onClose)
+                Spacer()
+                if let deck = Decks.all.randomElement() { Mascot(deck: deck, mood: .think, size: 130) }
+                Kicker("THEIR MOVE")
+                StickerText("\(controller.partner?.name.uppercased() ?? "YOUR PARTNER")'S TURN", size: TypeScale.title)
+                OlaSays(text: controller.transport.isPassAndPlay ? "Hand the phone over when they're ready." : "You'll get a notification when they've played. Go live your life.")
+                if let err = controller.error {
+                    Text(err).font(.body(13)).foregroundStyle(Theme.gold)
+                }
+                RoundHistory(controller: controller)
+                Spacer()
+                Button("Back to matches") { onClose() }
+                    .buttonStyle(ChunkyButtonStyle(color: .white, edge: Theme.panelEdge, ink: Theme.ink))
             }
-            RoundHistory(controller: controller)
-            Spacer()
-            Button("Back to matches") { onClose() }
-                .buttonStyle(ChunkyButtonStyle(color: .white, edge: Theme.panelEdge, ink: Theme.ink))
+            .padding(20)
         }
-        .padding(20)
     }
 }
 

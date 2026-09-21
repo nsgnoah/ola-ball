@@ -8,14 +8,15 @@ struct ProfileSetupView: View {
     @State private var wiggle = false
 
     var body: some View {
-        ZStack {
-            GameBackground(top: Theme.violet, bottom: Theme.violetDeep)
-            ScrollView(showsIndicators: false) {
+        Stage(GameBackground(top: Theme.violet, bottom: Theme.violetDeep)) {
+            StageScroll {
                 VStack(spacing: 18) {
                     VStack(spacing: 2) {
                         Kicker("OLA · TRIVIA FOR TWO")
                         Text("WHOSE WORLD").font(.headline(TypeScale.heading)).foregroundStyle(.white.opacity(0.85))
-                        StickerText("DO YOU KNOW?", size: TypeScale.display).padding(.top, -10)
+                        // No negative nudge here: in a narrow column this headline wraps to two
+                        // lines, and pulling a two-line block upward prints it through the line above.
+                        StickerText("DO YOU KNOW?", size: TypeScale.display)
                     }
                     .padding(.top, 10)
 
@@ -92,7 +93,7 @@ struct ProfileSetupView: View {
                 }
                 .padding(.top, 8)
                 Spacer(minLength: 6)
-                StickerText(w == .hers ? "HER" : "HIS", size: 44, alignment: .leading).padding(.bottom, -8)
+                StickerText(w == .hers ? "HER" : "HIS", size: 44, alignment: .leading).padding(.bottom, UI.s(-8))
                 Text("WORLD").font(.headline(22)).foregroundStyle(.white.opacity(0.9))
                 Text(w == .hers ? "Beauty, fashion, rom-coms, reality TV, divas, weddings, books, wellness, gossip" : "Football, ball sports, cars, grilling, games, gear, movies, tech, fights")
                     .font(.bodyRegular(11)).foregroundStyle(.white.opacity(0.85)).fixedSize(horizontal: false, vertical: true)
@@ -104,7 +105,7 @@ struct ProfileSetupView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing).padding(10)
             }
         }
-        .frame(height: 230)
+        .frame(minHeight: UI.s(230))   // grows with its contents; a fixed height spills on iPad
         .overlay(RoundedRectangle(cornerRadius: 22, style: .continuous).stroke(.white, lineWidth: selected ? 4 : 0))
         .scaleEffect(selected ? 1.03 : 1)
     }
