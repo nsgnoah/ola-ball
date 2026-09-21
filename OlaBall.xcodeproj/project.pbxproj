@@ -19,6 +19,7 @@
 		58F461118BB141E893F6BB83 /* DeckPickView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEC18DC118B64D620B3C4C41 /* DeckPickView.swift */; };
 		59F765E87EC9483A42F2F1FE /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE971345D0D0B52CBD12D47E /* Theme.swift */; };
 		5A1C8929194DA71E785A15EF /* MatchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E203D87F0E7CB5372D1FD009 /* MatchView.swift */; };
+		5F49C474D23A1FFFFF91C632 /* AppIconTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F50E274F9D578F3D22935FC /* AppIconTests.swift */; };
 		6EEAF1FD324119800F2F8AA5 /* GameCenterService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF129FB9BE919EA90D155D6F /* GameCenterService.swift */; };
 		6F68C78D975C20107B782A85 /* HUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = C73634D2584CBC365EF159CD /* HUD.swift */; };
 		74CB55D11BAB7D198CB16C02 /* HisWorld.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDE8A422DAB70CEA66FC2A8F /* HisWorld.swift */; };
@@ -71,6 +72,7 @@
 		2FB54E8A2979C8D2D7C0446D /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		32D1360B80554459203E8CBE /* IconSheetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconSheetTests.swift; sourceTree = "<group>"; };
 		3444FB08B7B10BEBCA817D62 /* MatchState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchState.swift; sourceTree = "<group>"; };
+		3F50E274F9D578F3D22935FC /* AppIconTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIconTests.swift; sourceTree = "<group>"; };
 		42FD7D91A6A0FB34BF0E6D81 /* PlayThroughUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayThroughUITests.swift; sourceTree = "<group>"; };
 		4619BF5131B14EB8A4306BE4 /* MatchEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchEngine.swift; sourceTree = "<group>"; };
 		493AAD598997A2CDF0026970 /* HisWorldMore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HisWorldMore.swift; sourceTree = "<group>"; };
@@ -196,6 +198,7 @@
 		8C81A8D1BB04A19F94AD82BE /* OlaBallTests */ = {
 			isa = PBXGroup;
 			children = (
+				3F50E274F9D578F3D22935FC /* AppIconTests.swift */,
 				AA774E78CE553708DD4C4BBF /* EngineTests.swift */,
 				32D1360B80554459203E8CBE /* IconSheetTests.swift */,
 			);
@@ -404,6 +407,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5F49C474D23A1FFFFF91C632 /* AppIconTests.swift in Sources */,
 				1BEA5EFDFC038E5EB924DEE4 /* EngineTests.swift in Sources */,
 				C0EC44E247ACF29E9929905C /* IconSheetTests.swift in Sources */,
 			);
@@ -477,7 +481,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -536,7 +540,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;

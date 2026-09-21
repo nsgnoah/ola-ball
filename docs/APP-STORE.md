@@ -12,7 +12,7 @@ Status as of September 20, 2026. The code side is ready; what remains is App Sto
 | Privacy manifest, no tracking, no collected data | `OlaBall/PrivacyInfo.xcprivacy` (UserDefaults reason CA92.1) |
 | No permission prompts, no third-party SDKs | nothing in `Info.plist`, no packages |
 | Export compliance | `ITSAppUsesNonExemptEncryption = false` in `Info.plist` |
-| 1024×1024 icon, no alpha | `OlaBall/Resources/Assets.xcassets/AppIcon.appiconset/icon.png` |
+| 1024×1024 icon, no alpha, not blank | `icon.png`, rendered and guarded by `OlaBallTests/AppIconTests.swift` |
 | Launch screen; portrait on iPhone, all orientations on iPad; universal (device family 1,2) | `project.yml` |
 | Version 1.0, build 1 | `project.yml` (`MARKETING_VERSION`, `CURRENT_PROJECT_VERSION`; bump the build for every upload) |
 | Dynamic Type up to xxLarge, Reduce Motion, 44pt targets | `Views/Theme.swift`, `Views/HUD.swift` |
@@ -83,6 +83,14 @@ football app and unrelated.
 A note on screenshot sizes: the iPhone slot wants **6.5-inch** (1242x2688 or 1284x2778), and rejects
 the 6.9-inch 1320x2868 set. `./scripts/store_shots.sh <udid>` against an iPhone 14 Plus or 13 Pro Max
 simulator produces 1284x2778. The iPad slot takes 2064x2752 directly.
+
+**Build 2 supersedes build 1.** Build 1's app icon was a solid black square: the old generator
+script drew a design and then silently lost it while stripping the alpha channel. Build 2 carries a
+real icon, rendered by `OlaBallTests/AppIconTests.swift` from the app's own palette, and that test now
+fails if the icon ever comes out as one flat colour or carries alpha. Attach build 2, not build 1.
+
+TestFlight: internal group "Family", automatic distribution on, with Noah (noah@nsgsolutions.co) and
+Alex Dye (alexandrad.1999@icloud.com, Customer Support role, app access Ola Ball and Spinola only).
 
 Also done: **price set to free** across all 175 regions, and **build 1.0 (1) uploaded** on
 September 20, 2026 at 11:32 PM. It was re-archived first, because the previous archive predated the
