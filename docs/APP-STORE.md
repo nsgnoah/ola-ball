@@ -22,6 +22,10 @@ Status as of September 20, 2026. The code side is ready; what remains is App Sto
 
 ## Before you upload
 
+0. **Agree to the Apple Developer Program License Agreement.** Done on September 20, 2026. Until it is signed, Apple refuses to create the App ID, the provisioning profile, or any certificate, and `xcodebuild archive` fails with "PLA Update available" rather than anything about your code. If it ever reappears, it is at [developer.apple.com/account](https://developer.apple.com/account) as a banner.
+
+   While you are there: the account has **no card on file for auto-renew**. That does not block this submission, but if the membership lapses, apps come off the App Store.
+
 1. **Test Game Center on two real iPhones.** It is the one path the simulator can't exercise. Put a TestFlight build on your phone and your wife's, sign both into Game Center (Settings > Game Center), start "Challenge your partner", and play a full match both directions. Also try "Challenge another couple" with a second pair if you can. A crash here is the likeliest rejection.
 2. **Pick the App Store name.** "Ola" is taken (the ride-hailing app), and App Store names must be unique. Suggested: **Ola: His World vs Her World** (27 characters, under the 30 limit). The name on the home screen stays "Ola" (`CFBundleDisplayName`), that's separate.
 3. **Host the privacy policy and a support page.** `docs/privacy-policy.md` needs a public URL, for example a page on nsgsolutions.co or GitHub Pages from this repo. App Store Connect requires it.
@@ -86,6 +90,21 @@ xcodebuild -project OlaBall.xcodeproj -scheme OlaBall -configuration Release -de
 
 ```bash
 xcodebuild -exportArchive -archivePath build/Ola.xcarchive -exportOptionsPlist scripts/ExportOptions.plist -exportPath build/export -allowProvisioningUpdates DEVELOPMENT_TEAM=S6QW7SV228
+```
+
+Both of these were run on September 20, 2026 and passed. The exported `.ipa` came back signed by
+`Apple Distribution: Noah Greensweig (S6QW7SV228)`, with `get-task-allow` false and
+`com.apple.developer.game-center` true, which is the only place that entitlement can be confirmed:
+simulator builds are ad-hoc signed and drop it.
+
+Note the archive itself is development-signed; that is normal. The export step re-signs it for
+distribution, which is what the checks above are looking at.
+
+To produce an `.ipa` on disk without uploading, use `scripts/ExportOptions-local.plist` instead,
+which is identical except it writes to `build/export`:
+
+```bash
+xcodebuild -exportArchive -archivePath build/Ola.xcarchive -exportOptionsPlist scripts/ExportOptions-local.plist -exportPath build/export -allowProvisioningUpdates
 ```
 
 Verify the entitlement made it in before exporting:
