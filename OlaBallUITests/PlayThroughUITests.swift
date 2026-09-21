@@ -56,6 +56,35 @@ final class PlayThroughUITests: XCTestCase {
         snap(app, "11-privacy")
     }
 
+    /// Every empty name field in the new-match sheet must show a placeholder people can read.
+    /// Noah found the first-launch one invisible on a real phone; the pass-and-play fields had the
+    /// same pale system placeholder and no play-through ever opened this sheet empty to show it.
+    /// This captures both modes so the screenshots can be looked at, not just the code.
+    func testNewMatchSheetFieldsShowPlaceholders() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-ui-testing-reset", "-ui-testing-seed"]
+        app.launch()
+        XCTAssertTrue(app.buttons["new-local-match"].waitForExistence(timeout: 10))
+        app.buttons["new-local-match"].tap()
+
+        // Me vs my partner: one empty field.
+        let partner = app.textFields["partner-name"]
+        XCTAssertTrue(partner.waitForExistence(timeout: 5))
+        XCTAssertEqual(partner.placeholderValue, "Partner's first name")
+        snap(app, "12-new-match-couple")
+
+        // Our couple vs theirs: the name fields for both couples.
+        app.buttons["mode-teams"].tap()
+        let teamFields = app.textFields.matching(NSPredicate(format: "identifier BEGINSWITH 'team-name-'"))
+        XCTAssertTrue(teamFields.firstMatch.waitForExistence(timeout: 5))
+        XCTAssertGreaterThan(teamFields.count, 0)
+        for i in 0..<teamFields.count {
+            let f = teamFields.element(boundBy: i)
+            XCTAssertFalse((f.placeholderValue ?? "").isEmpty, "team field \(i) has no placeholder")
+        }
+        snap(app, "13-new-match-teams")
+    }
+
     func testPassAndPlayMatch() {
         let app = XCUIApplication()
         app.launchArguments = ["-ui-testing-reset", "-ui-testing-seed"]
