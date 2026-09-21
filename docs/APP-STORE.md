@@ -60,49 +60,55 @@ Status as of September 20, 2026. The code side is ready; what remains is App Sto
 
 ## App Store Connect
 
-1. **Certificates, Identifiers & Profiles**: automatic signing in Xcode creates the App ID `co.nsgsolutions.spinola` and turns on the Game Center capability the first time you archive with your team selected. Your team ID is `S6QW7SV228` (from the Apple Development certificate on this Mac). Only that development certificate exists here; Xcode creates the distribution certificate on the first archive. Simulator builds are ad-hoc signed and drop the Game Center entitlement (Xcode keeps only the app identifier there), so the entitlement can only be verified on the archive: after archiving, run the check under "Archive and upload" and expect `com.apple.developer.game-center`.
-2. **New app**: the details are in "Create a new app record" above. SKU `spinola`.
-3. **Features > Game Center**: enable Game Center for the app. No leaderboards or achievements needed; turn-based matches work with just the toggle. Then, on the version page, under Game Center, tick it for 1.0.
-4. **App Privacy**: answer "No, we do not collect data from this app." This matches the privacy manifest. Game Center's own data is Apple's.
-5. **Age rating**: answer the questionnaire honestly and let App Store Connect calculate the rating. Do not assume a number in advance, and do not trim content to chase a lower one: the test suite asserts every deck holds exactly 36 questions with 12 per tier, so pulling questions means authoring tier-matched replacements.
+The app record exists: **Spinola: Couples Trivia**, Apple ID **6814338074**, bundle ID
+`co.nsgsolutions.spinola`, SKU `spinola`. Set up on September 20, 2026. Do not confuse it with the
+old "Ola Ball" record (Apple ID 6756221325, bundle ID `com.olaball.app`), which is last winter's
+football app and unrelated.
 
-   Declare at least these:
-   - **Alcohol, Tobacco, or Drug Use or References → Infrequent/Mild.** The "Grilling, Beer & Whiskey" deck asks factual questions about beer and whiskey.
-   - **Contests.** Apple's descriptor covers competitive quizzes, and that is the whole game. Read Apple's current definition and pick the frequency it describes rather than answering "None".
-   - **Health or wellness topics.** The wellness deck covers sleep, fasting and supplements (`Content/HerWorldMore.swift`). Check whether any question reads as medical advice; factual questions about a drug or a supplement still belong in this descriptor.
-   - **Mature or suggestive themes.** The romance, reality-TV and celebrity decks deal in dating and relationships. This is a separate descriptor from sexual content and nudity, which the app does not have.
-   - **Violence references.** A handful of questions name a hammer, a boxer's bite, and an action film's plot. These are text references, not depictions. Read each descriptor's wording before answering; several will be "None".
+### Done
 
-   Everything else None; Unrestricted Web Access No; no gambling.
+| Item | Value |
+|---|---|
+| Name / subtitle | Spinola: Couples Trivia / His World vs Her World |
+| Category | Games > Trivia |
+| Description, keywords, support URL, copyright | filled; keywords are 91 of 100 bytes |
+| Privacy Policy URL | `https://nsgnoah.github.io/ola/privacy.html` |
+| Support URL | `https://nsgnoah.github.io/ola/` |
+| App Privacy | Data Not Collected, **saved but not yet published** |
+| Age rating | 13+ in 172 regions (16+ Vietnam, 12+ Korea, 12+ on OS older than 26) |
+| Screenshots | 4 iPhone at 1284x2778, 4 iPad at 2064x2752 |
+| App Review notes | full walkthrough, sign-in explicitly not required |
+| Review contact | Noah Greensweig, noah@nsgsolutions.co |
 
-   Apple replaced 12+ and 17+ with 13+, 16+ and 18+ in 2025, but the older tiers still apply on older OS versions, which matters here because the deployment target is iOS 17. App Store Connect works this out from the answers, so give it accurate ones and read the result rather than predicting it.
+A note on screenshot sizes: the iPhone slot wants **6.5-inch** (1242x2688 or 1284x2778), and rejects
+the 6.9-inch 1320x2868 set. `./scripts/store_shots.sh <udid>` against an iPhone 14 Plus or 13 Pro Max
+simulator produces 1284x2778. The iPad slot takes 2064x2752 directly.
 
-6. **Category**: Games > Trivia (secondary: Games > Family or Word).
-7. **Screenshots**: the app is universal, so App Store Connect needs BOTH sizes: 6.9" iPhone (1320×2868) and 13" iPad (2064×2752). `scripts/store_shots.sh` plays a real match and saves the set (home, hand-off, wheel, round intro, question, answered, reveal, match over); pick 3 to 6 of each.
+### Left to do, and why each one is yours
 
-   ```bash
-   ./scripts/store_shots.sh && ./scripts/store_shots.sh ipad
-   ```
+1. **Phone number** in App Review Information. Required, and it blocks Save on the version page. It
+   needs a `+` and the country code.
+2. **Publish the App Privacy responses.** The button asks you to attest the answers are accurate and
+   legally compliant. That attestation is yours to make, so it was deliberately left unclicked.
+3. **Pricing and Availability.** Not set. Free is implied by everything else here, but the price of
+   your own app is a decision, not a default.
+4. **Upload the build**, then tick **Game Center** on the version page. That checkbox stays greyed
+   out until a build carrying the entitlement has been processed.
+5. **Test on two real devices**, then **Add for Review**.
 
-   They land in `build/shots-store/iphone` (1320×2868) and `build/shots-store/ipad` (2064×2752),
-   ten each: home, the match list, the wheel, hand-off, round intro, a question, an answered
-   question, the round reveal, the final screen, and the home screen afterwards. Both directories
-   are gitignored; upload them straight from disk. Good picks for a listing are the wheel, a
-   question, the round reveal and the final screen, in that order.
-8. **Description** (draft):
+### Age-rating answers that were judgement calls
 
-   > A trivia game for two people who share a couch and not a knowledge base. Declare the world you know, His World or Her World, then pick what your partner gets quizzed on: football, cars, grilling, tech and fight night on one side; skincare, fashion, rom-coms, reality TV and pop divas on the other. Seven questions a round, fifteen seconds each, difficulty climbing from Rookie to Legend. First to three crowns wins. Play from two phones through Game Center, or pass one phone back and forth. Couples mode lets your team take on another couple.
+Worth a sanity check, because they set the 13+ rather than a lower rating:
 
-9. **Keywords**: Apple allows 100 bytes, commas and spaces included, so no spaces after the commas. This is 91:
-
-   ```
-   couples,trivia,date night,quiz,pass and play,sports,pop culture,party,two player,game night
-   ```
-
-   Do not repeat words already in the app name or subtitle; Apple indexes those separately.
-10. **Review notes** (paste into "Notes for review"):
-
-   > No account or login is required. First launch asks only for a first name and which "world" you know; nothing is verified or sent. Everything the reviewer needs is then on the home screen under "Pass & play": tap "New pass & play", enter two names, and play a full match on one device; hand-offs are shown on screen. "Online, two phones" uses Apple's Game Center turn-based matches only, with no server of ours, and needs two Game Center accounts on two devices; pass-and-play exercises the same rules, decks, and screens. Trivia content is factual public knowledge about sports, cars, beauty, fashion, film, TV, and music. Real people, products and titles are named in both questions and answers as matters of fact, with no endorsement or affiliation implied. The privacy policy is in the app under "Privacy & support" in the home-screen menu.
+- **Contests: Frequent.** Apple defines it as users competing for rankings or rewards, which is the
+  entire game.
+- **Alcohol: Infrequent.** The grilling deck asks about beer and whiskey. This is also why the app
+  will not be sold in Afghanistan or Morocco.
+- **Mature or suggestive themes: Infrequent.** Romance, reality TV and celebrity decks.
+- **Health or wellness topics: Yes.** The wellness deck covers sleep, fasting and supplements.
+- **Realistic violence and weapons: Infrequent.** Fight-night and action-movie decks reference real
+  physical conflict. Arguably None, since these are text trivia rather than depictions; under-
+  declaring risks a re-rate, so it was answered the conservative way.
 
 ## Archive and upload
 
