@@ -109,7 +109,7 @@ struct HomeView: View {
 
     private var header: some View {
         VStack(spacing: 12) {
-            Kicker("OLA · TRIVIA FOR TWO")
+            Kicker("SPINOLA · TRIVIA FOR TWO")
             Wordmark()
             Text("Pick what your partner gets quizzed on. They pick yours. First to three crowns.")
                 .font(.body(13)).foregroundStyle(.white.opacity(0.85))

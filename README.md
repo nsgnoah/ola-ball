@@ -1,4 +1,4 @@
-# Ola — His World vs Her World
+# Spinola — His World vs Her World
 
 A trivia game for two people who share a couch and not a knowledge base.
 

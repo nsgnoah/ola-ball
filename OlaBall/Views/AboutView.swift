@@ -20,7 +20,7 @@ struct AboutView: View {
             StageScroll {
                 VStack(alignment: .leading, spacing: 16) {
                     HStack {
-                        Kicker("OLA")
+                        Kicker("SPINOLA")
                         Spacer()
                         Button { onClose() } label: {
                             Glyph(kind: .close, size: 15, weight: 18)
@@ -35,16 +35,16 @@ struct AboutView: View {
 
                     VStack(alignment: .leading, spacing: 14) {
                         section("THE SHORT VERSION",
-                                "Ola has no accounts, no servers of ours, and no analytics. There is no service of ours for your data to go to, and we never receive it.")
+                                "Spinola has no accounts, no servers of ours, and no analytics. There is no service of ours for your data to go to, and we never receive it.")
 
                         section("WHAT STAYS ON YOUR PHONE",
                                 "Your profile, a first name and which world you know, and any pass-and-play matches are stored in the app on this phone. Clear them any time with Start over on the home screen, or by deleting the app.")
 
                         section("WHAT ONLINE PLAY SENDS",
-                                "Playing from two phones uses Apple's Game Center. To carry a match between phones, Ola puts the match into Game Center: the first names entered on both sides, including a partner's name if you typed one, the identifier Game Center gives each player, which world each person answers, the decks chosen, each answer, the scores, and how long each answer took.\n\nApple stores that match and shows it to the other side, and holds it under Apple's Game Center privacy policy.\n\nIf you would rather not share a real name, use a nickname.")
+                                "Playing from two phones uses Apple's Game Center. To carry a match between phones, Spinola puts the match into Game Center: the first names entered on both sides, including a partner's name if you typed one, the identifier Game Center gives each player, which world each person answers, the decks chosen, each answer, the scores, and how long each answer took.\n\nApple stores that match and shows it to the other side, and holds it under Apple's Game Center privacy policy.\n\nIf you would rather not share a real name, use a nickname.")
 
                         section("REMOVING A MATCH",
-                                "Once a match has finished, a delete button appears beside it, and Game Center lets you remove matches from its own screens. Either way this removes your copy only. The other player keeps theirs, with the names and answers still in it, and there is no way for Ola or for you to delete their copy.\n\nStart over is separate: it clears what is on this phone and touches nothing held by Game Center.")
+                                "Once a match has finished, a delete button appears beside it, and Game Center lets you remove matches from its own screens. Either way this removes your copy only. The other player keeps theirs, with the names and answers still in it, and there is no way for Spinola or for you to delete their copy.\n\nStart over is separate: it clears what is on this phone and touches nothing held by Game Center.")
 
                         section("NOTHING ELSE LEAVES",
                                 "No network requests other than Game Center's. No advertising, no tracking, no third-party SDKs, and no device permissions: no contacts, no location, no photos, no microphone.")

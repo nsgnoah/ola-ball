@@ -1,4 +1,4 @@
-# Ola
+# Spinola
 
 Native SwiftUI iOS trivia game for couples (iOS 17+, iPhone and iPad). Two "worlds": His World and Her World. Two modes: **couple** (you vs your partner: each declares the world they know and is quizzed on the other's) and **teams** (your couple vs another couple: each member has a lane, the world they answer, and the other couple picks a deck per member; scores add up). Five rounds, seven questions each, difficulty escalates from Rookie to Legend, first to three crowns wins. Async on two phones through Game Center turn-based matches (one phone per side, a couple shares theirs), or pass-and-play on one phone.
 

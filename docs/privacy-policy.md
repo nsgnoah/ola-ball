@@ -1,8 +1,8 @@
-# Ola Privacy Policy
+# Spinola Privacy Policy
 
 _Last updated: September 20, 2026_
 
-Ola has no accounts, no servers of ours, and no analytics. There is no service of ours for your
+Spinola has no accounts, no servers of ours, and no analytics. There is no service of ours for your
 data to go to, and we never receive it.
 
 ## What stays on your device
@@ -13,7 +13,7 @@ deleting the app.
 
 ## What online play sends, and who sees it
 
-Playing from two phones uses Apple's Game Center. To carry a match between phones, Ola puts the
+Playing from two phones uses Apple's Game Center. To carry a match between phones, Spinola puts the
 match itself into Game Center. That match contains:
 
 - the first names entered on both sides, including a partner's name if you typed one for couples play
@@ -25,10 +25,10 @@ match itself into Game Center. That match contains:
 Apple stores that match and shows it to the other side, and to their partner in couples play. Apple
 holds it under [Apple's Game Center privacy policy](https://www.apple.com/legal/privacy/data/en/game-center/).
 
-**Removing a match.** Once a match has finished, Ola shows a delete button beside it; Game Center
+**Removing a match.** Once a match has finished, Spinola shows a delete button beside it; Game Center
 also lets you remove matches from its own screens. Either way this removes **your** copy only. The
 other player keeps theirs, and their copy still contains the names and answers from the match. There
-is no way for Ola, or for you, to delete their copy. "Start over" inside Ola is separate again: it
+is no way for Spinola, or for you, to delete their copy. "Start over" inside Spinola is separate again: it
 clears what is on your device and touches nothing held by Game Center.
 
 If you would rather not share a real name, use a nickname. Nothing else is asked for: no email, no
@@ -36,12 +36,12 @@ password, no contacts, no location, and no device permissions.
 
 ## Nothing else leaves the device
 
-Ola makes no network requests other than Game Center's. There are no analytics, no advertising, no
+Spinola makes no network requests other than Game Center's. There are no analytics, no advertising, no
 third-party SDKs, and no tracking of any kind.
 
 ## Children
 
-Ola is made for adults playing together. It collects nothing from anyone, children included.
+Spinola is made for adults playing together. It collects nothing from anyone, children included.
 
 ## Questions
 

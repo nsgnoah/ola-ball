@@ -12,7 +12,7 @@ struct ProfileSetupView: View {
             StageScroll {
                 VStack(spacing: 18) {
                     VStack(spacing: 2) {
-                        Kicker("OLA · TRIVIA FOR TWO")
+                        Kicker("SPINOLA · TRIVIA FOR TWO")
                         Text("WHOSE WORLD").font(.headline(TypeScale.heading)).foregroundStyle(.white.opacity(0.85))
                         // No negative nudge here: in a narrow column this headline wraps to two
                         // lines, and pulling a two-line block upward prints it through the line above.

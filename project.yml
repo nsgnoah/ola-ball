@@ -18,7 +18,7 @@ targets:
     info:
       path: OlaBall/Info.plist
       properties:
-        CFBundleDisplayName: Ola
+        CFBundleDisplayName: Spinola
         # Without these the generated Info.plist freezes literal 1.0/1 and bumping the build number
         # in the settings above silently does nothing - which bites on the SECOND upload, not the first.
         CFBundleShortVersionString: $(MARKETING_VERSION)
@@ -34,7 +34,7 @@ targets:
         com.apple.developer.game-center: true
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: co.nsgsolutions.olaball
+        PRODUCT_BUNDLE_IDENTIFIER: co.nsgsolutions.spinola
         TARGETED_DEVICE_FAMILY: "1,2"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor

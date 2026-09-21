@@ -1,4 +1,4 @@
-# Ola — Status / Handoff
+# Spinola — Status / Handoff
 
 _Updated: 2026-09-20 20:00 CDT_
 

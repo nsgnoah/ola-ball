@@ -1,4 +1,4 @@
-# Submitting Ola to the App Store
+# Submitting Spinola to the App Store
 
 Status as of September 20, 2026. The code side is ready; what remains is App Store Connect setup, a real-device Game Center test, and the upload.
 
@@ -27,7 +27,23 @@ Status as of September 20, 2026. The code side is ready; what remains is App Sto
    While you are there: the account has **no card on file for auto-renew**. That does not block this submission, but if the membership lapses, apps come off the App Store.
 
 1. **Test Game Center on two real iPhones.** It is the one path the simulator can't exercise. Put a TestFlight build on your phone and your wife's, sign both into Game Center (Settings > Game Center), start "Challenge your partner", and play a full match both directions. Also try "Challenge another couple" with a second pair if you can. A crash here is the likeliest rejection.
-2. **Pick the App Store name.** "Ola" is taken (the ride-hailing app), and App Store names must be unique. Suggested: **Ola: His World vs Her World** (27 characters, under the 30 limit). The name on the home screen stays "Ola" (`CFBundleDisplayName`), that's separate.
+2. **Create a new app record, named Spinola.** Do not try to reuse the existing "Ola Ball" record in App Store Connect: it is the old football app, its bundle ID is `com.olaball.app`, and ours is `co.nsgsolutions.spinola`. A bundle ID cannot be changed once a record exists, so this has to be a new record.
+
+   - **Name:** `Spinola: Couples Trivia` (23 characters, inside Apple's 30 limit). Plain "Ola" was never viable, because the ride-hailing company holds it.
+   - **Bundle ID:** `co.nsgsolutions.spinola`, **SKU:** `spinola`, primary language English (U.S.).
+   - The home-screen name stays the single word **Spinola** (`CFBundleDisplayName`), which is separate from the store name.
+   - Ola is the host character inside the game and keeps her name. The app is Spinola; you spin Ola's wheel.
+
+   **What sank the old submission, for reference.** "Ola Ball" 1.0 was rejected in December 2025 on three counts, all of which are structurally impossible in this build:
+
+   | Apple's finding | Why it cannot recur |
+   |---|---|
+   | 2.1 Completeness: "An error message occurred when we try to sign up with Apple" | There is no sign-up, no Sign in with Apple, and no account of any kind |
+   | 2.1 Information Needed: wanted a demo account with pre-populated content | Nothing is behind a login; pass-and-play reaches every screen |
+   | 2.1 Information Needed: questions about paid digital content and the business model | There is no paid content, no in-app purchase, and no subscription |
+
+   Note they reviewed on an **iPad Air running iPadOS 26.1**. Apple reviews on iPad, which is why this version is a proper universal build rather than a letterboxed phone app.
+
 3. **Host the privacy policy and a support page.** `docs/privacy-policy.md` needs a public URL, for example a page on nsgsolutions.co or GitHub Pages from this repo. App Store Connect requires it.
 
    The Support URL must be a **web page**, not a `mailto:` link. A single short page with the contact address and a line about what the app is will do; it can sit next to the policy.
@@ -36,8 +52,8 @@ Status as of September 20, 2026. The code side is ready; what remains is App Sto
 
 ## App Store Connect
 
-1. **Certificates, Identifiers & Profiles**: automatic signing in Xcode creates the App ID `co.nsgsolutions.olaball` and turns on the Game Center capability the first time you archive with your team selected. Your team ID is `S6QW7SV228` (from the Apple Development certificate on this Mac). Only that development certificate exists here; Xcode creates the distribution certificate on the first archive. Simulator builds are ad-hoc signed and drop the Game Center entitlement (Xcode keeps only the app identifier there), so the entitlement can only be verified on the archive: after archiving, run the check under "Archive and upload" and expect `com.apple.developer.game-center`.
-2. **New app**: platform iOS, name from step 2 above, primary language English (U.S.), bundle ID `co.nsgsolutions.olaball`, SKU `olaball`.
+1. **Certificates, Identifiers & Profiles**: automatic signing in Xcode creates the App ID `co.nsgsolutions.spinola` and turns on the Game Center capability the first time you archive with your team selected. Your team ID is `S6QW7SV228` (from the Apple Development certificate on this Mac). Only that development certificate exists here; Xcode creates the distribution certificate on the first archive. Simulator builds are ad-hoc signed and drop the Game Center entitlement (Xcode keeps only the app identifier there), so the entitlement can only be verified on the archive: after archiving, run the check under "Archive and upload" and expect `com.apple.developer.game-center`.
+2. **New app**: the details are in "Create a new app record" above. SKU `spinola`.
 3. **Features > Game Center**: enable Game Center for the app. No leaderboards or achievements needed; turn-based matches work with just the toggle. Then, on the version page, under Game Center, tick it for 1.0.
 4. **App Privacy**: answer "No, we do not collect data from this app." This matches the privacy manifest. Game Center's own data is Apple's.
 5. **Age rating**: answer the questionnaire honestly and let App Store Connect calculate the rating. Do not assume a number in advance, and do not trim content to chase a lower one: the test suite asserts every deck holds exactly 36 questions with 12 per tier, so pulling questions means authoring tier-matched replacements.
@@ -85,11 +101,11 @@ Status as of September 20, 2026. The code side is ready; what remains is App Sto
 Run from the repo root with your team ID:
 
 ```bash
-xcodebuild -project OlaBall.xcodeproj -scheme OlaBall -configuration Release -destination 'generic/platform=iOS' -archivePath build/Ola.xcarchive archive -allowProvisioningUpdates DEVELOPMENT_TEAM=S6QW7SV228
+xcodebuild -project OlaBall.xcodeproj -scheme OlaBall -configuration Release -destination 'generic/platform=iOS' -archivePath build/Spinola.xcarchive archive -allowProvisioningUpdates DEVELOPMENT_TEAM=S6QW7SV228
 ```
 
 ```bash
-xcodebuild -exportArchive -archivePath build/Ola.xcarchive -exportOptionsPlist scripts/ExportOptions.plist -exportPath build/export -allowProvisioningUpdates DEVELOPMENT_TEAM=S6QW7SV228
+xcodebuild -exportArchive -archivePath build/Spinola.xcarchive -exportOptionsPlist scripts/ExportOptions.plist -exportPath build/export -allowProvisioningUpdates DEVELOPMENT_TEAM=S6QW7SV228
 ```
 
 Both of these were run on September 20, 2026 and passed. The exported `.ipa` came back signed by
@@ -104,13 +120,13 @@ To produce an `.ipa` on disk without uploading, use `scripts/ExportOptions-local
 which is identical except it writes to `build/export`:
 
 ```bash
-xcodebuild -exportArchive -archivePath build/Ola.xcarchive -exportOptionsPlist scripts/ExportOptions-local.plist -exportPath build/export -allowProvisioningUpdates
+xcodebuild -exportArchive -archivePath build/Spinola.xcarchive -exportOptionsPlist scripts/ExportOptions-local.plist -exportPath build/export -allowProvisioningUpdates
 ```
 
 Verify the entitlement made it in before exporting:
 
 ```bash
-codesign -d --entitlements - build/Ola.xcarchive/Products/Applications/OlaBall.app | grep game-center
+codesign -d --entitlements - build/Spinola.xcarchive/Products/Applications/OlaBall.app | grep game-center
 ```
 
 `scripts/ExportOptions.plist` uploads straight to App Store Connect (method `app-store-connect`, destination `upload`); it needs Xcode signed in to your Apple ID (Xcode > Settings > Accounts). Or open the `.xcarchive` in Xcode's Organizer and click Distribute. Then in App Store Connect: TestFlight for the two-phone test, then "Add for Review" on the 1.0 version.
