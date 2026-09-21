@@ -20,8 +20,20 @@ final class SoundKit {
     func start() {
         guard !started else { return }
         started = true
-        try? AVAudioSession.sharedInstance().setCategory(.ambient, options: [.mixWithOthers])
-        try? AVAudioSession.sharedInstance().setActive(true)
+
+        // If the session will not activate, the audio server is not answering. Touching
+        // AVAudioEngine after that can abort the process from inside CoreAudio (an RPC timeout
+        // calls abort(), which no Swift error handling can catch), so give up and run silently.
+        // A game with no sound is a small loss; a game that dies on launch is a rejection.
+        let session = AVAudioSession.sharedInstance()
+        do {
+            try session.setCategory(.ambient, options: [.mixWithOthers])
+            try session.setActive(true)
+        } catch {
+            isEnabled = false
+            return
+        }
+
         for _ in 0..<6 {
             let p = AVAudioPlayerNode()
             engine.attach(p)
