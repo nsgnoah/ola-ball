@@ -21,6 +21,17 @@ Audited September 20, 2026 by Codex. **Original recommendation: do not submit ye
 > the docs has been narrowed to "up to xxLarge" rather than the cap being lifted. Both are 1.1 work.
 > Several age-rating descriptors (contests, violence) remain judgement calls for App Store Connect's
 > own questionnaire; the guidance now tells the reader to answer them rather than assume "None".
+>
+> **Second round.** All four follow-ups verified against the source and three acted on. The policy
+> now names the Game Center player identifier and explains that removing a match removes *your* copy
+> only, which is what `GKTurnBasedMatch.remove` actually does. The waiting screen no longer claims
+> "their turn" after a failed upload; it says the round is still on this phone, and leaving asks
+> first rather than silently discarding it. `GameCenterService.remove` was dead code that nothing
+> called, so the policy would have described a capability the app did not offer: it is now a delete
+> button on finished online matches, which is the only state Apple permits removal in. The two
+> genuinely open items, publishing the policy and support pages and validating a signed archive,
+> are gates that need an Apple ID and hosting; `AboutView.policyURL` is one line to set once the
+> page is live.
 
 Scope: repository source/configuration, privacy policy and submission drafts, content screening, existing screenshot dimensions and two visual samples, a fresh simulator test run, and an unsigned Release device build. Apple requirements were checked against the official pages linked below. App Store Connect, public policy/support pages, a signed distribution archive, and two-device Game Center behavior were not verified. This is an audit, not an implementation change or assurance of approval.
 

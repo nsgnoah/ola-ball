@@ -10,6 +10,11 @@ struct AboutView: View {
 
     private let support = "noah@nsgsolutions.co"
 
+    /// Set this to the published policy URL once it is live, and the button below appears.
+    /// Left empty on purpose: a link that 404s is worse than no link, and the full text is here
+    /// anyway, which is what matters when someone has no signal.
+    private let policyURL = ""
+
     var body: some View {
         Stage(GameBackground(top: Theme.violet, bottom: Theme.violetDeep)) {
             StageScroll {
@@ -36,7 +41,10 @@ struct AboutView: View {
                                 "Your profile, a first name and which world you know, and any pass-and-play matches are stored in the app on this phone. Clear them any time with Start over on the home screen, or by deleting the app.")
 
                         section("WHAT ONLINE PLAY SENDS",
-                                "Playing from two phones uses Apple's Game Center. To carry a match between phones, Ola puts the match into Game Center: the first names entered on both sides, including a partner's name if you typed one, which world each person answers, the decks chosen, each answer, the scores, and how long each answer took.\n\nApple stores that match and shows it to the other side. It is held under Apple's Game Center privacy policy and stays there until the match is removed from Game Center. Start over inside Ola clears only what is on this phone.\n\nIf you would rather not share a real name, use a nickname.")
+                                "Playing from two phones uses Apple's Game Center. To carry a match between phones, Ola puts the match into Game Center: the first names entered on both sides, including a partner's name if you typed one, the identifier Game Center gives each player, which world each person answers, the decks chosen, each answer, the scores, and how long each answer took.\n\nApple stores that match and shows it to the other side, and holds it under Apple's Game Center privacy policy.\n\nIf you would rather not share a real name, use a nickname.")
+
+                        section("REMOVING A MATCH",
+                                "Once a match has finished, a delete button appears beside it, and Game Center lets you remove matches from its own screens. Either way this removes your copy only. The other player keeps theirs, with the names and answers still in it, and there is no way for Ola or for you to delete their copy.\n\nStart over is separate: it clears what is on this phone and touches nothing held by Game Center.")
 
                         section("NOTHING ELSE LEAVES",
                                 "No network requests other than Game Center's. No advertising, no tracking, no third-party SDKs, and no device permissions: no contacts, no location, no photos, no microphone.")
@@ -45,6 +53,15 @@ struct AboutView: View {
                                 "Questions, bugs, or a wrong answer you want corrected: \(support)")
                     }
                     .panel(padding: 16)
+
+                    if let url = URL(string: policyURL), !policyURL.isEmpty {
+                        Link(destination: url) {
+                            Text("Read this policy on the web")
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(ChunkyButtonStyle(color: .white, edge: Theme.panelEdge, ink: Theme.ink, height: 48, fontSize: 17))
+                        .accessibilityIdentifier("policy-link")
+                    }
 
                     Text("Version \(version)")
                         .font(.label(11)).foregroundStyle(.white.opacity(0.7))

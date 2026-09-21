@@ -141,7 +141,22 @@ struct HomeView: View {
                         .font(.body(14)).foregroundStyle(.white.opacity(0.85))
                 }
                 ForEach(gc.matches, id: \.matchID) { m in
-                    Button { openGCMatch = m } label: { matchRow(gc: m) }.buttonStyle(.plain)
+                    HStack(spacing: 8) {
+                        Button { openGCMatch = m } label: { matchRow(gc: m) }.buttonStyle(.plain)
+                        // Game Center only allows removing a match that has ended, and removing it
+                        // takes it off this phone's list only; the other player keeps their copy.
+                        if m.status == .ended {
+                            Button {
+                                Haptics.tap()
+                                Task { await gc.remove(m) }
+                            } label: {
+                                Glyph(kind: .trash, size: 17)
+                                    .frame(width: 44, height: 44)
+                                    .background(.white.opacity(0.2), in: Circle())
+                            }
+                            .accessibilityLabel("Remove match from my list")
+                        }
+                    }
                 }
                 Button {
                     Haptics.tap()

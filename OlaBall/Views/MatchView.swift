@@ -168,16 +168,24 @@ struct WaitingView: View {
     /// Picked once. Chosen inside `body` it changed on every redraw, so the mascot flickered
     /// through decks whenever anything else on the screen moved.
     @State private var companion = Decks.all.randomElement()
+    @State private var confirmLeave = false
+
+    /// The last turn failed to reach Game Center. It is still only on this phone.
+    private var unsent: Bool { controller.error != nil }
 
     var body: some View {
         Stage(GameBackground(top: Theme.violet, bottom: Theme.violetDeep)) {
             VStack(spacing: 16) {
-                MatchHeader(controller: controller, onClose: onClose)
+                MatchHeader(controller: controller, onClose: attemptClose)
                 Spacer()
-                if let companion { Mascot(deck: companion, mood: .think, size: 130) }
-                Kicker("THEIR MOVE")
-                StickerText("\(controller.partner?.name.uppercased() ?? "YOUR PARTNER")'S TURN", size: TypeScale.title)
-                OlaSays(text: controller.transport.isPassAndPlay ? "Hand the phone over when they're ready." : "You'll get a notification when they've played. Go live your life.")
+                if let companion { Mascot(deck: companion, mood: unsent ? .sad : .think, size: 130) }
+                // Saying "their turn" when the upload failed is simply untrue: the move never left
+                // this phone. Say what actually happened.
+                Kicker(unsent ? "STILL ON THIS PHONE" : "THEIR MOVE")
+                StickerText(unsent ? "NOT SENT YET" : "\(controller.partner?.name.uppercased() ?? "YOUR PARTNER")'S TURN", size: TypeScale.title)
+                OlaSays(text: unsent
+                        ? "Your last turn didn't reach them. Try again when you have a signal."
+                        : (controller.transport.isPassAndPlay ? "Hand the phone over when they're ready." : "You'll get a notification when they've played. Go live your life."))
                 if let err = controller.error {
                     VStack(spacing: 8) {
                         Text(err).font(.body(13)).foregroundStyle(Theme.gold)
@@ -191,11 +199,23 @@ struct WaitingView: View {
                 }
                 RoundHistory(controller: controller)
                 Spacer()
-                Button("Back to matches") { onClose() }
+                Button("Back to matches") { attemptClose() }
                     .buttonStyle(ChunkyButtonStyle(color: .white, edge: Theme.panelEdge, ink: Theme.ink))
             }
             .padding(20)
         }
+        .confirmationDialog("This round hasn't been sent", isPresented: $confirmLeave, titleVisibility: .visible) {
+            Button("Try again") { controller.retrySubmit() }
+            Button("Leave and lose it", role: .destructive) { onClose() }
+            Button("Stay", role: .cancel) {}
+        } message: {
+            Text("Your answers are only on this phone. Leaving now means playing the round again.")
+        }
+    }
+
+    /// Leaving with an unsent turn throws the round away, so say so rather than letting it vanish.
+    private func attemptClose() {
+        if unsent { confirmLeave = true } else { onClose() }
     }
 }
 
