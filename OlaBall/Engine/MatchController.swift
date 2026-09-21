@@ -265,6 +265,15 @@ final class MatchController {
     /// Saves the current state without blocking the UI. The snapshot matters: `state` is a value
     /// this class keeps mutating on the main thread, and handing it to a Task by reference would let
     /// the save read it mid-edit.
+    /// Re-sends a turn whose submit failed. Nothing was lost locally, but the other phone never
+    /// received the move, so the match would sit on "their turn" forever with no way forward.
+    func retrySubmit() {
+        guard !isSubmitting else { return }
+        error = nil
+        stage = .waiting
+        Task { await finishTurn() }
+    }
+
     private func saveInBackground() {
         let snapshot = state
         Task { try? await transport.save(snapshot) }

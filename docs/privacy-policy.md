@@ -1,11 +1,43 @@
 # Ola Privacy Policy
 
-_Last updated: September 19, 2026_
+_Last updated: September 20, 2026_
 
-Ola does not collect, store, transmit, or share personal information on its own.
+Ola has no accounts, no servers of ours, and no analytics. There is no service of ours for your
+data to go to, and we never receive it.
 
-- The app has no accounts of its own. Online play uses Apple's Game Center, governed by Apple's privacy policy.
-- Your local profile (a first name and which "world" you know) and pass-and-play matches are stored only on your device. Erase them any time with "Start over" on the home screen, or by deleting the app.
-- The app makes no network requests other than Game Center's, uses no analytics or advertising, and requests no device permissions.
+## What stays on your device
 
-Questions: noah@nsgsolutions.co
+Your profile, which is a first name and which "world" you know, and any pass-and-play matches are
+stored in the app on your device. Clear them any time with "Start over" on the home screen, or by
+deleting the app.
+
+## What online play sends, and who sees it
+
+Playing from two phones uses Apple's Game Center. To carry a match between phones, Ola puts the
+match itself into Game Center. That match contains:
+
+- the first names entered on both sides, including a partner's name if you typed one for couples play
+- which world each person answers
+- the decks chosen each round
+- each answer given, the scores, and how long each answer took
+
+Apple stores that match and shows it to the other side, and to their partner in couples play. Apple
+holds it under [Apple's Game Center privacy policy](https://www.apple.com/legal/privacy/data/en/game-center/),
+and it stays with Game Center until the match is removed there. "Start over" inside Ola clears only
+what is on your device; it does not delete matches held by Game Center.
+
+If you would rather not share a real name, use a nickname. Nothing else is asked for: no email, no
+password, no contacts, no location, and no device permissions.
+
+## Nothing else leaves the device
+
+Ola makes no network requests other than Game Center's. There are no analytics, no advertising, no
+third-party SDKs, and no tracking of any kind.
+
+## Children
+
+Ola is made for adults playing together. It collects nothing from anyone, children included.
+
+## Questions
+
+noah@nsgsolutions.co

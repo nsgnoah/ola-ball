@@ -25,6 +25,7 @@
 		8E631903C32C14300494A5B9 /* Deck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EF87EC98B16EA70A371B33 /* Deck.swift */; };
 		940AA0EBBFDDA52F9BA03469 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 2FB54E8A2979C8D2D7C0446D /* PrivacyInfo.xcprivacy */; };
 		94AE96AAEB3500F00E4AA693 /* MatchState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3444FB08B7B10BEBCA817D62 /* MatchState.swift */; };
+		9B1FEDA86E8F3396FE22964F /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DC4D5F275B63FD8BB80C5B5 /* AboutView.swift */; };
 		A1785D359D2A584230BDDF12 /* LocalMatchStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054E7DDEEDE5959AAB629146 /* LocalMatchStore.swift */; };
 		AEEDEB34ABBC9F0941E1BEFC /* QuestionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4DC20F9EC8D03260CB9287F /* QuestionView.swift */; };
 		AF9902D84797CBA9A9FC2B80 /* MatchEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4619BF5131B14EB8A4306BE4 /* MatchEngine.swift */; };
@@ -63,6 +64,7 @@
 		0E7B7B61C3E9D8589EAFA6E7 /* OlaBallTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = OlaBallTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		18F064202EEBD07686BA9389 /* OlaBallApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OlaBallApp.swift; sourceTree = "<group>"; };
 		1AC9C84534845ADF1307187A /* OlaBallUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = OlaBallUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		1DC4D5F275B63FD8BB80C5B5 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 		1EE4CDAAEF5AE6ED2B95A9E0 /* HerWorldMore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HerWorldMore.swift; sourceTree = "<group>"; };
 		26EF87EC98B16EA70A371B33 /* Deck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Deck.swift; sourceTree = "<group>"; };
 		29AE2497FBB3AE71C7F0F61F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -100,6 +102,7 @@
 		2AD2D2AE42326F87D7C6FB37 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				1DC4D5F275B63FD8BB80C5B5 /* AboutView.swift */,
 				BEC18DC118B64D620B3C4C41 /* DeckPickView.swift */,
 				AF4E4A92D9971125574E14E3 /* HomeView.swift */,
 				C73634D2584CBC365EF159CD /* HUD.swift */,
@@ -367,6 +370,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9B1FEDA86E8F3396FE22964F /* AboutView.swift in Sources */,
 				8E631903C32C14300494A5B9 /* Deck.swift in Sources */,
 				58F461118BB141E893F6BB83 /* DeckPickView.swift in Sources */,
 				6EEAF1FD324119800F2F8AA5 /* GameCenterService.swift in Sources */,

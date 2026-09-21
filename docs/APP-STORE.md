@@ -15,15 +15,18 @@ Status as of September 20, 2026. The code side is ready; what remains is App Sto
 | 1024×1024 icon, no alpha | `OlaBall/Resources/Assets.xcassets/AppIcon.appiconset/icon.png` |
 | Launch screen; portrait on iPhone, all orientations on iPad; universal (device family 1,2) | `project.yml` |
 | Version 1.0, build 1 | `project.yml` (`MARKETING_VERSION`, `CURRENT_PROJECT_VERSION`; bump the build for every upload) |
-| Dynamic Type, Reduce Motion, 44pt targets | `Views/Theme.swift`, `Views/HUD.swift` |
+| Dynamic Type up to xxLarge, Reduce Motion, 44pt targets | `Views/Theme.swift`, `Views/HUD.swift` |
+| Privacy policy and support reachable in the app (5.1.1(i), 1.5) | `Views/AboutView.swift`, home menu > "Privacy & support" |
 | iPad layout that is not a stretched phone app | `Viewport`/`UI.scale`, `Stage`/`StageScroll` (see below) |
-| Tests | 14 unit tests, 2 full UI play-throughs |
+| Tests | 14 unit tests, 2 full UI play-throughs, 1 in-app privacy/support check |
 
 ## Before you upload
 
 1. **Test Game Center on two real iPhones.** It is the one path the simulator can't exercise. Put a TestFlight build on your phone and your wife's, sign both into Game Center (Settings > Game Center), start "Challenge your partner", and play a full match both directions. Also try "Challenge another couple" with a second pair if you can. A crash here is the likeliest rejection.
 2. **Pick the App Store name.** "Ola" is taken (the ride-hailing app), and App Store names must be unique. Suggested: **Ola: His World vs Her World** (27 characters, under the 30 limit). The name on the home screen stays "Ola" (`CFBundleDisplayName`), that's separate.
-3. **Host the privacy policy.** `docs/privacy-policy.md` needs a public URL, for example a page on nsgsolutions.co or GitHub Pages from this repo. App Store Connect requires the URL, plus a support URL (a mailto or a page with the same email works).
+3. **Host the privacy policy and a support page.** `docs/privacy-policy.md` needs a public URL, for example a page on nsgsolutions.co or GitHub Pages from this repo. App Store Connect requires it.
+
+   The Support URL must be a **web page**, not a `mailto:` link. A single short page with the contact address and a line about what the app is will do; it can sit next to the policy. The policy is also inside the app now, under "Privacy & support" in the home-screen menu, which is what guideline 5.1.1(i) asks for.
 
 ## App Store Connect
 
@@ -31,12 +34,19 @@ Status as of September 20, 2026. The code side is ready; what remains is App Sto
 2. **New app**: platform iOS, name from step 2 above, primary language English (U.S.), bundle ID `co.nsgsolutions.olaball`, SKU `olaball`.
 3. **Features > Game Center**: enable Game Center for the app. No leaderboards or achievements needed; turn-based matches work with just the toggle. Then, on the version page, under Game Center, tick it for 1.0.
 4. **App Privacy**: answer "No, we do not collect data from this app." This matches the privacy manifest. Game Center's own data is Apple's.
-5. **Age rating**: App Store Connect uses the current questionnaire, which returns 4+/9+/13+/16+/18+ (there is no 12+ any more). Declare honestly:
-   - **Alcohol, Tobacco, or Drug Use or References → Infrequent/Mild.** The "Grilling, Beer & Whiskey" deck asks factual questions about beer and whiskey.
-   - **Sexual Content or Nudity / Mature or Suggestive Themes → Infrequent/Mild.** The romance, reality-TV and celebrity decks deal in dating and relationships.
-   - Everything else **None**; "Unrestricted Web Access" No, no contests, no gambling.
+5. **Age rating**: answer the questionnaire honestly and let App Store Connect calculate the rating. Do not assume a number in advance, and do not trim content to chase a lower one: the test suite asserts every deck holds exactly 36 questions with 12 per tier, so pulling questions means authoring tier-matched replacements.
 
-   Both of those land the app at **13+**, so declaring them costs nothing and removes any chance of a re-rate for under-declaring. Do not trim content to chase 9+: the test suite asserts every deck holds exactly 36 questions with 12 per tier, so pulling questions means authoring tier-matched replacements.
+   Declare at least these:
+   - **Alcohol, Tobacco, or Drug Use or References → Infrequent/Mild.** The "Grilling, Beer & Whiskey" deck asks factual questions about beer and whiskey.
+   - **Contests.** Apple's descriptor covers competitive quizzes, and that is the whole game. Read Apple's current definition and pick the frequency it describes rather than answering "None".
+   - **Health or wellness topics.** The wellness deck covers sleep, fasting and supplements (`Content/HerWorldMore.swift`). Check whether any question reads as medical advice; factual questions about a drug or a supplement still belong in this descriptor.
+   - **Mature or suggestive themes.** The romance, reality-TV and celebrity decks deal in dating and relationships. This is a separate descriptor from sexual content and nudity, which the app does not have.
+   - **Violence references.** A handful of questions name a hammer, a boxer's bite, and an action film's plot. These are text references, not depictions. Read each descriptor's wording before answering; several will be "None".
+
+   Everything else None; Unrestricted Web Access No; no gambling.
+
+   Apple replaced 12+ and 17+ with 13+, 16+ and 18+ in 2025, but the older tiers still apply on older OS versions, which matters here because the deployment target is iOS 17. App Store Connect works this out from the answers, so give it accurate ones and read the result rather than predicting it.
+
 6. **Category**: Games > Trivia (secondary: Games > Family or Word).
 7. **Screenshots**: the app is universal, so App Store Connect needs BOTH sizes: 6.9" iPhone (1320×2868) and 13" iPad (2064×2752). `scripts/store_shots.sh` plays a real match and saves the set (home, hand-off, wheel, round intro, question, answered, reveal, match over); pick 3 to 6 of each.
 
@@ -53,10 +63,16 @@ Status as of September 20, 2026. The code side is ready; what remains is App Sto
 
    > A trivia game for two people who share a couch and not a knowledge base. Declare the world you know, His World or Her World, then pick what your partner gets quizzed on: football, cars, grilling, tech and fight night on one side; skincare, fashion, rom-coms, reality TV and pop divas on the other. Seven questions a round, fifteen seconds each, difficulty climbing from Rookie to Legend. First to three crowns wins. Play from two phones through Game Center, or pass one phone back and forth. Couples mode lets your team take on another couple.
 
-9. **Keywords**: couples trivia, his world, her world, date night game, family game night, quiz for two, pass and play, sports trivia, pop culture trivia.
+9. **Keywords**: Apple allows 100 bytes, commas and spaces included, so no spaces after the commas. This is 91:
+
+   ```
+   couples,trivia,date night,quiz,pass and play,sports,pop culture,party,two player,game night
+   ```
+
+   Do not repeat words already in the app name or subtitle; Apple indexes those separately.
 10. **Review notes** (paste into "Notes for review"):
 
-   > No account or login is required. Everything the reviewer needs is on the home screen under "Pass & play": tap "New pass & play", enter two names, and play a full match on one device; hand-offs are shown on screen. "Online, two phones" uses Apple's Game Center turn-based matches only (no server of ours) and needs two Game Center accounts on two devices; pass-and-play exercises the same rules, decks, and screens. Trivia content is factual public knowledge about sports, cars, beauty, fashion, film, TV, and music; real names and brands appear only as trivia answers.
+   > No account or login is required. First launch asks only for a first name and which "world" you know; nothing is verified or sent. Everything the reviewer needs is then on the home screen under "Pass & play": tap "New pass & play", enter two names, and play a full match on one device; hand-offs are shown on screen. "Online, two phones" uses Apple's Game Center turn-based matches only, with no server of ours, and needs two Game Center accounts on two devices; pass-and-play exercises the same rules, decks, and screens. Trivia content is factual public knowledge about sports, cars, beauty, fashion, film, TV, and music. Real people, products and titles are named in both questions and answers as matters of fact, with no endorsement or affiliation implied. The privacy policy is in the app under "Privacy & support" in the home-screen menu.
 
 ## Archive and upload
 

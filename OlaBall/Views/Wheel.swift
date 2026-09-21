@@ -12,6 +12,8 @@ struct WheelView: View {
     @State private var tickTask: Task<Void, Never>?
     private var k: CGFloat { UI.scale }   // the wheel grows with the canvas
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     private var sliceAngle: Double { 360 / Double(max(1, decks.count)) }
 
     var body: some View {
@@ -127,11 +129,13 @@ struct WheelView: View {
         let target = Int.random(in: 0..<decks.count)
         // Land the target slice under the pointer at the top: slice i is centered at i*slice degrees clockwise from the top,
         // so rotating the wheel by -(i*slice) brings it up. Add whole turns for drama and a little wobble.
-        let turns = Double(Int.random(in: 4...6))
-        let wobble = Double.random(in: -sliceAngle * 0.3...sliceAngle * 0.3)
+        // Reduce Motion turns the spin into a decision, not a ride: the wheel steps straight to the
+        // slice it picked. This is the largest movement in the app, so honouring the setting matters.
+        let turns = reduceMotion ? 0 : Double(Int.random(in: 4...6))
+        let wobble = reduceMotion ? 0 : Double.random(in: -sliceAngle * 0.3...sliceAngle * 0.3)
         let final = turns * 360 - Double(target) * sliceAngle + wobble
         let base = rotation.truncatingRemainder(dividingBy: 360)
-        let duration = 3.4
+        let duration = reduceMotion ? 0.3 : 3.4
         withAnimation(.timingCurve(0.12, 0.85, 0.2, 1.0, duration: duration)) {
             rotation = rotation - base + final
         }

@@ -27,18 +27,26 @@ xcrun simctl bootstatus "$DEVICE" -b >/dev/null
 # A clean, consistent status bar for store shots.
 xcrun simctl status_bar "$DEVICE" override --time "9:41" --cellularBars 4 --batteryState charged --batteryLevel 100 2>/dev/null || true
 
-rm -rf build/shots
+rm -rf "build/shots/$DEVICE"
 
+# pipefail matters: without it the grep's exit status hides a failed test, the script reports
+# success, and an `&&` chain marches on to the next device as if nothing happened.
+set -o pipefail
 xcodebuild test -project OlaBall.xcodeproj -scheme OlaBall \
   -destination "platform=iOS Simulator,id=$DEVICE" \
   -derivedDataPath build/DerivedDataShots \
   -only-testing:OlaBallUITests/PlayThroughUITests/testPassAndPlayMatch 2>&1 \
-  | grep -E "error:|Test Case .* (passed|failed)|TEST (SUCCEEDED|FAILED)"
+  | grep -E "error:|Test Case .* (passed|failed)|TEST (SUCCEEDED|FAILED)" \
+  || { echo; echo "The play-through failed, so there are no screenshots to upload."; \
+       echo "If another tool is running this project's tests at the same time, let it finish first:"; \
+       echo "  pgrep -fl 'xcodebuild test'"; \
+       xcrun simctl shutdown "$DEVICE" 2>/dev/null; exit 1; }
+set +o pipefail
 
-# The test writes to build/shots (xcodebuild does not reliably pass TEST_RUNNER_* through to the
-# runner, so the test falls back to a path beside its own source). Collect them here.
-mv build/shots/*.png "$DIR"/ 2>/dev/null || true
-rm -rf build/shots
+# The test writes to build/shots/<udid>: xcodebuild does not reliably pass TEST_RUNNER_* through to
+# the runner, so the test falls back to a path beside its own source. Collect them here.
+mv "build/shots/$DEVICE"/*.png "$DIR"/ 2>/dev/null || true
+rm -rf "build/shots/$DEVICE"
 
 # Booted simulators hold memory, and on a full disk macOS answers that with swap. Let it go.
 xcrun simctl shutdown "$DEVICE" 2>/dev/null || true

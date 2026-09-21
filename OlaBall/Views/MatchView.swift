@@ -165,18 +165,29 @@ struct RoundIntroView: View {
 struct WaitingView: View {
     let controller: MatchController
     let onClose: () -> Void
+    /// Picked once. Chosen inside `body` it changed on every redraw, so the mascot flickered
+    /// through decks whenever anything else on the screen moved.
+    @State private var companion = Decks.all.randomElement()
 
     var body: some View {
         Stage(GameBackground(top: Theme.violet, bottom: Theme.violetDeep)) {
             VStack(spacing: 16) {
                 MatchHeader(controller: controller, onClose: onClose)
                 Spacer()
-                if let deck = Decks.all.randomElement() { Mascot(deck: deck, mood: .think, size: 130) }
+                if let companion { Mascot(deck: companion, mood: .think, size: 130) }
                 Kicker("THEIR MOVE")
                 StickerText("\(controller.partner?.name.uppercased() ?? "YOUR PARTNER")'S TURN", size: TypeScale.title)
                 OlaSays(text: controller.transport.isPassAndPlay ? "Hand the phone over when they're ready." : "You'll get a notification when they've played. Go live your life.")
                 if let err = controller.error {
-                    Text(err).font(.body(13)).foregroundStyle(Theme.gold)
+                    VStack(spacing: 8) {
+                        Text(err).font(.body(13)).foregroundStyle(Theme.gold)
+                            .multilineTextAlignment(.center)
+                            .fixedSize(horizontal: false, vertical: true)
+                        Button("Try again") { controller.retrySubmit() }
+                            .buttonStyle(ChunkyButtonStyle(color: Theme.gold, height: 48, fontSize: 18))
+                            .accessibilityIdentifier("retry-submit")
+                    }
+                    .padding(.horizontal, 8)
                 }
                 RoundHistory(controller: controller)
                 Spacer()

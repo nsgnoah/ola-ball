@@ -11,6 +11,7 @@ struct HomeView: View {
     @State private var myTeamDraft = TeamDraft()
     @State private var showNewLocal = false
     @State private var showResetConfirm = false
+    @State private var showAbout = false
     @State private var openLocalID: String?
     @State private var openGCMatch: GKTurnBasedMatch?
 
@@ -80,6 +81,9 @@ struct HomeView: View {
             } else {
                 openGCMatch = m
             }
+        }
+        .fullScreenCover(isPresented: $showAbout) {
+            AboutView { showAbout = false }
         }
         .confirmationDialog("Start over?", isPresented: $showResetConfirm, titleVisibility: .visible) {
             Button("Reset profile and pass-and-play matches", role: .destructive) { localMatches.reset(); profiles.reset() }
@@ -266,6 +270,8 @@ struct HomeView: View {
         HStack {
             Spacer()
             Menu {
+                Button("Privacy & support") { showAbout = true }
+                    .accessibilityIdentifier("open-about")
                 Button("Start over", role: .destructive) { showResetConfirm = true }
             } label: {
                 Glyph(kind: .more, size: 18)

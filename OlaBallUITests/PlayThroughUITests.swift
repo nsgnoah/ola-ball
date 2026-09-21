@@ -8,7 +8,10 @@ final class PlayThroughUITests: XCTestCase {
     private var shotDir: String? {
         if let fromEnv = ProcessInfo.processInfo.environment["OLABALL_SHOTS"] { return fromEnv }
         let repo = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
-        let dir = repo.appendingPathComponent("build/shots")
+        // Per-simulator, because more than one run can be in flight at once (another tool on this
+        // Mac runs this same suite) and a shared folder interleaves two runs into one mess.
+        let device = ProcessInfo.processInfo.environment["SIMULATOR_UDID"] ?? "unknown"
+        let dir = repo.appendingPathComponent("build/shots").appendingPathComponent(device)
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         return dir.path
     }
@@ -29,6 +32,28 @@ final class PlayThroughUITests: XCTestCase {
         let url = URL(fileURLWithPath: shotDir).appendingPathComponent("\(name).png")
         do { try XCUIScreen.main.screenshot().pngRepresentation.write(to: url) }
         catch { XCTFail("could not write screenshot \(name) to \(url.path): \(error)") }
+    }
+
+    /// Guideline 5.1.1(i) wants the privacy policy reachable from inside the app, not only from the
+    /// store listing, and 1.5 wants a route to support. Both live behind the home screen's menu.
+    func testPrivacyAndSupportAreReachableInApp() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-ui-testing-reset", "-ui-testing-seed"]
+        app.launch()
+
+        XCTAssertTrue(app.buttons["new-local-match"].waitForExistence(timeout: 10))
+        app.buttons["More"].tap()
+        XCTAssertTrue(app.buttons["open-about"].waitForExistence(timeout: 5))
+        app.buttons["open-about"].tap()
+
+        XCTAssertTrue(app.staticTexts["about-screen"].waitForExistence(timeout: 5),
+                      "the privacy and support screen must be reachable from the home screen")
+        // The things App Review looks for: what online play sends, and a way to make contact.
+        XCTAssertTrue(app.staticTexts.containing(NSPredicate(format: "label CONTAINS[c] %@", "Game Center")).count > 0,
+                      "the policy must say what online play sends")
+        XCTAssertTrue(app.staticTexts.containing(NSPredicate(format: "label CONTAINS[c] %@", "@nsgsolutions.co")).count > 0,
+                      "there must be a support contact")
+        snap(app, "11-privacy")
     }
 
     func testPassAndPlayMatch() {
