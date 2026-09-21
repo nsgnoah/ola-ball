@@ -44,11 +44,19 @@ Status as of September 20, 2026. The code side is ready; what remains is App Sto
 
    Note they reviewed on an **iPad Air running iPadOS 26.1**. Apple reviews on iPad, which is why this version is a proper universal build rather than a letterboxed phone app.
 
-3. **Host the privacy policy and a support page.** `docs/privacy-policy.md` needs a public URL, for example a page on nsgsolutions.co or GitHub Pages from this repo. App Store Connect requires it.
+3. **Privacy and support pages: done.** Both are live, served by GitHub Pages from the public
+   `nsgnoah/ola` repo (the source of truth stays here in `site/`; that repo only publishes it).
 
-   The Support URL must be a **web page**, not a `mailto:` link. A single short page with the contact address and a line about what the app is will do; it can sit next to the policy.
+   | App Store Connect field | URL |
+   |---|---|
+   | Privacy Policy URL | `https://nsgnoah.github.io/ola/privacy.html` |
+   | Support URL | `https://nsgnoah.github.io/ola/` |
 
-   The policy text is already inside the app, under "Privacy & support" in the home-screen menu, which is what guideline 5.1.1(i) asks for. Once the page is live, put its URL in `policyURL` in `OlaBall/Views/AboutView.swift` and a "Read this policy on the web" button appears next to it. It is one line, and it is deliberately empty until the page exists, because a link that 404s in front of a reviewer is worse than no link.
+   The Support URL had to be a web page rather than a `mailto:`, which is why the support page
+   exists. The policy is also inside the app under "Privacy & support" in the home-screen menu,
+   with a link to the hosted copy, which is what guideline 5.1.1(i) asks for.
+
+   To change either page: edit it in `site/`, then copy both into a clone of `nsgnoah/ola` and push.
 
 ## App Store Connect
 

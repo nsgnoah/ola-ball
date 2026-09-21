@@ -10,10 +10,9 @@ struct AboutView: View {
 
     private let support = "noah@nsgsolutions.co"
 
-    /// Set this to the published policy URL once it is live, and the button below appears.
-    /// Left empty on purpose: a link that 404s is worse than no link, and the full text is here
-    /// anyway, which is what matters when someone has no signal.
-    private let policyURL = ""
+    /// Guideline 5.1.1(i) asks for a link to the policy inside the app. The full text is here too,
+    /// so this still works with no signal; the link is for anyone who wants the canonical copy.
+    private let policyURL = "https://nsgnoah.github.io/ola/privacy.html"
 
     var body: some View {
         Stage(GameBackground(top: Theme.violet, bottom: Theme.violetDeep)) {
