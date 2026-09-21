@@ -84,6 +84,10 @@ A note on screenshot sizes: the iPhone slot wants **6.5-inch** (1242x2688 or 128
 the 6.9-inch 1320x2868 set. `./scripts/store_shots.sh <udid>` against an iPhone 14 Plus or 13 Pro Max
 simulator produces 1284x2778. The iPad slot takes 2064x2752 directly.
 
+**Build 3 is attached to version 1.0** (swapped in on September 21, 2026, replacing build 1), with
+Game Center enabled on the version and the review notes and "sign-in not required" confirmed intact
+after the save. "Add for Review" is live.
+
 **Build 3 is the one to submit.** It adds readable text-field placeholders on top of build 2's icon
 fix: the system placeholder is a pale grey that all but vanished on the cream fields, which Noah
 spotted on first launch on a real phone. Every field now uses `Text.placeholder` (ink2, about 6:1 on
