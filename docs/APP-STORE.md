@@ -84,17 +84,23 @@ A note on screenshot sizes: the iPhone slot wants **6.5-inch** (1242x2688 or 128
 the 6.9-inch 1320x2868 set. `./scripts/store_shots.sh <udid>` against an iPhone 14 Plus or 13 Pro Max
 simulator produces 1284x2778. The iPad slot takes 2064x2752 directly.
 
-### Left to do, and why each one is yours
+Also done: **price set to free** across all 175 regions, and **build 1.0 (1) uploaded** on
+September 20, 2026 at 11:32 PM. It was re-archived first, because the previous archive predated the
+commit that set the live policy URL and would have shipped a privacy screen with no link on it.
 
-1. **Phone number** in App Review Information. Required, and it blocks Save on the version page. It
-   needs a `+` and the country code.
-2. **Publish the App Privacy responses.** The button asks you to attest the answers are accurate and
-   legally compliant. That attestation is yours to make, so it was deliberately left unclicked.
-3. **Pricing and Availability.** Not set. Free is implied by everything else here, but the price of
-   your own app is a decision, not a default.
-4. **Upload the build**, then tick **Game Center** on the version page. That checkbox stays greyed
-   out until a build carrying the entitlement has been processed.
-5. **Test on two real devices**, then **Add for Review**.
+### Left to do
+
+1. **Wait for the build to finish processing**, then on the version page pick it under Build and
+   tick **Game Center**. That checkbox stays greyed out until a processed build carrying the
+   entitlement exists.
+2. **Test on two real devices.** Put the TestFlight build on both phones, sign both into Game
+   Center, play a full match each way, and put one phone into airplane mode mid-turn to exercise
+   the failed-upload path. No simulator can do this, and it is the only part of the app that has
+   never run for real.
+3. **Add for Review.**
+
+For any later upload, bump `CURRENT_PROJECT_VERSION` in `project.yml`. That now actually reaches the
+bundle; before today it was a frozen literal and bumping it did nothing.
 
 ### Age-rating answers that were judgement calls
 
