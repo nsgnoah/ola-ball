@@ -1,0 +1,1118 @@
+{
+ "football": [
+  {
+   "prompt": "'The Catch' in January 1982 was Joe Montana's pass to whom?",
+   "correct": "Dwight Clark",
+   "source": "https://en.wikipedia.org/wiki/The_Catch_(American_football)"
+  },
+  {
+   "prompt": "Whose 1975 playoff pass popularized the term 'Hail Mary'?",
+   "correct": "Roger Staubach",
+   "source": "https://www.history.com/articles/hail-mary-pass-roger-staubach-drew-pearson-1975"
+  },
+  {
+   "prompt": "Which Cowboy was Super Bowl V MVP despite losing the game?",
+   "correct": "Chuck Howley",
+   "source": "https://www.profootballhof.com/players/chuck-howley"
+  },
+  {
+   "prompt": "The 1967 'Ice Bowl' was the Packers vs. which team?",
+   "correct": "Dallas Cowboys",
+   "source": "https://en.wikipedia.org/wiki/1967_NFL_Championship_Game"
+  },
+  {
+   "prompt": "Which team drafted John Elway No. 1 overall in 1983?",
+   "correct": "Baltimore Colts",
+   "source": "https://en.wikipedia.org/wiki/John_Elway"
+  },
+  {
+   "prompt": "The NFL was founded in 1920 in a car showroom in which city?",
+   "correct": "Canton, Ohio",
+   "source": "https://www.espn.com/nfl/story/_/id/13673330/nfl-was-born-smoky-ohio-car-showroom-95-years-ago-today"
+  },
+  {
+   "prompt": "Which NFL franchise is the oldest continuously run pro football team?",
+   "correct": "Arizona Cardinals",
+   "source": "https://en.wikipedia.org/wiki/Arizona_Cardinals"
+  },
+  {
+   "prompt": "On defense, who is the 'Mike'?",
+   "correct": "The middle linebacker",
+   "source": "https://en.wikipedia.org/wiki/Linebacker"
+  },
+  {
+   "prompt": "A quarterback's 'hard count' tries to do what?",
+   "correct": "Draw the defense offside",
+   "source": "https://en.wikipedia.org/wiki/Hard_count"
+  },
+  {
+   "prompt": "The 1968 'Heidi Game' is famous because NBC did what?",
+   "correct": "Cut to a movie before the finish",
+   "source": "https://www.history.com/this-day-in-history/november-17/the-heidi-bowl"
+  },
+  {
+   "prompt": "Lamar Hunt said the name 'Super Bowl' came from what?",
+   "correct": "His kids' Super Ball toy",
+   "source": "https://www.history.com/articles/super-bowl-name-nfl-football-origins"
+  },
+  {
+   "prompt": "After a fair catch, an NFL team may try what rare play?",
+   "correct": "A field goal with no snap",
+   "source": "https://en.wikipedia.org/wiki/Fair_catch_kick"
+  }
+ ],
+ "ballsports": [
+  {
+   "prompt": "Which golf major's champion is handed the Claret Jug?",
+   "correct": "The Open Championship",
+   "source": "https://www.theopen.com/latest/claret-jug-all-you-need-to-know"
+  },
+  {
+   "prompt": "What is baseball's 'Mendoza Line'?",
+   "correct": "A .200 batting average",
+   "source": "https://www.mlb.com/glossary/idioms/mendoza-line"
+  },
+  {
+   "prompt": "In baseball, a 'golden sombrero' means what?",
+   "correct": "Striking out four times in a game",
+   "source": "https://www.baseball-reference.com/bullpen/Golden_Sombrero"
+  },
+  {
+   "prompt": "The NBA logo's designer based its silhouette on which player?",
+   "correct": "Jerry West",
+   "source": "https://www.nba.com/news/qa-alan-siegel-creator-of-the-nbas-classic-logo"
+  },
+  {
+   "prompt": "In hockey, what is a 'Gordie Howe hat trick'?",
+   "correct": "A goal, an assist and a fight",
+   "source": "https://en.wikipedia.org/wiki/Gordie_Howe_hat_trick"
+  },
+  {
+   "prompt": "Which trophy goes to the MVP of the NHL playoffs?",
+   "correct": "The Conn Smythe Trophy",
+   "source": "https://en.wikipedia.org/wiki/Conn_Smythe_Trophy"
+  },
+  {
+   "prompt": "After the 'Miracle on Ice,' whom did the U.S. beat to clinch 1980 gold?",
+   "correct": "Finland",
+   "source": "https://teamusa.usahockey.com/news_article/show/1086152"
+  },
+  {
+   "prompt": "In soccer, what is a 'Panenka'?",
+   "correct": "A chipped penalty down the middle",
+   "source": "https://www.uefa.com/uefaeuro/history/news/0253-0d7b2fd33353-cdc961ca4218-1000--panenka-makes-his-name-as-czechoslovakia-beat-west-german/"
+  },
+  {
+   "prompt": "Which country won the first FIFA World Cup in 1930?",
+   "correct": "Uruguay",
+   "source": "https://en.wikipedia.org/wiki/1930_FIFA_World_Cup_final"
+  },
+  {
+   "prompt": "Roland Garros, home of the French Open, is named after a what?",
+   "correct": "A World War I fighter pilot",
+   "source": "https://www.france24.com/en/20150605-roland-garros-aviator-world-war-french-open-fokker"
+  },
+  {
+   "prompt": "In 1988, who won all four tennis majors plus Olympic gold?",
+   "correct": "Steffi Graf",
+   "source": "https://www.olympics.com/ioc/news/steffi-graf-s-1988-golden-slam-an-unprecedented-achievement"
+  },
+  {
+   "prompt": "Arnold Palmer's legion of fans was nicknamed what?",
+   "correct": "Arnie's Army",
+   "source": "https://www.golfmonthly.com/tour/us-masters/masters-history-records/the-birth-of-arnies-army-88841"
+  }
+ ],
+ "fightnight": [
+  {
+   "prompt": "Cassius Clay won Olympic boxing gold at which Games?",
+   "correct": "Rome 1960",
+   "source": "https://www.olympics.com/en/news/muhammad-ali-olympic-gold"
+  },
+  {
+   "prompt": "Modern boxing rules are named after which nobleman?",
+   "correct": "The Marquess of Queensberry",
+   "source": "https://www.britannica.com/sports/Marquess-of-Queensberry-rules"
+  },
+  {
+   "prompt": "The very first UFC event, in 1993, was held in which city?",
+   "correct": "Denver",
+   "source": "https://www.ufc.com/news/revisiting-ufc-1"
+  },
+  {
+   "prompt": "In jiu-jitsu and MMA, a 'kimura' attacks which joint?",
+   "correct": "The shoulder",
+   "source": "https://en.wikipedia.org/wiki/Masahiko_Kimura_vs._H%C3%A9lio_Gracie"
+  },
+  {
+   "prompt": "Who was the first UFC fighter to hold two titles at once?",
+   "correct": "Conor McGregor",
+   "source": "https://www.espn.com/mma/story/_/id/18036210/conor-mcgregor-knocks-eddie-alvarez-win-lightweight-title-ufc-205-madison-square-garden"
+  },
+  {
+   "prompt": "Who was the first heavyweight to hold all four major belts at once?",
+   "correct": "Oleksandr Usyk",
+   "source": "https://www.npr.org/2024/05/19/1252335889/usyk-beats-fury-undisputed-heavyweight-boxing-champion-24-years"
+  },
+  {
+   "prompt": "The 1980 'No Más' fight was Roberto Durán vs. whom?",
+   "correct": "Sugar Ray Leonard",
+   "source": "https://en.wikipedia.org/wiki/Roberto_Dur%C3%A1n_vs._Sugar_Ray_Leonard_II"
+  },
+  {
+   "prompt": "Who was double-crossed out of the title in the 1997 'Montreal Screwjob'?",
+   "correct": "Bret Hart",
+   "source": "https://www.espn.com/wwe/story/_/id/18056671/wwe-survivor-series-moments-montreal-screwjob"
+  },
+  {
+   "prompt": "In pro wrestling, what is 'kayfabe'?",
+   "correct": "Presenting scripted action as real",
+   "source": "https://www.merriam-webster.com/dictionary/kayfabe"
+  },
+  {
+   "prompt": "Who was boxing's first Black world heavyweight champion?",
+   "correct": "Jack Johnson",
+   "source": "https://www.history.com/this-day-in-history/december-26/jack-johnson-wins-heavyweight-title"
+  },
+  {
+   "prompt": "Griffin vs. Bonnar, 'the fight that saved the UFC,' was the finale of what?",
+   "correct": "The Ultimate Fighter",
+   "source": "https://www.ufc.com/news/griffin-bonnar-night-changed-everything"
+  },
+  {
+   "prompt": "Which WWE star went on to win the UFC heavyweight title?",
+   "correct": "Brock Lesnar",
+   "source": "https://www.ufc.com/news/flashback-brock-lesnar-shocks-randy-couture-ufc-91"
+  }
+ ],
+ "cars": [
+  {
+   "prompt": "Unlike a turbo, a supercharger is usually driven by what?",
+   "correct": "A belt off the crankshaft",
+   "source": "https://en.wikipedia.org/wiki/Supercharger"
+  },
+  {
+   "prompt": "Heel-toe downshifting lets a driver do what?",
+   "correct": "Brake while blipping the throttle",
+   "source": "https://en.wikipedia.org/wiki/Heel-and-toe_shifting"
+  },
+  {
+   "prompt": "A Hemi engine is named for the shape of what?",
+   "correct": "Its combustion chambers",
+   "source": "https://en.wikipedia.org/wiki/Hemispherical_combustion_chamber"
+  },
+  {
+   "prompt": "The '40' in the Ford GT40 refers to what?",
+   "correct": "Its height in inches",
+   "source": "https://en.wikipedia.org/wiki/Ford_GT40"
+  },
+  {
+   "prompt": "Before sports cars, Ferruccio Lamborghini got rich building what?",
+   "correct": "Tractors",
+   "source": "https://www.lamborghini.com/en-en/history/350-gt"
+  },
+  {
+   "prompt": "The 'GTO' in Ferrari 250 GTO and Pontiac GTO stands for what?",
+   "correct": "Gran Turismo Omologato",
+   "source": "https://www.cars.com/articles/what-does-gto-stand-for-419091/"
+  },
+  {
+   "prompt": "Subaru's six-star logo depicts what?",
+   "correct": "The Pleiades star cluster",
+   "source": "https://media.subaru.com/pressrelease/333/1/origin-subaru"
+  },
+  {
+   "prompt": "Ayrton Senna won all three of his F1 titles with which team?",
+   "correct": "McLaren",
+   "source": "https://global.honda/en/F1/driver/AyrtonSenna/"
+  },
+  {
+   "prompt": "Who won the very first Daytona 500, in 1959?",
+   "correct": "Lee Petty",
+   "source": "https://www.history.com/this-day-in-history/lee-petty-wins-first-daytona-500"
+  },
+  {
+   "prompt": "Carroll Shelby built the Cobra on a roadster from which British maker?",
+   "correct": "AC Cars",
+   "source": "https://en.wikipedia.org/wiki/AC_Ace"
+  },
+  {
+   "prompt": "Gearheads doing an 'LS swap' are installing what?",
+   "correct": "A GM small-block V8",
+   "source": "https://en.wikipedia.org/wiki/General_Motors_LS-based_small-block_engine"
+  },
+  {
+   "prompt": "The Nürburgring's Nordschleife is nicknamed what?",
+   "correct": "The Green Hell",
+   "source": "https://en.wikipedia.org/wiki/N%C3%BCrburgring"
+  }
+ ],
+ "gear": [
+  {
+   "prompt": "A Robertson screwdriver, a Canadian favorite, has what tip shape?",
+   "correct": "Square",
+   "source": "https://en.wikipedia.org/wiki/Robertson_screw"
+  },
+  {
+   "prompt": "The 'd' in nail sizes like 16d stands for what?",
+   "correct": "Penny",
+   "source": "https://www.familyhandyman.com/article/what-does-the-d-in-nail-sizes-mean/"
+  },
+  {
+   "prompt": "Which knot is best for joining two ropes of different thickness?",
+   "correct": "The sheet bend",
+   "source": "https://en.wikipedia.org/wiki/Sheet_bend"
+  },
+  {
+   "prompt": "To campers and loggers, a 'widowmaker' is what?",
+   "correct": "A dead limb that could fall",
+   "source": "https://en.wikipedia.org/wiki/Widowmaker_(forestry)"
+  },
+  {
+   "prompt": "In woodworking, a saw's 'kerf' is what?",
+   "correct": "The width of the cut it makes",
+   "source": "https://en.wikipedia.org/wiki/Saw"
+  },
+  {
+   "prompt": "Down 'fill power' measures what?",
+   "correct": "How much space an ounce fills",
+   "source": "https://en.wikipedia.org/wiki/Fill_power"
+  },
+  {
+   "prompt": "The Pulaski, a wildfire tool, combines an axe with what?",
+   "correct": "An adze",
+   "source": "https://en.wikipedia.org/wiki/Pulaski_(tool)"
+  },
+  {
+   "prompt": "On a compass, 'declination' is what?",
+   "correct": "Angle from true to magnetic north",
+   "source": "https://www.ncei.noaa.gov/products/magnetic-declination"
+  },
+  {
+   "prompt": "The Appalachian Trail's northern end is atop which mountain?",
+   "correct": "Mount Katahdin",
+   "source": "https://appalachiantrail.org/experience/hike-the-trail/at-basics/"
+  },
+  {
+   "prompt": "In fly fishing, a 'nymph' imitates what?",
+   "correct": "A young underwater insect",
+   "source": "https://lelandfly.com/pages/what-is-a-nymph"
+  },
+  {
+   "prompt": "Which of these screws on with a left-hand (reverse) thread?",
+   "correct": "A bike's left pedal",
+   "source": "https://www.sheldonbrown.com/brandt/left.html"
+  },
+  {
+   "prompt": "Which company introduced the first cordless electric drill, in 1961?",
+   "correct": "Black & Decker",
+   "source": "https://www.blackanddecker.com/pages/milestones"
+  }
+ ],
+ "tech": [
+  {
+   "prompt": "Bluetooth is named after whom?",
+   "correct": "A Viking-era Danish king",
+   "source": "https://www.bluetooth.com/about-us/bluetooth-origin/"
+  },
+  {
+   "prompt": "In 1947, what 'bug' was found jammed in Harvard's Mark II computer?",
+   "correct": "A moth",
+   "source": "https://americanhistory.si.edu/collections/object/nmah_334663"
+  },
+  {
+   "prompt": "Who designed the QWERTY layout for his 1870s typewriter?",
+   "correct": "Christopher Latham Sholes",
+   "source": "https://en.wikipedia.org/wiki/QWERTY"
+  },
+  {
+   "prompt": "What was the first item ever sold on eBay?",
+   "correct": "A broken laser pointer",
+   "source": "https://time.com/4018841/first-item-sold-listed-ebay/"
+  },
+  {
+   "prompt": "The QR code was invented in Japan to do what?",
+   "correct": "Track car parts in factories",
+   "source": "https://www.denso.com/global/en/business/innovation/qrcode/"
+  },
+  {
+   "prompt": "What was the first commercially available microprocessor?",
+   "correct": "The Intel 4004",
+   "source": "https://www.intel.com/content/www/us/en/history/virtual-vault/articles/the-intel-4004.html"
+  },
+  {
+   "prompt": "ARPANET's first message in 1969 was meant to be 'LOGIN.' What got through?",
+   "correct": "LO",
+   "source": "https://www.universityofcalifornia.edu/news/lo-and-behold-internet"
+  },
+  {
+   "prompt": "The first public handheld cellphone call, in 1973, came from which company?",
+   "correct": "Motorola",
+   "source": "https://en.wikipedia.org/wiki/Martin_Cooper_(inventor)"
+  },
+  {
+   "prompt": "Junk email is called 'spam' thanks to what?",
+   "correct": "A Monty Python sketch",
+   "source": "https://en.wikipedia.org/wiki/Spam_(Monty_Python_sketch)"
+  },
+  {
+   "prompt": "In cybersecurity, a 'zero-day' is what?",
+   "correct": "A flaw unknown to its maker",
+   "source": "https://en.wikipedia.org/wiki/Zero-day_vulnerability"
+  },
+  {
+   "prompt": "Sony co-developed the compact disc with which company?",
+   "correct": "Philips",
+   "source": "https://en.wikipedia.org/wiki/Compact_disc"
+  },
+  {
+   "prompt": "Besides Jobs and Wozniak, who was Apple's third co-founder?",
+   "correct": "Ronald Wayne",
+   "source": "https://en.wikipedia.org/wiki/Ronald_Wayne"
+  }
+ ],
+ "grill": [
+  {
+   "prompt": "The 1516 Reinheitsgebot allowed only water, hops, and what?",
+   "correct": "Barley",
+   "source": "https://en.wikipedia.org/wiki/Reinheitsgebot"
+  },
+  {
+   "prompt": "Which of these is an authentic Trappist beer?",
+   "correct": "Westmalle",
+   "source": "https://en.wikipedia.org/wiki/Trappist_beer"
+  },
+  {
+   "prompt": "A hefeweizen's banana and clove flavors come from what?",
+   "correct": "The yeast",
+   "source": "https://www.beerandbrewing.com/dictionary/9Al9LHtPlN"
+  },
+  {
+   "prompt": "A beer's SRM number measures what?",
+   "correct": "Its color",
+   "source": "https://en.wikipedia.org/wiki/Standard_Reference_Method"
+  },
+  {
+   "prompt": "Tennessee whiskey is filtered through charcoal made from which wood?",
+   "correct": "Sugar maple",
+   "source": "https://en.wikipedia.org/wiki/Lincoln_County_Process"
+  },
+  {
+   "prompt": "Maker's Mark and Pappy Van Winkle use which grain in place of rye?",
+   "correct": "Wheat",
+   "source": "https://en.wikipedia.org/wiki/Maker%27s_Mark"
+  },
+  {
+   "prompt": "Bottled-in-bond whiskey must be bottled at what proof?",
+   "correct": "100 proof",
+   "source": "https://en.wikipedia.org/wiki/Bottled_in_bond"
+  },
+  {
+   "prompt": "Alabama white barbecue sauce is built on what?",
+   "correct": "Mayonnaise",
+   "source": "https://en.wikipedia.org/wiki/Barbecue_in_Alabama"
+  },
+  {
+   "prompt": "California's Santa Maria-style barbecue is built around which cut?",
+   "correct": "Tri-tip",
+   "source": "https://en.wikipedia.org/wiki/Santa_Maria-style_barbecue"
+  },
+  {
+   "prompt": "What makes a porterhouse a porterhouse instead of a T-bone?",
+   "correct": "A bigger piece of tenderloin",
+   "source": "https://en.wikipedia.org/wiki/T-bone_steak"
+  },
+  {
+   "prompt": "A brisket's pink smoke ring forms when smoke gases bind with what?",
+   "correct": "Myoglobin in the meat",
+   "source": "https://en.wikipedia.org/wiki/Smoke_ring_(cooking)"
+  },
+  {
+   "prompt": "In whiskey making, 'sour mash' means what?",
+   "correct": "Adding old mash to a new batch",
+   "source": "https://en.wikipedia.org/wiki/Sour_mash"
+  }
+ ],
+ "nerd": [
+  {
+   "prompt": "In 1981's 'Donkey Kong,' Mario's job was what?",
+   "correct": "Carpenter",
+   "source": "https://en.wikipedia.org/wiki/Mario"
+  },
+  {
+   "prompt": "The Konami Code (up, up, down, down...) first appeared in which game?",
+   "correct": "Gradius",
+   "source": "https://en.wikipedia.org/wiki/Konami_Code"
+  },
+  {
+   "prompt": "Spider-Man made his debut in which comic?",
+   "correct": "Amazing Fantasy #15",
+   "source": "https://en.wikipedia.org/wiki/Amazing_Fantasy_15"
+  },
+  {
+   "prompt": "Wolverine debuted in 1974 in which hero's comic?",
+   "correct": "The Incredible Hulk",
+   "source": "https://en.wikipedia.org/wiki/Wolverine_(character)"
+  },
+  {
+   "prompt": "Captain America's very first shield in 1941 was what shape?",
+   "correct": "Triangular",
+   "source": "https://en.wikipedia.org/wiki/Captain_America%27s_shield"
+  },
+  {
+   "prompt": "In 'The Killing Joke,' the Joker's origin is as a failed what?",
+   "correct": "Stand-up comedian",
+   "source": "https://en.wikipedia.org/wiki/Batman:_The_Killing_Joke"
+  },
+  {
+   "prompt": "Which Infinity Stone waits on Vormir, for the price of a loved one?",
+   "correct": "The Soul Stone",
+   "source": "https://en.wikipedia.org/wiki/Infinity_Stones"
+  },
+  {
+   "prompt": "'Would you kindly' is the twist phrase in which game?",
+   "correct": "BioShock",
+   "source": "https://en.wikipedia.org/wiki/BioShock"
+  },
+  {
+   "prompt": "Sony's PlayStation began as a CD add-on for which console?",
+   "correct": "The Super Nintendo",
+   "source": "https://en.wikipedia.org/wiki/PlayStation_(console)"
+  },
+  {
+   "prompt": "Who voiced Batman in 'Batman: The Animated Series'?",
+   "correct": "Kevin Conroy",
+   "source": "https://en.wikipedia.org/wiki/Batman:_The_Animated_Series"
+  },
+  {
+   "prompt": "Halo's Master Chief goes by what name and number?",
+   "correct": "John-117",
+   "source": "https://en.wikipedia.org/wiki/Master_Chief_(Halo)"
+  },
+  {
+   "prompt": "Nintendo was founded in 1889 to make what?",
+   "correct": "Playing cards",
+   "source": "https://en.wikipedia.org/wiki/Nintendo"
+  }
+ ],
+ "actionmovies": [
+  {
+   "prompt": "'Die Hard' was adapted from which novel?",
+   "correct": "Nothing Lasts Forever",
+   "source": "https://en.wikipedia.org/wiki/Die_Hard"
+  },
+  {
+   "prompt": "Arnold's character in 'Commando' is named what?",
+   "correct": "John Matrix",
+   "source": "https://en.wikipedia.org/wiki/Commando_(1985_film)"
+  },
+  {
+   "prompt": "In 'Top Gun,' Goose's real name is what?",
+   "correct": "Nick Bradshaw",
+   "source": "https://en.wikipedia.org/wiki/Top_Gun"
+  },
+  {
+   "prompt": "Who played Bond in 1969's 'On Her Majesty's Secret Service'?",
+   "correct": "George Lazenby",
+   "source": "https://en.wikipedia.org/wiki/George_Lazenby"
+  },
+  {
+   "prompt": "Saul Goodman's real name is what?",
+   "correct": "Jimmy McGill",
+   "source": "https://en.wikipedia.org/wiki/Saul_Goodman"
+  },
+  {
+   "prompt": "'Deserve's got nothing to do with it' is from which Western?",
+   "correct": "Unforgiven",
+   "source": "https://en.wikiquote.org/wiki/Unforgiven"
+  },
+  {
+   "prompt": "'A Fistful of Dollars' was an unofficial remake of which Kurosawa film?",
+   "correct": "Yojimbo",
+   "source": "https://en.wikipedia.org/wiki/A_Fistful_of_Dollars"
+  },
+  {
+   "prompt": "Who says 'Clever girl' in 'Jurassic Park'?",
+   "correct": "Robert Muldoon",
+   "source": "https://en.wikiquote.org/wiki/Jurassic_Park_(film)"
+  },
+  {
+   "prompt": "In the original 'Magnum, P.I.,' Magnum drives which Ferrari?",
+   "correct": "Ferrari 308",
+   "source": "https://en.wikipedia.org/wiki/Magnum,_P.I."
+  },
+  {
+   "prompt": "In 'Gladiator,' arena crowds know Maximus by what name?",
+   "correct": "The Spaniard",
+   "source": "https://en.wikipedia.org/wiki/Gladiator_(2000_film)"
+  },
+  {
+   "prompt": "Who played Jack Ryan in 'The Hunt for Red October' (1990)?",
+   "correct": "Alec Baldwin",
+   "source": "https://en.wikipedia.org/wiki/The_Hunt_for_Red_October_(film)"
+  },
+  {
+   "prompt": "In 'Lonesome Dove' (1989), Robert Duvall plays which ex-Ranger?",
+   "correct": "Gus McCrae",
+   "source": "https://en.wikipedia.org/wiki/Lonesome_Dove_(miniseries)"
+  }
+ ],
+ "skincare": [
+  {
+   "prompt": "Which AHA exfoliant was first made from bitter almonds?",
+   "correct": "Mandelic acid",
+   "source": "https://en.wikipedia.org/wiki/Mandelic_acid"
+  },
+  {
+   "prompt": "On Asian sunscreens, the PA rating (PA++++) measures protection from what?",
+   "correct": "UVA rays",
+   "source": "https://en.wikipedia.org/wiki/Sunscreen"
+  },
+  {
+   "prompt": "Squalane is named after which animal, its original source?",
+   "correct": "Shark",
+   "source": "https://en.wikipedia.org/wiki/Squalene"
+  },
+  {
+   "prompt": "The chemist who introduced SPF in 1974 founded which sun-care brand?",
+   "correct": "Piz Buin",
+   "source": "https://en.wikipedia.org/wiki/Piz_Buin_(brand)"
+  },
+  {
+   "prompt": "Whose Mascara-Matic popularized mascara in a tube with a built-in wand?",
+   "correct": "Helena Rubinstein",
+   "source": "https://cosmeticsandskin.com/ded/automatic-mascara.php"
+  },
+  {
+   "prompt": "Which Hollywood cosmetics pioneer popularized the word 'make-up'?",
+   "correct": "Max Factor",
+   "source": "https://en.wikipedia.org/wiki/Max_Factor_Sr."
+  },
+  {
+   "prompt": "Differin went over the counter in the U.S. in 2016. Which retinoid is it?",
+   "correct": "Adapalene",
+   "source": "https://en.wikipedia.org/wiki/Adapalene"
+  },
+  {
+   "prompt": "SK-II's signature ingredient, Pitera, was inspired by whose hands?",
+   "correct": "Elderly sake brewers",
+   "source": "https://www.sk-ii.com/our-story"
+  },
+  {
+   "prompt": "L'Oréal was founded in 1909 on which product?",
+   "correct": "A hair dye",
+   "source": "https://en.wikipedia.org/wiki/L%27Or%C3%A9al"
+  },
+  {
+   "prompt": "On ingredient labels, 'Butyrospermum parkii' is which ingredient?",
+   "correct": "Shea butter",
+   "source": "https://en.wikipedia.org/wiki/Vitellaria"
+  },
+  {
+   "prompt": "Cold cream is credited to which ancient physician?",
+   "correct": "Galen",
+   "source": "https://en.wikipedia.org/wiki/Cold_cream"
+  },
+  {
+   "prompt": "Hawaii's 2018 reef law banned sunscreens with oxybenzone and what?",
+   "correct": "Octinoxate",
+   "source": "https://en.wikipedia.org/wiki/Sunscreen"
+  }
+ ],
+ "fashion": [
+  {
+   "prompt": "Who is considered the father of haute couture?",
+   "correct": "Charles Frederick Worth",
+   "source": "https://en.wikipedia.org/wiki/Charles_Frederick_Worth"
+  },
+  {
+   "prompt": "Hermès was founded in 1837 to make what?",
+   "correct": "Harnesses for horses",
+   "source": "https://en.wikipedia.org/wiki/Herm%C3%A8s"
+  },
+  {
+   "prompt": "Before founding Gucci, Guccio Gucci worked at which London hotel?",
+   "correct": "The Savoy",
+   "source": "https://en.wikipedia.org/wiki/Guccio_Gucci"
+  },
+  {
+   "prompt": "Grace Kelly famously used her Hermès bag to hide what?",
+   "correct": "Her pregnancy",
+   "source": "https://en.wikipedia.org/wiki/Kelly_bag"
+  },
+  {
+   "prompt": "Chanel's historic Paris couture house is at which address?",
+   "correct": "31 Rue Cambon",
+   "source": "https://en.wikipedia.org/wiki/Chanel"
+  },
+  {
+   "prompt": "Mary Quant said she named the miniskirt after what?",
+   "correct": "Her favorite car, the Mini",
+   "source": "https://en.wikipedia.org/wiki/Mary_Quant"
+  },
+  {
+   "prompt": "Who was Jacqueline Kennedy's official couturier as First Lady?",
+   "correct": "Oleg Cassini",
+   "source": "https://en.wikipedia.org/wiki/Oleg_Cassini"
+  },
+  {
+   "prompt": "Fendi's double-F logo was created by which designer?",
+   "correct": "Karl Lagerfeld",
+   "source": "https://en.wikipedia.org/wiki/Fendi"
+  },
+  {
+   "prompt": "What makes a pair of jeans 'selvedge' denim?",
+   "correct": "Woven on a shuttle loom",
+   "source": "https://en.wikipedia.org/wiki/Selvage_denim"
+  },
+  {
+   "prompt": "Madeleine Vionnet is famous for pioneering what?",
+   "correct": "The bias-cut dress",
+   "source": "https://en.wikipedia.org/wiki/Madeleine_Vionnet"
+  },
+  {
+   "prompt": "Which is the oldest women's fashion magazine still publishing?",
+   "correct": "Harper's Bazaar",
+   "source": "https://en.wikipedia.org/wiki/Harper%27s_Bazaar"
+  },
+  {
+   "prompt": "Who founded the Met Gala in 1948?",
+   "correct": "Eleanor Lambert",
+   "source": "https://en.wikipedia.org/wiki/Met_Gala"
+  }
+ ],
+ "wellness": [
+  {
+   "prompt": "What did Joseph Pilates originally call his method?",
+   "correct": "Contrology",
+   "source": "https://en.wikipedia.org/wiki/Pilates"
+  },
+  {
+   "prompt": "Matcha is stone-ground from shade-grown leaves called what?",
+   "correct": "Tencha",
+   "source": "https://en.wikipedia.org/wiki/Matcha"
+  },
+  {
+   "prompt": "The Yoga Sutras are traditionally credited to whom?",
+   "correct": "Patanjali",
+   "source": "https://en.wikipedia.org/wiki/Yoga_Sutras_of_Patanjali"
+  },
+  {
+   "prompt": "In 1968, the Beatles studied meditation in which Indian town?",
+   "correct": "Rishikesh",
+   "source": "https://en.wikipedia.org/wiki/The_Beatles_in_India"
+  },
+  {
+   "prompt": "Who developed Mindfulness-Based Stress Reduction (MBSR)?",
+   "correct": "Jon Kabat-Zinn",
+   "source": "https://en.wikipedia.org/wiki/Mindfulness-based_stress_reduction"
+  },
+  {
+   "prompt": "The barre workout traces back to Lotte Berk's 1959 studio in which city?",
+   "correct": "London",
+   "source": "https://en.wikipedia.org/wiki/Lotte_Berk"
+  },
+  {
+   "prompt": "Kefir, the fermented milk drink, is traditionally from which mountain region?",
+   "correct": "The Caucasus",
+   "source": "https://en.wikipedia.org/wiki/Kefir"
+  },
+  {
+   "prompt": "The Ayurvedic herb ashwagandha's name means what in Sanskrit?",
+   "correct": "Smell of a horse",
+   "source": "https://en.wikipedia.org/wiki/Withania_somnifera"
+  },
+  {
+   "prompt": "In a Finnish sauna, what is 'löyly'?",
+   "correct": "Steam from water on hot stones",
+   "source": "https://en.wikipedia.org/wiki/Sauna"
+  },
+  {
+   "prompt": "Zumba was created by a fitness instructor from which country?",
+   "correct": "Colombia",
+   "source": "https://en.wikipedia.org/wiki/Zumba"
+  },
+  {
+   "prompt": "In Ayurveda, the three doshas are vata, pitta, and what?",
+   "correct": "Kapha",
+   "source": "https://en.wikipedia.org/wiki/Dosha"
+  },
+  {
+   "prompt": "A Tabata round is 20 seconds of all-out work, then how much rest?",
+   "correct": "10 seconds",
+   "source": "https://en.wikipedia.org/wiki/Izumi_Tabata"
+  }
+ ],
+ "romcoms": [
+  {
+   "prompt": "Who directed 'When Harry Met Sally...'?",
+   "correct": "Rob Reiner",
+   "source": "https://en.wikipedia.org/wiki/When_Harry_Met_Sally..."
+  },
+  {
+   "prompt": "In 'Notting Hill,' William's bookshop specializes in what?",
+   "correct": "Travel books",
+   "source": "https://en.wikipedia.org/wiki/Notting_Hill_(film)"
+  },
+  {
+   "prompt": "In 'Sleepless in Seattle,' Annie lives in which city?",
+   "correct": "Baltimore",
+   "source": "https://en.wikipedia.org/wiki/Sleepless_in_Seattle"
+  },
+  {
+   "prompt": "In 'You've Got Mail,' Kathleen Kelly's bookstore is called what?",
+   "correct": "The Shop Around the Corner",
+   "source": "https://en.wikipedia.org/wiki/You%27ve_Got_Mail"
+  },
+  {
+   "prompt": "'Four Weddings and a Funeral' features a funeral poem by whom?",
+   "correct": "W. H. Auden",
+   "source": "https://en.wikipedia.org/wiki/Funeral_Blues"
+  },
+  {
+   "prompt": "In 'Love Actually,' the prime minister dances to which song?",
+   "correct": "Jump (For My Love)",
+   "source": "https://www.today.com/popculture/hugh-grant-says-dance-scene-love-actually-was-absolute-hell-t169982"
+  },
+  {
+   "prompt": "Audrey Hepburn won her Best Actress Oscar for which film?",
+   "correct": "Roman Holiday",
+   "source": "https://en.wikipedia.org/wiki/List_of_awards_and_honours_received_by_Audrey_Hepburn"
+  },
+  {
+   "prompt": "Which rom-com was the first film to win all five top Oscars?",
+   "correct": "It Happened One Night",
+   "source": "https://en.wikipedia.org/wiki/List_of_Big_Five_Academy_Award_winners_and_nominees"
+  },
+  {
+   "prompt": "In 'Dirty Dancing,' Baby's real name is what?",
+   "correct": "Frances",
+   "source": "https://www.quotes.net/mquote/24774"
+  },
+  {
+   "prompt": "In 'Outlander,' Jamie Fraser's Scottish family estate is called what?",
+   "correct": "Lallybroch",
+   "source": "https://en.wikipedia.org/wiki/Midhope_Castle"
+  },
+  {
+   "prompt": "'She's the Man' updates which Shakespeare play?",
+   "correct": "Twelfth Night",
+   "source": "https://en.wikipedia.org/wiki/She%27s_the_Man"
+  },
+  {
+   "prompt": "'Before Sunrise' follows two strangers wandering which city overnight?",
+   "correct": "Vienna",
+   "source": "https://en.wikipedia.org/wiki/Before_Sunset"
+  }
+ ],
+ "divas": [
+  {
+   "prompt": "What was Taylor Swift's debut single?",
+   "correct": "Tim McGraw",
+   "source": "https://en.wikipedia.org/wiki/Tim_McGraw_(song)"
+  },
+  {
+   "prompt": "What was Madonna's first No. 1 on the Billboard Hot 100?",
+   "correct": "Like a Virgin",
+   "source": "https://en.wikipedia.org/wiki/Like_a_Virgin_(song)"
+  },
+  {
+   "prompt": "What was Mariah Carey's debut single?",
+   "correct": "Vision of Love",
+   "source": "https://en.wikipedia.org/wiki/Vision_of_Love"
+  },
+  {
+   "prompt": "Céline Dion won Eurovision 1988 representing which country?",
+   "correct": "Switzerland",
+   "source": "https://en.wikipedia.org/wiki/Ne_partez_pas_sans_moi"
+  },
+  {
+   "prompt": "Who was the first woman inducted into the Rock & Roll Hall of Fame?",
+   "correct": "Aretha Franklin",
+   "source": "https://en.wikipedia.org/wiki/Aretha_Franklin"
+  },
+  {
+   "prompt": "Beyoncé played which legend in 'Cadillac Records' (2008)?",
+   "correct": "Etta James",
+   "source": "https://en.wikipedia.org/wiki/Cadillac_Records"
+  },
+  {
+   "prompt": "Beyoncé's first Album of the Year Grammy came for which album?",
+   "correct": "Cowboy Carter",
+   "source": "https://en.wikipedia.org/wiki/67th_Annual_Grammy_Awards"
+  },
+  {
+   "prompt": "Katy Perry's 2001 Christian debut album came out under what name?",
+   "correct": "Katy Hudson",
+   "source": "https://en.wikipedia.org/wiki/Katy_Perry"
+  },
+  {
+   "prompt": "What was Rihanna's debut single?",
+   "correct": "Pon de Replay",
+   "source": "https://en.wikipedia.org/wiki/Pon_de_Replay"
+  },
+  {
+   "prompt": "Sabrina Carpenter played Maya Hart on which Disney Channel show?",
+   "correct": "Girl Meets World",
+   "source": "https://en.wikipedia.org/wiki/Girl_Meets_World"
+  },
+  {
+   "prompt": "The '1814' in Janet Jackson's 'Rhythm Nation 1814' is the year of what?",
+   "correct": "The Star-Spangled Banner",
+   "source": "https://en.wikipedia.org/wiki/Janet_Jackson%27s_Rhythm_Nation_1814"
+  },
+  {
+   "prompt": "Which future pop star was a Mouseketeer alongside Britney Spears?",
+   "correct": "Christina Aguilera",
+   "source": "https://en.wikipedia.org/wiki/The_All-New_Mickey_Mouse_Club"
+  }
+ ],
+ "bookclub": [
+  {
+   "prompt": "Charlotte Brontë first published 'Jane Eyre' under what name?",
+   "correct": "Currer Bell",
+   "source": "https://en.wikipedia.org/wiki/Charlotte_Bront%C3%AB"
+  },
+  {
+   "prompt": "Novelist George Eliot's real name was what?",
+   "correct": "Mary Ann Evans",
+   "source": "https://en.wikipedia.org/wiki/George_Eliot"
+  },
+  {
+   "prompt": "Liane Moriarty's novel 'Big Little Lies' is set in which country?",
+   "correct": "Australia",
+   "source": "https://en.wikipedia.org/wiki/Big_Little_Lies_(novel)"
+  },
+  {
+   "prompt": "In 'Evelyn Hugo,' which reporter does Evelyn choose to tell her story?",
+   "correct": "Monique Grant",
+   "source": "https://en.wikipedia.org/wiki/The_Seven_Husbands_of_Evelyn_Hugo"
+  },
+  {
+   "prompt": "In 'Fourth Wing,' Violet bonds with which black dragon?",
+   "correct": "Tairn",
+   "source": "https://en.wikipedia.org/wiki/Fourth_Wing"
+  },
+  {
+   "prompt": "Who narrates Madeline Miller's 'The Song of Achilles'?",
+   "correct": "Patroclus",
+   "source": "https://en.wikipedia.org/wiki/The_Song_of_Achilles"
+  },
+  {
+   "prompt": "What was the very first pick of Oprah's Book Club?",
+   "correct": "The Deep End of the Ocean",
+   "source": "https://en.wikipedia.org/wiki/Oprah%27s_Book_Club"
+  },
+  {
+   "prompt": "What was Colleen Hoover's debut novel?",
+   "correct": "Slammed",
+   "source": "https://en.wikipedia.org/wiki/Colleen_Hoover"
+  },
+  {
+   "prompt": "What was Sally Rooney's debut novel?",
+   "correct": "Conversations with Friends",
+   "source": "https://en.wikipedia.org/wiki/Conversations_with_Friends"
+  },
+  {
+   "prompt": "'Frankenstein' is subtitled 'The Modern' what?",
+   "correct": "Prometheus",
+   "source": "https://en.wikipedia.org/wiki/Frankenstein"
+  },
+  {
+   "prompt": "In Kristin Hannah's 'The Nightingale,' the sisters are Vianne and who?",
+   "correct": "Isabelle",
+   "source": "https://en.wikipedia.org/wiki/The_Nightingale_(Hannah_novel)"
+  },
+  {
+   "prompt": "Which Austen novel was first published after her death, alongside 'Persuasion'?",
+   "correct": "Northanger Abbey",
+   "source": "https://en.wikipedia.org/wiki/Northanger_Abbey"
+  }
+ ],
+ "reality": [
+  {
+   "prompt": "'Survivor' first aired as 'Expedition Robinson' in which country?",
+   "correct": "Sweden",
+   "source": "https://en.wikipedia.org/wiki/Survivor_(franchise)"
+  },
+  {
+   "prompt": "The 'Big Brother' format first aired in which country?",
+   "correct": "The Netherlands",
+   "source": "https://en.wikipedia.org/wiki/Big_Brother_(Dutch_TV_series)"
+  },
+  {
+   "prompt": "Who was the first person to win 'Survivor' twice?",
+   "correct": "Sandra Diaz-Twine",
+   "source": "https://en.wikipedia.org/wiki/Sandra_Diaz-Twine"
+  },
+  {
+   "prompt": "Who was the very first lead of 'The Bachelor' in 2002?",
+   "correct": "Alex Michel",
+   "source": "https://en.wikipedia.org/wiki/The_Bachelor_(American_TV_series)_season_1"
+  },
+  {
+   "prompt": "Who won the first season of 'RuPaul's Drag Race'?",
+   "correct": "BeBe Zahara Benet",
+   "source": "https://en.wikipedia.org/wiki/RuPaul%27s_Drag_Race_season_1"
+  },
+  {
+   "prompt": "Season one of Netflix's 'Love Is Blind' was filmed in which city?",
+   "correct": "Atlanta",
+   "source": "https://screenrant.com/love-is-blind-season-1-where-filmed-location/"
+  },
+  {
+   "prompt": "'Jersey Shore' season four was filmed in which Italian city?",
+   "correct": "Florence",
+   "source": "https://www.cbsnews.com/news/jersey-shore-stars-sell-pizza-in-florence/"
+  },
+  {
+   "prompt": "On 'The Amazing Race,' a task only one teammate can do is a what?",
+   "correct": "Roadblock",
+   "source": "https://en.wikipedia.org/wiki/The_Amazing_Race"
+  },
+  {
+   "prompt": "SUR, the restaurant on 'Vanderpump Rules,' is billed as short for what?",
+   "correct": "Sexy Unique Restaurant",
+   "source": "https://www.bravotv.com/the-daily-dish/lisa-vanderpump-restaurant-sur-what-does-it-mean"
+  },
+  {
+   "prompt": "Who finished runner-up to Kelly Clarkson on 'American Idol' season one?",
+   "correct": "Justin Guarini",
+   "source": "https://en.wikipedia.org/wiki/American_Idol_season_1"
+  },
+  {
+   "prompt": "Which 'The Hills' star got her own spin-off, 'The City'?",
+   "correct": "Whitney Port",
+   "source": "https://en.wikipedia.org/wiki/The_City_(2008_TV_series)"
+  },
+  {
+   "prompt": "Before Peacock, 'Love Island USA' aired on which network?",
+   "correct": "CBS",
+   "source": "https://www.hollywoodreporter.com/tv/tv-news/love-island-moves-peacock-cbs-1235098271/"
+  }
+ ],
+ "weddings": [
+  {
+   "prompt": "The first recorded diamond engagement ring was given by whom?",
+   "correct": "Archduke Maximilian of Austria",
+   "source": "https://www.americangemsociety.org/buying-diamonds-with-confidence/the-history-of-the-diamond-as-an-engagement-ring/"
+  },
+  {
+   "prompt": "The traditional 40th wedding anniversary gift is what?",
+   "correct": "Ruby",
+   "source": "https://www.gemsociety.org/article/anniversary-gifts-by-year/"
+  },
+  {
+   "prompt": "In a Shinto wedding, the couple sips from three cups of what?",
+   "correct": "Sake",
+   "source": "https://www.gov-online.go.jp/hlj/en/april_2025/april_2025-07.html"
+  },
+  {
+   "prompt": "At Italian weddings, 'confetti' are what?",
+   "correct": "Sugared almonds",
+   "source": "https://www.theknot.com/content/all-about-jordan-almonds"
+  },
+  {
+   "prompt": "The French wedding cake built as a tower of cream puffs is called what?",
+   "correct": "Croquembouche",
+   "source": "https://en.wikipedia.org/wiki/Croquembouche"
+  },
+  {
+   "prompt": "Charles and Diana married in 1981 at which London church?",
+   "correct": "St Paul's Cathedral",
+   "source": "https://fashionhistory.fitnyc.edu/1981-emanuel-diana-wedding-dress/"
+  },
+  {
+   "prompt": "Who designed Kate Middleton's 2011 wedding dress?",
+   "correct": "Sarah Burton for Alexander McQueen",
+   "source": "https://www.royal.uk/wedding-dress-bridesmaids-dresses-and-pages-uniforms"
+  },
+  {
+   "prompt": "Grace Kelly's 1956 wedding gown was a gift from which film studio?",
+   "correct": "MGM",
+   "source": "https://en.wikipedia.org/wiki/Wedding_dress_of_Grace_Kelly"
+  },
+  {
+   "prompt": "'Here Comes the Bride' comes from which Wagner opera?",
+   "correct": "Lohengrin",
+   "source": "https://en.wikipedia.org/wiki/Bridal_Chorus"
+  },
+  {
+   "prompt": "Aquarius, the 'water bearer,' belongs to which element?",
+   "correct": "Air",
+   "source": "https://en.wikipedia.org/wiki/Aquarius_(astrology)"
+  },
+  {
+   "prompt": "The Bellini was invented at which Venice bar?",
+   "correct": "Harry's Bar",
+   "source": "https://www.cipriani.com/bellini"
+  },
+  {
+   "prompt": "Before designing wedding gowns, Vera Wang competed in which sport?",
+   "correct": "Figure skating",
+   "source": "https://en.wikipedia.org/wiki/Vera_Wang"
+  }
+ ],
+ "gossip": [
+  {
+   "prompt": "George and Amal Clooney married in 2014 in which Italian city?",
+   "correct": "Venice",
+   "source": "https://www.cnn.com/2014/09/29/showbiz/italy-george-clooney-wedding/index.html"
+  },
+  {
+   "prompt": "Kourtney Kardashian and Travis Barker's 2022 Italian wedding was in which town?",
+   "correct": "Portofino",
+   "source": "https://wwd.com/fashion-news/fashion-scoops/kourtney-kardashian-travis-barker-lavish-wedding-portofino-details-1235186564/"
+  },
+  {
+   "prompt": "Priyanka Chopra and Nick Jonas married in 2018 in which Indian city?",
+   "correct": "Jodhpur",
+   "source": "https://www.cbc.ca/news/entertainment/priyanka-chopra-nick-jonas-married-1.4928896"
+  },
+  {
+   "prompt": "Gwen Stefani and Blake Shelton married in 2021 on his ranch in which state?",
+   "correct": "Oklahoma",
+   "source": "https://www.nbcnews.com/pop-culture/celebrity/gwen-stefani-blake-shelton-marry-n1273097"
+  },
+  {
+   "prompt": "Kristen Bell and Dax Shepard's 2013 wedding took place where?",
+   "correct": "A Beverly Hills courthouse",
+   "source": "https://www.cbsnews.com/losangeles/news/kristen-bell-shares-photos-of-142-courthouse-wedding-to-dax-shepard/"
+  },
+  {
+   "prompt": "Humphrey Bogart and Lauren Bacall first starred together in which film?",
+   "correct": "To Have and Have Not",
+   "source": "https://en.wikipedia.org/wiki/Lauren_Bacall"
+  },
+  {
+   "prompt": "Beyoncé and Jay-Z released their 2018 joint album under what name?",
+   "correct": "The Carters",
+   "source": "https://en.wikipedia.org/wiki/Everything_Is_Love"
+  },
+  {
+   "prompt": "What was Beyoncé and Jay-Z's first song together?",
+   "correct": "'03 Bonnie & Clyde",
+   "source": "https://en.wikipedia.org/wiki/%2703_Bonnie_%26_Clyde"
+  },
+  {
+   "prompt": "Jennifer Lopez wore her famous green Versace dress to which event?",
+   "correct": "The 2000 Grammys",
+   "source": "https://www.cnn.com/style/article/jlo-green-dress-grammys-remember-when/index.html"
+  },
+  {
+   "prompt": "Serena Williams married the co-founder of which website?",
+   "correct": "Reddit",
+   "source": "https://www.cnn.com/2017/11/17/tennis/serena-williams-marriage-reddit-co-founder-alexis-ohanian-new-orleans"
+  },
+  {
+   "prompt": "Paul Newman was married for 50 years to which actress?",
+   "correct": "Joanne Woodward",
+   "source": "https://en.wikipedia.org/wiki/Joanne_Woodward"
+  },
+  {
+   "prompt": "Kelly Ripa met Mark Consuelos on the set of which soap opera?",
+   "correct": "All My Children",
+   "source": "https://en.wikipedia.org/wiki/Mark_Consuelos"
+  }
+ ]
+}
