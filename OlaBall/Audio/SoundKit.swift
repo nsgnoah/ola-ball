@@ -157,9 +157,29 @@ enum Synth {
         return normalized(mul(tone(n, frequency: { _ in 1500 }), decay(n, tau: 0.006)), peak: 0.35)
     }
 
+    /// A soft-edged bell: a few ms of attack so it doesn't click, a slightly detuned twin for
+    /// warmth, and a fade to silence at the end instead of being chopped off mid-ring.
+    static func chime(_ f: Float, length: Float, tau: Float = 0.22, gain: Float = 1) -> [Float] {
+        let n = frames(length)
+        let body = mix([tone(n, frequency: { _ in f }, harmonics: [1, 0.3, 0.1, 0.04]), tone(n, frequency: { _ in f * 1.004 }, harmonics: [0.45])])
+        let env = mul(decay(n, tau: tau), envelope(n, attack: 0.005, hold: max(0, length - 0.065), release: 0.06))
+        return mul(body, env).map { $0 * gain }
+    }
+
+    /// High, quiet twinkles on top of a win: the arcade "sparkle".
+    static func sparkle(_ notes: [Float], from: Float, gap: Float, total: Int) -> [[Float]] {
+        notes.enumerated().map { i, f in delayed(chime(f, length: 0.22, tau: 0.07, gain: 0.16), by: from + Float(i) * gap, total: total) }
+    }
+
     static func correct() -> [Float] {
-        let total = frames(0.6)
-        return normalized(mix([delayed(note(784, length: 0.35), by: 0, total: total), delayed(note(1175, length: 0.45), by: 0.09, total: total)]), peak: 0.6)
+        // "ba-DING": a grace note up to a major chord, pitched mid-range so it lands bright, not shrill.
+        let total = frames(0.75)
+        return normalized(mix([
+            delayed(chime(659, length: 0.12, tau: 0.06, gain: 0.7), by: 0, total: total),
+            delayed(chime(784, length: 0.6, tau: 0.22), by: 0.075, total: total),
+            delayed(chime(988, length: 0.55, tau: 0.2, gain: 0.4), by: 0.075, total: total),
+            delayed(chime(392, length: 0.5, tau: 0.2, gain: 0.35), by: 0.075, total: total),
+        ] + sparkle([1568, 1976, 2349], from: 0.12, gap: 0.045, total: total)), peak: 0.55)
     }
 
     static func wrong() -> [Float] {
@@ -176,23 +196,36 @@ enum Synth {
     }
 
     static func crown() -> [Float] {
-        let total = frames(1.2)
-        return normalized(mix([
-            delayed(note(523, length: 0.3), by: 0, total: total),
-            delayed(note(659, length: 0.3), by: 0.12, total: total),
-            delayed(note(784, length: 0.3), by: 0.24, total: total),
-            delayed(note(1047, length: 0.8, tau: 0.3), by: 0.36, total: total),
-        ]), peak: 0.65)
+        // Quick run up the chord, then the whole chord rings out with twinkles.
+        let total = frames(1.5)
+        let run: [Float] = [523, 659, 784]
+        return normalized(mix(
+            run.enumerated().map { i, f in delayed(chime(f, length: 0.2, tau: 0.1, gain: 0.8), by: Float(i) * 0.085, total: total) } + [
+                delayed(chime(1047, length: 1.1, tau: 0.35), by: 0.255, total: total),
+                delayed(chime(784, length: 1.0, tau: 0.3, gain: 0.45), by: 0.255, total: total),
+                delayed(chime(659, length: 1.0, tau: 0.3, gain: 0.4), by: 0.255, total: total),
+                delayed(chime(262, length: 0.9, tau: 0.3, gain: 0.4), by: 0.255, total: total),
+            ] + sparkle([2093, 2637, 3136, 2637, 3136], from: 0.32, gap: 0.06, total: total)
+        ), peak: 0.6)
     }
 
     static func fanfare() -> [Float] {
-        let total = frames(1.8)
-        func brass(_ f: Float, at: Float, len: Float) -> [Float] {
+        // Ta-ta-ta-TAAA on mellow brass, landing on a full chord with a little vibrato.
+        let total = frames(2.0)
+        func brass(_ f: Float, at: Float, len: Float, gain: Float = 1) -> [Float] {
             let n = frames(len)
-            let raw = lowpass(tone(n, frequency: { _ in f }, harmonics: [1, 0.7, 0.5, 0.35, 0.25]), cutoff: 2600)
-            return delayed(mul(raw, envelope(n, attack: 0.02, hold: max(0, len - 0.22), release: 0.2)), by: at, total: total)
+            let raw = lowpass(tone(n, frequency: { i in
+                let t = Float(i) / sr
+                return f * (1 + 0.005 * sin(2 * Float.pi * 5.5 * t) * min(1, max(0, t - 0.2) / 0.3))
+            }, harmonics: [1, 0.5, 0.28, 0.14, 0.06]), cutoff: 1900)
+            return delayed(mul(raw, envelope(n, attack: 0.025, hold: max(0, len - 0.25), release: 0.22)).map { $0 * gain }, by: at, total: total)
         }
-        return normalized(mix([brass(523, at: 0, len: 0.16), brass(659, at: 0.14, len: 0.16), brass(784, at: 0.28, len: 0.16), brass(1047, at: 0.42, len: 1.2), brass(523, at: 0.42, len: 1.2).map { $0 * 0.5 }]), peak: 0.65)
+        let held: Float = 1.3
+        return normalized(mix([
+            brass(392, at: 0, len: 0.15), brass(523, at: 0.13, len: 0.15), brass(659, at: 0.26, len: 0.15),
+            brass(784, at: 0.4, len: held), brass(659, at: 0.4, len: held, gain: 0.5),
+            brass(523, at: 0.4, len: held, gain: 0.5), brass(262, at: 0.4, len: held, gain: 0.45),
+        ] + sparkle([2093, 2637, 3136, 4186], from: 0.45, gap: 0.07, total: total)), peak: 0.65)
     }
 
     static func lose() -> [Float] {
