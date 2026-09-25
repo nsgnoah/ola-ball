@@ -83,6 +83,57 @@ struct StageScroll<Content: View>: View {
     }
 }
 
+/// A screen with its header pinned to the top and its buttons pinned to the bottom. The middle sits
+/// centred between them, exactly where a Spacer above and below it would put it, and scrolls when
+/// it doesn't fit: an iPhone SE, the largest text size, a long question with Ola's verdict under it.
+/// Without this the middle pushed the header up into the status bar and the button off the screen.
+/// On a phone with room to spare nothing moves. The Android port's `PinnedColumn` is the same shape.
+struct PinnedColumn<Top: View, Middle: View, Bottom: View>: View {
+    let spacing: CGFloat
+    let top: () -> Top
+    let middle: () -> Middle
+    let bottom: () -> Bottom
+
+    init(spacing: CGFloat, @ViewBuilder top: @escaping () -> Top, @ViewBuilder middle: @escaping () -> Middle, @ViewBuilder bottom: @escaping () -> Bottom) {
+        self.spacing = spacing
+        self.top = top
+        self.middle = middle
+        self.bottom = bottom
+    }
+
+    var body: some View {
+        VStack(spacing: spacing) {
+            top()
+            GeometryReader { geo in
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: spacing) {
+                        Spacer(minLength: 0)
+                        middle()
+                        Spacer(minLength: 0)
+                    }
+                    .frame(maxWidth: .infinity, minHeight: geo.size.height)
+                }
+                .scrollBounceBehavior(.basedOnSize)
+                // Clip where the middle slides under the header and the buttons, but not at the
+                // sides, where a shaking wrong answer and a winner's gold outline overhang the column.
+                .scrollClipDisabled()
+                .clipShape(ClipAboveAndBelow())
+            }
+            bottom()
+        }
+    }
+}
+
+extension PinnedColumn where Top == EmptyView {
+    init(spacing: CGFloat, @ViewBuilder middle: @escaping () -> Middle, @ViewBuilder bottom: @escaping () -> Bottom) {
+        self.init(spacing: spacing, top: { EmptyView() }, middle: middle, bottom: bottom)
+    }
+}
+
+private struct ClipAboveAndBelow: Shape {
+    func path(in rect: CGRect) -> Path { Path(rect.insetBy(dx: -rect.width, dy: 0)) }
+}
+
 
 /// Game-show backdrop: a solid color, sunburst rays turning slowly from above the top edge,
 /// a halftone dot band rising from the bottom, paper grain over everything.

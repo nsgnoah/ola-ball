@@ -15,9 +15,9 @@ struct RoundRevealView: View {
         let iWon = winner == me
         let winnerWorld = winner.flatMap { s.player($0)?.world }
         Stage(winnerWorld.map { GameBackground(world: $0) } ?? GameBackground(top: Theme.violet, bottom: Theme.violetDeep)) {
-            VStack(spacing: 14) {
+            PinnedColumn(spacing: 14) {
                 MatchHeader(controller: controller)
-                Spacer()
+            } middle: {
                 Kicker("ROUND \(round) · \(MatchEngine.roundLabel(round))")
                 if winner != nil {
                     CrownIcon(size: 84)
@@ -64,7 +64,7 @@ struct RoundRevealView: View {
                     }
                 }
                 OlaSays(text: olaLine(iWon: iWon, tie: winner == nil))
-                Spacer()
+            } bottom: {
                 Button(s.status == .finished ? "See the final" : "Continue") { Haptics.tap(); controller.acknowledgeReveal() }
                     .buttonStyle(ChunkyButtonStyle(color: Theme.gold))
                     .accessibilityIdentifier("reveal-continue")

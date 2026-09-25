@@ -91,15 +91,14 @@ struct HandoffView: View {
 
     var body: some View {
         Stage(GameBackground(top: Theme.violet, bottom: Theme.violetDeep)) {
-            VStack(spacing: 18) {
-                Spacer()
+            PinnedColumn(spacing: 18) {
                 HandoffIcon(size: 96)
                     .rotationEffect(.degrees(bounce ? 6 : -6))
                     .onAppear { if !reduceMotion { withAnimation(.easeInOut(duration: 0.4).repeatForever(autoreverses: true)) { bounce = true } } }
                 Kicker("HAND THE PHONE TO")
                 StickerText(name.uppercased(), size: TypeScale.display)
                 OlaSays(text: "No peeking. Their questions are next.")
-                Spacer()
+            } bottom: {
                 Button(name.contains("&") ? "We're ready" : "I'm \(name), let's go") { Haptics.tap(); onContinue() }
                     .buttonStyle(ChunkyButtonStyle(color: Theme.gold))
                     .accessibilityIdentifier("handoff-continue")
@@ -116,9 +115,9 @@ struct RoundIntroView: View {
     var body: some View {
         let deck = controller.deck
         Stage(GameBackground(top: deck?.color ?? Theme.violet, bottom: (deck?.color ?? Theme.violet).mix(with: .black, by: 0.35))) {
-            VStack(spacing: 14) {
+            PinnedColumn(spacing: 14) {
                 MatchHeader(controller: controller)
-                Spacer()
+            } middle: {
                 if let deck {
                     Mascot(deck: deck, mood: .think, size: 170)
                     if controller.state.mode == .teams, let m = controller.currentMember {
@@ -134,7 +133,7 @@ struct RoundIntroView: View {
                     fact("\(Int(MatchEngine.secondsPerQuestion))s", "EACH")
                     fact(MatchEngine.tierName(MatchEngine.tiers(forRound: round).max() ?? 1), "TOP TIER")
                 }
-                Spacer()
+            } bottom: {
                 Button("Start round \(round)") { Haptics.heavy(); controller.beginAnswering() }
                     .buttonStyle(ChunkyButtonStyle(color: Theme.gold))
                     .accessibilityIdentifier("start-round")
@@ -175,9 +174,9 @@ struct WaitingView: View {
 
     var body: some View {
         Stage(GameBackground(top: Theme.violet, bottom: Theme.violetDeep)) {
-            VStack(spacing: 16) {
+            PinnedColumn(spacing: 16) {
                 MatchHeader(controller: controller, onClose: attemptClose)
-                Spacer()
+            } middle: {
                 if let companion { Mascot(deck: companion, mood: unsent ? .sad : .think, size: 130) }
                 // Saying "their turn" when the upload failed is simply untrue: the move never left
                 // this phone. Say what actually happened.
@@ -198,7 +197,7 @@ struct WaitingView: View {
                     .padding(.horizontal, 8)
                 }
                 RoundHistory(controller: controller)
-                Spacer()
+            } bottom: {
                 Button("Back to matches") { attemptClose() }
                     .buttonStyle(ChunkyButtonStyle(color: .white, edge: Theme.panelEdge, ink: Theme.ink))
             }

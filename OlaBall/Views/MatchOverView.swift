@@ -15,9 +15,9 @@ struct MatchOverView: View {
         let iWon = winner == me
         let winnerWorld = winner.flatMap { s.player($0)?.world }
         Stage(winnerWorld.map { GameBackground(world: $0) } ?? GameBackground(top: Theme.violet, bottom: Theme.violetDeep)) {
-            VStack(spacing: 14) {
+            PinnedColumn(spacing: 14) {
                 MatchHeader(controller: controller, onClose: onClose)
-                Spacer()
+            } middle: {
                 Kicker("FINAL")
                 TrophyIcon(size: 96)
                     .scaleEffect(pop ? 1 : 0.2).rotationEffect(.degrees(pop ? 0 : 20))
@@ -39,7 +39,7 @@ struct MatchOverView: View {
                     }
                 }
                 OlaSays(text: winner == nil ? "Identical. Suspicious. Run it back." : (iWon ? "Bragging rights are yours until the rematch." : "Rematch. Immediately. Don't let this stand."))
-                Spacer()
+            } bottom: {
                 if controller.transport.isPassAndPlay, let p = profiles.profile, let partner = s.partner(of: s.players[0].id) {
                     Button("Rematch") {
                         Haptics.heavy()

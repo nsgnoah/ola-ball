@@ -5,45 +5,60 @@ struct QuestionView: View {
     @State private var shakeAmount: CGFloat = 0
     @State private var confetti = false
     @State private var pop = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         let deck = controller.deck
         let color = deck?.color ?? Theme.violet
         Stage(GameBackground(top: color, bottom: color.mix(with: .black, by: 0.4))) {
-            VStack(spacing: 12) {
-                header(deck: deck)
-                progressDots
-                Spacer(minLength: 0)
-                if let q = controller.currentQuestion, let deck {
-                    questionCard(q, deck: deck)
-                    VStack(spacing: 10) {
-                        ForEach(Array(q.options.enumerated()), id: \.offset) { i, option in
-                            Button {
-                                controller.select(i)
-                            } label: {
-                                optionRow(i, option, q: q)
+            ScrollViewReader { scroll in
+                PinnedColumn(spacing: 12) {
+                    header(deck: deck)
+                    progressDots
+                } middle: {
+                    if let q = controller.currentQuestion, let deck {
+                        questionCard(q, deck: deck).id(ScrollMark.card)
+                        VStack(spacing: 10) {
+                            ForEach(Array(q.options.enumerated()), id: \.offset) { i, option in
+                                Button {
+                                    controller.select(i)
+                                } label: {
+                                    optionRow(i, option, q: q)
+                                }
+                                .buttonStyle(.plain)
+                                .allowsHitTesting(!controller.revealed)
+                                .accessibilityIdentifier("option-\(i)")
+                                .modifier(Shake(animatableData: (controller.revealed && controller.selected == i && i != q.correctIndex) ? shakeAmount : 0))
                             }
-                            .buttonStyle(.plain)
-                            .allowsHitTesting(!controller.revealed)
-                            .accessibilityIdentifier("option-\(i)")
-                            .modifier(Shake(animatableData: (controller.revealed && controller.selected == i && i != q.correctIndex) ? shakeAmount : 0))
+                        }
+                        if controller.revealed {
+                            feedback(q).id(ScrollMark.verdict).transition(.move(edge: .bottom).combined(with: .opacity))
                         }
                     }
+                } bottom: {
                     if controller.revealed {
-                        feedback(q).transition(.move(edge: .bottom).combined(with: .opacity))
+                        Button(controller.index + 1 >= controller.questions.count ? "See the round" : "Next question") {
+                            Haptics.tap()
+                            controller.nextQuestion()
+                        }
+                        .buttonStyle(ChunkyButtonStyle(color: Theme.gold))
+                        .accessibilityIdentifier("next-question")
                     }
                 }
-                Spacer(minLength: 0)
-                if controller.revealed {
-                    Button(controller.index + 1 >= controller.questions.count ? "See the round" : "Next question") {
-                        Haptics.tap()
-                        controller.nextQuestion()
+                .padding(20)
+                // Only moves on a screen too short for the whole question. Ola's verdict lands under
+                // the options, out of sight there, so a reveal scrolls down to it; each new question
+                // starts back at the top. Where everything fits there is nowhere to scroll.
+                .onChange(of: controller.revealed) { _, revealed in
+                    guard revealed else { return }
+                    // After the reveal's own spring: while it runs the content is still growing
+                    // and there is nothing below to scroll to yet.
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        withAnimation(reduceMotion ? nil : .spring(duration: 0.4)) { scroll.scrollTo(ScrollMark.verdict, anchor: .bottom) }
                     }
-                    .buttonStyle(ChunkyButtonStyle(color: Theme.gold))
-                    .accessibilityIdentifier("next-question")
                 }
+                .onChange(of: controller.index) { scroll.scrollTo(ScrollMark.card, anchor: .top) }
             }
-            .padding(20)
             if confetti { ConfettiBurst().transition(.opacity) }
         }
         .animation(.spring(duration: 0.3), value: controller.revealed)
@@ -58,6 +73,8 @@ struct QuestionView: View {
             }
         }
     }
+
+    private enum ScrollMark: Hashable { case card, verdict }
 
     // MARK: Pieces
 
