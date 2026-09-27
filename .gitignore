@@ -11,3 +11,17 @@ xcuserdata/
 *.ipa
 *.dSYM.zip
 *.dSYM
+
+# Android
+android/.gradle/
+android/.kotlin/
+android/build/
+android/*/build/
+android/local.properties
+android/keystore.properties
+android/captures/
+android/.idea/
+*.apk
+*.aab
+*.jks
+*.keystore

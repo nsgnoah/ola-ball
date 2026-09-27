@@ -1,0 +1,198 @@
+{
+  "createdAt" : 800000000.25,
+  "mode" : "teams",
+  "players" : [
+    {
+      "id" : "local-a",
+      "members" : [
+        {
+          "answers" : "his",
+          "id" : "local-a/0",
+          "knows" : "his",
+          "name" : "Noah"
+        },
+        {
+          "answers" : "hers",
+          "id" : "local-a/1",
+          "knows" : "hers",
+          "name" : "Sam"
+        }
+      ],
+      "name" : "Noah & Sam",
+      "world" : "his"
+    },
+    {
+      "id" : "local-b",
+      "members" : [
+        {
+          "answers" : "his",
+          "id" : "local-b/0",
+          "knows" : "his",
+          "name" : "Alex"
+        },
+        {
+          "answers" : "hers",
+          "id" : "local-b/1",
+          "knows" : "hers",
+          "name" : "Jo"
+        }
+      ],
+      "name" : "Alex & Jo",
+      "world" : "his"
+    }
+  ],
+  "revealed" : {
+    "local-a" : 1
+  },
+  "rounds" : [
+    {
+      "number" : 1,
+      "picks" : {
+        "local-a/0" : "cars",
+        "local-a/1" : "divas",
+        "local-b/0" : "football",
+        "local-b/1" : "skincare"
+      },
+      "results" : {
+        "local-a/0" : {
+          "answers" : [
+            2,
+            1,
+            0,
+            null,
+            0,
+            3,
+            1
+          ],
+          "correct" : 6,
+          "questionIDs" : [
+            "cars-1",
+            "cars-2",
+            "cars-4",
+            "cars-5",
+            "cars-7",
+            "cars-20",
+            "cars-17"
+          ],
+          "score" : 942,
+          "timesMs" : [
+            1000,
+            2500,
+            4000,
+            15000,
+            7000,
+            8500,
+            10000
+          ]
+        },
+        "local-a/1" : {
+          "answers" : [
+            3,
+            0,
+            0,
+            null,
+            1,
+            2,
+            0
+          ],
+          "correct" : 6,
+          "questionIDs" : [
+            "divas-1",
+            "divas-2",
+            "divas-9",
+            "divas-11",
+            "divas-7",
+            "divas-19",
+            "divas-18"
+          ],
+          "score" : 942,
+          "timesMs" : [
+            1000,
+            2500,
+            4000,
+            15000,
+            7000,
+            8500,
+            10000
+          ]
+        },
+        "local-b/0" : {
+          "answers" : [
+            3,
+            0,
+            0,
+            null,
+            3,
+            3,
+            1
+          ],
+          "correct" : 6,
+          "questionIDs" : [
+            "football-2",
+            "football-4",
+            "football-9",
+            "football-7",
+            "football-12",
+            "football-15",
+            "football-13"
+          ],
+          "score" : 942,
+          "timesMs" : [
+            1000,
+            2500,
+            4000,
+            15000,
+            7000,
+            8500,
+            10000
+          ]
+        },
+        "local-b/1" : {
+          "answers" : [
+            0,
+            1,
+            3,
+            null,
+            1,
+            1,
+            3
+          ],
+          "correct" : 0,
+          "questionIDs" : [
+            "skincare-10",
+            "skincare-9",
+            "skincare-8",
+            "skincare-2",
+            "skincare-4",
+            "skincare-21",
+            "skincare-19"
+          ],
+          "score" : 0,
+          "timesMs" : [
+            1000,
+            2500,
+            4000,
+            15000,
+            7000,
+            8500,
+            10000
+          ]
+        }
+      }
+    },
+    {
+      "number" : 2,
+      "picks" : {
+        "local-b/0" : "grill"
+      },
+      "results" : {
+
+      }
+    }
+  ],
+  "seed" : 16045690984503111693,
+  "status" : "active",
+  "turnPlayerID" : "local-b",
+  "updatedAt" : 800000100,
+  "version" : 3
+}

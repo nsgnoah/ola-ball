@@ -1,0 +1,702 @@
+{
+  "bounded" : [
+    {
+      "seed" : 7,
+      "upperBound" : 2,
+      "values" : [
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "seed" : 7,
+      "upperBound" : 3,
+      "values" : [
+        1,
+        0,
+        2,
+        1,
+        1,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        2,
+        2,
+        2,
+        2,
+        1
+      ]
+    },
+    {
+      "seed" : 99,
+      "upperBound" : 7,
+      "values" : [
+        1,
+        0,
+        5,
+        0,
+        1,
+        1,
+        4,
+        5,
+        3,
+        3,
+        3,
+        5,
+        1,
+        3,
+        0,
+        5
+      ]
+    },
+    {
+      "seed" : 123456,
+      "upperBound" : 36,
+      "values" : [
+        8,
+        9,
+        21,
+        26,
+        14,
+        28,
+        13,
+        32,
+        26,
+        26,
+        28,
+        6,
+        9,
+        9,
+        23,
+        28
+      ]
+    },
+    {
+      "seed" : 18446744073709551615,
+      "upperBound" : 1000,
+      "values" : [
+        893,
+        912,
+        219,
+        426,
+        705,
+        824,
+        942,
+        251,
+        769,
+        12,
+        14,
+        806,
+        6,
+        865,
+        208,
+        675
+      ]
+    }
+  ],
+  "draws" : [
+    {
+      "deck" : "football",
+      "excluding" : [
+
+      ],
+      "playerID" : "local-a/0",
+      "questionIDs" : [
+        "football-7",
+        "football-11",
+        "football-6",
+        "football-9",
+        "football-5",
+        "football-13",
+        "football-24"
+      ],
+      "round" : 1,
+      "seed" : 4242
+    },
+    {
+      "deck" : "football",
+      "excluding" : [
+
+      ],
+      "playerID" : "x",
+      "questionIDs" : [
+        "football-6",
+        "football-1",
+        "football-18",
+        "football-19",
+        "football-13",
+        "football-20",
+        "football-31"
+      ],
+      "round" : 2,
+      "seed" : 99
+    },
+    {
+      "deck" : "football",
+      "excluding" : [
+
+      ],
+      "playerID" : "y",
+      "questionIDs" : [
+        "football-12",
+        "football-9",
+        "football-20",
+        "football-22",
+        "football-17",
+        "football-24",
+        "football-25"
+      ],
+      "round" : 2,
+      "seed" : 99
+    },
+    {
+      "deck" : "football",
+      "excluding" : [
+        "football-1",
+        "football-13",
+        "football-18",
+        "football-19",
+        "football-20",
+        "football-31",
+        "football-6"
+      ],
+      "playerID" : "x",
+      "questionIDs" : [
+        "football-7",
+        "football-2",
+        "football-17",
+        "football-21",
+        "football-15",
+        "football-22",
+        "football-36"
+      ],
+      "round" : 2,
+      "seed" : 99
+    },
+    {
+      "deck" : "skincare",
+      "excluding" : [
+
+      ],
+      "playerID" : "local-b/0",
+      "questionIDs" : [
+        "skincare-20",
+        "skincare-16",
+        "skincare-15",
+        "skincare-19",
+        "skincare-26",
+        "skincare-31",
+        "skincare-27"
+      ],
+      "round" : 3,
+      "seed" : 777
+    },
+    {
+      "deck" : "skincare",
+      "excluding" : [
+
+      ],
+      "playerID" : "G:abc/1",
+      "questionIDs" : [
+        "skincare-36",
+        "skincare-33",
+        "skincare-25",
+        "skincare-31",
+        "skincare-30",
+        "skincare-32",
+        "skincare-29"
+      ],
+      "round" : 5,
+      "seed" : 1
+    },
+    {
+      "deck" : "skincare",
+      "excluding" : [
+        "skincare-1",
+        "skincare-10",
+        "skincare-11",
+        "skincare-12",
+        "skincare-13",
+        "skincare-14",
+        "skincare-15",
+        "skincare-16",
+        "skincare-17",
+        "skincare-18",
+        "skincare-19",
+        "skincare-2",
+        "skincare-20",
+        "skincare-21",
+        "skincare-22",
+        "skincare-3",
+        "skincare-4",
+        "skincare-5",
+        "skincare-6",
+        "skincare-7",
+        "skincare-8",
+        "skincare-9"
+      ],
+      "playerID" : "local-a/0",
+      "questionIDs" : [
+        "skincare-23",
+        "skincare-24",
+        "skincare-33",
+        "skincare-29",
+        "skincare-34",
+        "skincare-32",
+        "skincare-26"
+      ],
+      "round" : 1,
+      "seed" : 12
+    },
+    {
+      "deck" : "football",
+      "excluding" : [
+        "football-1",
+        "football-10",
+        "football-11",
+        "football-12",
+        "football-13",
+        "football-14",
+        "football-15",
+        "football-16",
+        "football-17",
+        "football-18",
+        "football-19",
+        "football-2",
+        "football-20",
+        "football-21",
+        "football-22",
+        "football-23",
+        "football-24",
+        "football-25",
+        "football-26",
+        "football-27",
+        "football-28",
+        "football-29",
+        "football-3",
+        "football-30",
+        "football-31",
+        "football-32",
+        "football-33",
+        "football-4",
+        "football-5",
+        "football-6",
+        "football-7",
+        "football-8",
+        "football-9"
+      ],
+      "playerID" : "local-b/0",
+      "questionIDs" : [
+        "football-35",
+        "football-36",
+        "football-34",
+        "football-9",
+        "football-7",
+        "football-21",
+        "football-18"
+      ],
+      "round" : 4,
+      "seed" : 31
+    }
+  ],
+  "hashes" : [
+    {
+      "hash" : 1469598103934665603,
+      "string" : ""
+    },
+    {
+      "hash" : 4953267810257967366,
+      "string" : "a"
+    },
+    {
+      "hash" : -48782936933897468,
+      "string" : "local-a"
+    },
+    {
+      "hash" : 4252932634625336851,
+      "string" : "local-a/0"
+    },
+    {
+      "hash" : 6108140803438542373,
+      "string" : "local-b/1"
+    },
+    {
+      "hash" : 1852734059340034056,
+      "string" : "football-1"
+    },
+    {
+      "hash" : -3342135277420360225,
+      "string" : "skincare-36"
+    },
+    {
+      "hash" : -5282223897869847133,
+      "string" : "G:1234567890"
+    },
+    {
+      "hash" : 225721116742872348,
+      "string" : "Noah & Sam"
+    },
+    {
+      "hash" : 6624197923410877540,
+      "string" : "émoji 🎯"
+    }
+  ],
+  "points" : [
+    {
+      "correct" : false,
+      "elapsedMs" : 100,
+      "points" : 0,
+      "streak" : 0
+    },
+    {
+      "correct" : true,
+      "elapsedMs" : 0,
+      "points" : 150,
+      "streak" : 1
+    },
+    {
+      "correct" : true,
+      "elapsedMs" : 500,
+      "points" : 148,
+      "streak" : 1
+    },
+    {
+      "correct" : true,
+      "elapsedMs" : 7499,
+      "points" : 125,
+      "streak" : 1
+    },
+    {
+      "correct" : true,
+      "elapsedMs" : 7500,
+      "points" : 125,
+      "streak" : 1
+    },
+    {
+      "correct" : true,
+      "elapsedMs" : 14000,
+      "points" : 103,
+      "streak" : 1
+    },
+    {
+      "correct" : true,
+      "elapsedMs" : 15000,
+      "points" : 100,
+      "streak" : 1
+    },
+    {
+      "correct" : true,
+      "elapsedMs" : 20000,
+      "points" : 100,
+      "streak" : 1
+    },
+    {
+      "correct" : true,
+      "elapsedMs" : 1000,
+      "points" : 172,
+      "streak" : 2
+    },
+    {
+      "correct" : true,
+      "elapsedMs" : 1000,
+      "points" : 197,
+      "streak" : 3
+    },
+    {
+      "correct" : true,
+      "elapsedMs" : 1000,
+      "points" : 222,
+      "streak" : 4
+    },
+    {
+      "correct" : true,
+      "elapsedMs" : 1000,
+      "points" : 222,
+      "streak" : 9
+    },
+    {
+      "correct" : true,
+      "elapsedMs" : 3333,
+      "points" : 139,
+      "streak" : 0
+    },
+    {
+      "correct" : true,
+      "elapsedMs" : 150,
+      "points" : 150,
+      "streak" : 1
+    },
+    {
+      "correct" : true,
+      "elapsedMs" : 450,
+      "points" : 149,
+      "streak" : 1
+    },
+    {
+      "correct" : true,
+      "elapsedMs" : 750,
+      "points" : 173,
+      "streak" : 2
+    },
+    {
+      "correct" : true,
+      "elapsedMs" : 14850,
+      "points" : 101,
+      "streak" : 1
+    }
+  ],
+  "rng" : [
+    {
+      "seed" : 0,
+      "values" : [
+        16294208416658607535,
+        7960286522194355700,
+        487617019471545679,
+        17909611376780542444,
+        1961750202426094747,
+        6038094601263162090,
+        3207296026000306913,
+        14232521865600346940
+      ]
+    },
+    {
+      "seed" : 1,
+      "values" : [
+        10451216379200822465,
+        13757245211066428519,
+        17911839290282890590,
+        8196980753821780235,
+        8195237237126968761,
+        14072917602864530048,
+        16184226688143867045,
+        9648886400068060533
+      ]
+    },
+    {
+      "seed" : 42,
+      "values" : [
+        13679457532755275413,
+        2949826092126892291,
+        5139283748462763858,
+        6349198060258255764,
+        701532786141963250,
+        16015981125662989062,
+        4028864712777624925,
+        14769051326987775908
+      ]
+    },
+    {
+      "seed" : 4242,
+      "values" : [
+        15514741754378068195,
+        6618998805086131378,
+        6694171037031508525,
+        12885719489278247797,
+        3849346279739125428,
+        18102991823458081878,
+        13990320708289636280,
+        13445719821553802580
+      ]
+    },
+    {
+      "seed" : 11400714819323198485,
+      "values" : [
+        7960286522194355700,
+        487617019471545679,
+        17909611376780542444,
+        1961750202426094747,
+        6038094601263162090,
+        3207296026000306913,
+        14232521865600346940,
+        4532161160992623299
+      ]
+    },
+    {
+      "seed" : 18446744073709551615,
+      "values" : [
+        16490336266968443936,
+        16834447057089888969,
+        4048727598324417001,
+        7862637804313477842,
+        13015481187462834606,
+        15212506146343009075,
+        17388166129998380965,
+        4638043754431676516
+      ]
+    }
+  ],
+  "scores" : [
+    {
+      "answers" : [
+        3,
+        3,
+        2,
+        3,
+        null,
+        2,
+        1
+      ],
+      "correct" : 3,
+      "deck" : "football",
+      "playerID" : "local-b/0",
+      "round" : 1,
+      "score" : 459,
+      "seed" : 4242,
+      "timesMs" : [
+        1200,
+        3400,
+        15000,
+        800,
+        15000,
+        200,
+        6000
+      ]
+    },
+    {
+      "answers" : [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "correct" : 0,
+      "deck" : "skincare",
+      "playerID" : "local-a/0",
+      "round" : 5,
+      "score" : 0,
+      "seed" : 4242,
+      "timesMs" : [
+        15000,
+        15000,
+        15000,
+        15000,
+        15000,
+        15000,
+        15000
+      ]
+    },
+    {
+      "answers" : [
+        0,
+        0,
+        0
+      ],
+      "correct" : 1,
+      "deck" : "football",
+      "playerID" : "x",
+      "round" : 3,
+      "score" : 150,
+      "seed" : 99,
+      "timesMs" : [
+        100,
+        100,
+        100
+      ]
+    }
+  ],
+  "shuffles" : [
+    {
+      "count" : 4,
+      "order" : [
+        2,
+        3,
+        1,
+        0
+      ],
+      "seed" : 1
+    },
+    {
+      "count" : 12,
+      "order" : [
+        4,
+        9,
+        0,
+        3,
+        5,
+        7,
+        11,
+        1,
+        2,
+        10,
+        8,
+        6
+      ],
+      "seed" : 5
+    },
+    {
+      "count" : 36,
+      "order" : [
+        13,
+        18,
+        20,
+        9,
+        29,
+        17,
+        33,
+        19,
+        7,
+        26,
+        2,
+        21,
+        31,
+        28,
+        22,
+        5,
+        23,
+        10,
+        27,
+        30,
+        14,
+        4,
+        15,
+        0,
+        16,
+        3,
+        24,
+        25,
+        32,
+        12,
+        8,
+        34,
+        6,
+        35,
+        1,
+        11
+      ],
+      "seed" : 77
+    },
+    {
+      "count" : 7,
+      "order" : [
+        5,
+        3,
+        1,
+        0,
+        4,
+        6,
+        2
+      ],
+      "seed" : 4242
+    }
+  ]
+}

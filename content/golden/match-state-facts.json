@@ -1,0 +1,58 @@
+{
+  "crowns" : {
+    "local-a" : 1,
+    "local-b" : 0
+  },
+  "pendingAnswersFor" : {
+    "local-a" : [
+
+    ],
+    "local-b" : [
+      "local-b/0"
+    ]
+  },
+  "pendingPicksFor" : {
+    "local-a" : [
+      "local-b/1"
+    ],
+    "local-b" : [
+      "local-a/0",
+      "local-a/1"
+    ]
+  },
+  "status" : "active",
+  "totals" : {
+    "local-a" : 1884,
+    "local-b" : 942
+  },
+  "usedQuestionIDs" : [
+    "cars-1",
+    "cars-17",
+    "cars-2",
+    "cars-20",
+    "cars-4",
+    "cars-5",
+    "cars-7",
+    "divas-1",
+    "divas-11",
+    "divas-18",
+    "divas-19",
+    "divas-2",
+    "divas-7",
+    "divas-9",
+    "football-12",
+    "football-13",
+    "football-15",
+    "football-2",
+    "football-4",
+    "football-7",
+    "football-9",
+    "skincare-10",
+    "skincare-19",
+    "skincare-2",
+    "skincare-21",
+    "skincare-4",
+    "skincare-8",
+    "skincare-9"
+  ]
+}

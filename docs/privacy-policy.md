@@ -1,6 +1,6 @@
 # Spinola Privacy Policy
 
-_Last updated: September 20, 2026_
+_Last updated: September 24, 2026_
 
 Spinola has no accounts, no servers of ours, and no analytics. There is no service of ours for your
 data to go to, and we never receive it.
@@ -12,6 +12,9 @@ stored in the app on your device. Clear them any time with "Start over" on the h
 deleting the app.
 
 ## What online play sends, and who sees it
+
+This section is about the iPhone and iPad app. **The Android app plays on one phone only**, so it
+never sends a match anywhere; everything below about Game Center does not apply to it.
 
 Playing from two phones uses Apple's Game Center. To carry a match between phones, Spinola puts the
 match itself into Game Center. That match contains:
@@ -36,8 +39,9 @@ password, no contacts, no location, and no device permissions.
 
 ## Nothing else leaves the device
 
-Spinola makes no network requests other than Game Center's. There are no analytics, no advertising, no
-third-party SDKs, and no tracking of any kind.
+Spinola makes no network requests other than Game Center's on iPhone and iPad, and none at all on
+Android (the Android app does not even ask for the internet permission). There are no analytics, no
+advertising, no third-party SDKs, and no tracking of any kind.
 
 ## Children
 

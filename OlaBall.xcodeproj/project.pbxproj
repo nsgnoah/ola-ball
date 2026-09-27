@@ -37,6 +37,7 @@
 		D7E3C04DF212C13959FC1C7A /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = C44153EE6927EBB33629DF2C /* Profile.swift */; };
 		DFD2564878AA95D3CE147BF1 /* HisWorldMore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 493AAD598997A2CDF0026970 /* HisWorldMore.swift */; };
 		E3EACA8395E6DDE4BF2D0752 /* TeamSetup.swift in Sources */ = {isa = PBXBuildFile; fileRef = E35EDA48BB1E9EE05F2C1577 /* TeamSetup.swift */; };
+		E833A8212D4EEF085BF9462E /* CrossPlatformExportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B811A4910531AE5AE70618 /* CrossPlatformExportTests.swift */; };
 		E90EF8B91330ABF193F06F77 /* Wheel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07EB47EFDE6EABBA063374A5 /* Wheel.swift */; };
 		F37C6E311E1FE27790FBA843 /* Icons.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F80EF042798C435582E3B7 /* Icons.swift */; };
 		F7355AE2664FF230153A8582 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF4E4A92D9971125574E14E3 /* HomeView.swift */; };
@@ -91,6 +92,7 @@
 		C5E93C1F2304E6984158858B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C73634D2584CBC365EF159CD /* HUD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HUD.swift; sourceTree = "<group>"; };
 		D400A2356E1140F41DF35565 /* RoundRevealView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundRevealView.swift; sourceTree = "<group>"; };
+		D9B811A4910531AE5AE70618 /* CrossPlatformExportTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrossPlatformExportTests.swift; sourceTree = "<group>"; };
 		DDE8A422DAB70CEA66FC2A8F /* HisWorld.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HisWorld.swift; sourceTree = "<group>"; };
 		E203D87F0E7CB5372D1FD009 /* MatchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchView.swift; sourceTree = "<group>"; };
 		E306F19148BACBBAB5F7229E /* OlaBall.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = OlaBall.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -201,6 +203,7 @@
 			isa = PBXGroup;
 			children = (
 				3F50E274F9D578F3D22935FC /* AppIconTests.swift */,
+				D9B811A4910531AE5AE70618 /* CrossPlatformExportTests.swift */,
 				AA774E78CE553708DD4C4BBF /* EngineTests.swift */,
 				32D1360B80554459203E8CBE /* IconSheetTests.swift */,
 				104AB967D0C81FE26D5AF062 /* WaitingScreenTests.swift */,
@@ -411,6 +414,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5F49C474D23A1FFFFF91C632 /* AppIconTests.swift in Sources */,
+				E833A8212D4EEF085BF9462E /* CrossPlatformExportTests.swift in Sources */,
 				1BEA5EFDFC038E5EB924DEE4 /* EngineTests.swift in Sources */,
 				C0EC44E247ACF29E9929905C /* IconSheetTests.swift in Sources */,
 				63494D28840AEE5D83F279B5 /* WaitingScreenTests.swift in Sources */,

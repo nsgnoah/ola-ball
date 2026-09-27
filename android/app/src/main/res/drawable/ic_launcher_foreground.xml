@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Launcher icon, foreground layer: a his-blue and her-pink prize wheel with a gold pointer.
+  The wheel is the "spin" in Spinola; the two colours are His World and Her World. No
+  lettering, because text is unreadable at home-screen size. Mirrors AppIconArt in
+  OlaBallTests/AppIconTests.swift, scaled so the whole wheel-plus-pointer group sits inside
+  the 66dp safe circle (Android masks the icon into whatever shape the launcher likes).
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Wheel, tilted -11 degrees about its centre. -->
+    <group android:rotation="-11" android:pivotX="54" android:pivotY="56.66">
+        <!-- Drop shadow, the sticker look used throughout the app. -->
+        <path
+            android:fillColor="#731D1A33"
+            android:pathData="M27.4,58.522 a26.6,26.6 0 1,0 53.2,0 a26.6,26.6 0 1,0 -53.2,0 z" />
+        <!-- Rim. -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M27.4,56.66 a26.6,26.6 0 1,0 53.2,0 a26.6,26.6 0 1,0 -53.2,0 z" />
+        <!-- Slices, alternating His and Her. -->
+        <path
+            android:fillColor="#2F56BF"
+            android:pathData="M54,56.66 L54,32.986 A23.674,23.674 0 0,1 70.74,39.92 z M54,56.66 L77.674,56.66 A23.674,23.674 0 0,1 70.74,73.4 z M54,56.66 L54,80.334 A23.674,23.674 0 0,1 37.26,73.4 z M54,56.66 L30.326,56.66 A23.674,23.674 0 0,1 37.26,39.92 z" />
+        <path
+            android:fillColor="#D6406F"
+            android:pathData="M54,56.66 L70.74,39.92 A23.674,23.674 0 0,1 77.674,56.66 z M54,56.66 L70.74,73.4 A23.674,23.674 0 0,1 54,80.334 z M54,56.66 L37.26,73.4 A23.674,23.674 0 0,1 30.326,56.66 z M54,56.66 L37.26,39.92 A23.674,23.674 0 0,1 54,32.986 z" />
+        <!-- White dividers between slices. -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M53.521,32.72 L54.479,32.72 L54.479,56.66 L53.521,56.66 z M70.59,39.393 L71.267,40.07 L54.339,56.999 L53.661,56.321 z M77.94,56.181 L77.94,57.139 L54,57.139 L54,56.181 z M71.267,73.25 L70.59,73.927 L53.661,56.999 L54.339,56.321 z M54.479,80.6 L53.521,80.6 L53.521,56.66 L54.479,56.66 z M37.41,73.927 L36.733,73.25 L53.661,56.321 L54.339,56.999 z M30.06,57.139 L30.06,56.181 L54,56.181 L54,57.139 z M36.733,40.07 L37.41,39.393 L54.339,56.321 L53.661,56.999 z" />
+        <!-- Ink outline. -->
+        <path
+            android:strokeColor="#1D1A33"
+            android:strokeWidth="1.17"
+            android:pathData="M27.985,56.66 a26.015,26.015 0 1,0 52.03,0 a26.015,26.015 0 1,0 -52.03,0 z" />
+    </group>
+    <!-- Hub: brass disc with a star, like the in-game wheel. Drawn upright: on iOS it is
+         rotated back by the wheel's tilt so the star stays level. -->
+    <path
+        android:fillColor="#B97F0C"
+        android:pathData="M46.02,57.298 a7.98,7.98 0 1,0 15.96,0 a7.98,7.98 0 1,0 -15.96,0 z" />
+    <path
+        android:fillColor="#EDB240"
+        android:pathData="M46.02,56.66 a7.98,7.98 0 1,0 15.96,0 a7.98,7.98 0 1,0 -15.96,0 z" />
+    <path
+        android:strokeColor="#1D1A33"
+        android:strokeWidth="0.958"
+        android:pathData="M46.499,56.66 a7.501,7.501 0 1,0 15.002,0 a7.501,7.501 0 1,0 -15.002,0 z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#1D1A33"
+        android:strokeWidth="0.532"
+        android:pathData="M54,52.67 L55.032,55.24 L57.795,55.427 L55.67,57.203 L56.345,59.888 L54,58.416 L51.655,59.888 L52.33,57.203 L50.205,55.427 L52.968,55.24 z" />
+    <!-- Pointer: gold with a goldDeep shadow and an ink outline. -->
+    <path
+        android:fillColor="#B97F0C"
+        android:pathData="M47.54,23.372 L60.46,23.372 L54,35.258 z" />
+    <path
+        android:fillColor="#EDB240"
+        android:strokeColor="#1D1A33"
+        android:strokeWidth="0.904"
+        android:strokeLineJoin="round"
+        android:pathData="M47.54,22.597 L60.46,22.597 L54,34.483 z" />
+</vector>

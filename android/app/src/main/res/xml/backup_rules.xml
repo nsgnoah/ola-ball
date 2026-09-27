@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The profile and pass-and-play matches may ride along with device backups; nothing else exists. -->
+<full-backup-content>
+    <include domain="sharedpref" path="." />
+</full-backup-content>

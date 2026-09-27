@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Violet pulled toward night: the home screen's backdrop, so the launch frame is never white. -->
+    <color name="stage_violet">#3F3392</color>
+    <color name="night">#1A1B4B</color>
+</resources>

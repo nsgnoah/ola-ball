@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Launcher icon, monochrome layer (Android 13 themed icons): the wheel's silhouette in one
+  colour. The system keeps only the alpha and tints it, so the rim, the eight slices, the
+  hub with its star and the pointer are separated by transparent gaps instead of colour.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Rim. -->
+    <path
+        android:fillColor="#1D1A33"
+        android:fillType="evenOdd"
+        android:pathData="M27.4,56.66 a26.6,26.6 0 1,0 53.2,0 a26.6,26.6 0 1,0 -53.2,0 z M29.6,56.66 a24.4,24.4 0 1,0 48.8,0 a24.4,24.4 0 1,0 -48.8,0 z" />
+    <!-- Slices, tilted -11 degrees like the coloured wheel. -->
+    <group android:rotation="-11" android:pivotX="54" android:pivotY="56.66">
+        <path
+            android:fillColor="#1D1A33"
+            android:pathData="M54.8,33.874 A22.8,22.8 0 0,1 69.546,39.982 L60.185,49.344 A9.58,9.58 0 0,0 54.8,47.113 z M70.678,41.114 A22.8,22.8 0 0,1 76.786,55.86 L63.547,55.86 A9.58,9.58 0 0,0 61.316,50.475 z M76.786,57.46 A22.8,22.8 0 0,1 70.678,72.206 L61.316,62.845 A9.58,9.58 0 0,0 63.547,57.46 z M69.546,73.338 A22.8,22.8 0 0,1 54.8,79.446 L54.8,66.207 A9.58,9.58 0 0,0 60.185,63.976 z M53.2,79.446 A22.8,22.8 0 0,1 38.454,73.338 L47.815,63.976 A9.58,9.58 0 0,0 53.2,66.207 z M37.322,72.206 A22.8,22.8 0 0,1 31.214,57.46 L44.453,57.46 A9.58,9.58 0 0,0 46.684,62.845 z M31.214,55.86 A22.8,22.8 0 0,1 37.322,41.114 L46.684,50.475 A9.58,9.58 0 0,0 44.453,55.86 z M38.454,39.982 A22.8,22.8 0 0,1 53.2,33.874 L53.2,47.113 A9.58,9.58 0 0,0 47.815,49.344 z" />
+    </group>
+    <!-- Hub with the star cut out. -->
+    <path
+        android:fillColor="#1D1A33"
+        android:fillType="evenOdd"
+        android:pathData="M46.02,56.66 a7.98,7.98 0 1,0 15.96,0 a7.98,7.98 0 1,0 -15.96,0 z M54,52.67 L55.032,55.24 L57.795,55.427 L55.67,57.203 L56.345,59.888 L54,58.416 L51.655,59.888 L52.33,57.203 L50.205,55.427 L52.968,55.24 z" />
+    <!-- Pointer. -->
+    <path
+        android:fillColor="#1D1A33"
+        android:pathData="M47.54,22.597 L60.46,22.597 L54,32.26 z" />
+</vector>

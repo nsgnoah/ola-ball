@@ -16,6 +16,19 @@ open OlaBall.xcodeproj
 
 Tests: `⌘U`, or `xcodebuild test -project OlaBall.xcodeproj -scheme OlaBall -destination 'platform=iOS Simulator,name=iPhone 16 Pro'`.
 
+## Android
+
+A native Kotlin + Jetpack Compose port lives in `android/` (pass-and-play on one phone; there is no
+Game Center on Android). It ships the same questions from `content/assets/decks.json`, which the iOS
+tests export, and proves the same rules with golden fixtures.
+
+```bash
+export JAVA_HOME=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home ANDROID_HOME=$HOME/Library/Android/sdk
+cd android && ./gradlew :core:test :app:testDebugUnitTest :app:assembleDebug
+```
+
+Build notes in `android/README.md`, the Google Play checklist in `docs/PLAY-STORE.md`.
+
 ## App Store readiness
 
 - No accounts, passwords, or network of our own. Game Center handles identity and match storage.

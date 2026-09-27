@@ -1,6 +1,6 @@
 # Spinola — Status / Handoff
 
-_Updated: 2026-09-20 20:00 CDT_
+_Updated: 2026-09-25_
 
 ## What this is now
 A couples trivia game: His World vs Her World. Each player declares the world they know; the challenger picks the deck their partner is quizzed on each round; five rounds, escalating difficulty, first to three crowns. Async over Game Center turn-based matches, or pass-and-play on one phone. Pivoted from the 3D football game on 2026-09-19 (that build is tagged `v1-football-draw-the-play`).
@@ -38,11 +38,62 @@ A couples trivia game: His World vs Her World. Each player declares the world th
 - Game Center on a real device (needs a sandbox Apple ID on the simulator or a device with Game Center signed in). All Game Center code paths are unexercised by tests.
 - Audio levels (no audio in the simulator here).
 
-## Android (planned, not started)
-Noah wants a Google Play version later. Keep that in mind now:
-- Keep game rules, scoring, question draw, and match-state JSON in plain Swift with no UIKit/SwiftUI imports (`Models/`, `Engine/MatchEngine.swift`) so they can be ported line for line to Kotlin, and keep `MatchState`'s JSON shape stable and documented; it is the cross-platform contract if the two apps ever share a backend.
-- Question content lives in Swift source today. Before the Android build, export it to a JSON file both apps load, with a unit test that the Swift and JSON copies match.
-- Game Center is iOS-only. Cross-platform async play needs a small backend (or Google Play Games on Android with no cross-play). Decide before building.
+## Android (built September 24, 2026)
+
+A native Kotlin + Jetpack Compose port lives in `android/`. Same rules, same screens, Ola's lines
+word for word, same game-show look, no accounts, no server, no permissions, no third-party SDKs.
+It is **pass-and-play only**: Game Center is Apple-only and Google shut down Play Games'
+turn-based multiplayer in 2020, so there is no drop-in equivalent. Both modes work on one phone.
+The `MatchTransport` seam is kept for an online transport later.
+
+- `android/core`: pure Kotlin (no Android imports): `SeededRNG` (SplitMix64 plus Swift's
+  `shuffle(using:)` and `Int.random(in:using:)` reproduced bit for bit), `Deck`/`Question`,
+  `MatchState` (immutable, JSON-compatible with Swift's `JSONEncoder` output), `MatchEngine`,
+  `MatchController` (a `StateFlow` snapshot instead of `@Observable`), `ProfileStore`,
+  `LocalMatchStore`, `PassAndPlayTransport`. 32 JVM tests, including replays of every golden
+  fixture the iOS tests write (see below).
+- `android/app`: Compose. `ui/theme` (palette, `Viewport`/`UI.s()` canvas scale, `AppText` type
+  roles), `ui/hud` (`Stage`, `GameBackground`, `StickerText`, `ChunkyButton`, `Mascot`,
+  `WheelView`, `TimerRing`, `ConfettiBurst`, every icon drawn from paths in `Icons.kt`),
+  `ui/screens` (one file per iOS view), `audio` (the same synthesized sounds through `AudioTrack`,
+  haptics through `performHapticFeedback` so no permission is needed). Adaptive launcher icon as
+  vector drawables from the same geometry as `AppIconTests.swift`. Play Store art in `android/play/`.
+- **Shared content.** `OlaBallTests/CrossPlatformExportTests.swift` writes
+  `content/assets/decks.json` (shipped as an Android asset) and `content/golden/*.json` (RNG
+  streams, hashes, draws, scores, one `MatchState` as Swift encodes it). The Kotlin tests replay
+  them; the Swift test fails once whenever the export drifts, so a content change cannot ship on one
+  platform only. `content/README.md` has the workflow.
+- **Fonts.** Rockwell and DIN Condensed ship with iOS, not Android. The port bundles Arvo and
+  Barlow Condensed Bold (SIL OFL), chosen side by side against the iOS fonts on September 25.
+- **Verified:** JVM tests green, lint clean of errors, `assembleDebug` builds (compileSdk 37, target
+  36, min 26), the instrumented `PlayThroughTest` plays a whole pass-and-play match and a couples match
+  on the Pixel 8 emulator and writes screenshots (`android/scripts/store_shots.sh`). The R8-minified
+  release APK (1.5 MB, signed with the debug key when no upload key is present) was installed and
+  played by hand on the emulator: profile, new match, pick, a round, a dark-mode switch mid-question
+  (activity recreated, round and clock intact), back mid-question (ignored), force-stop and relaunch
+  (everything restored), About and Start over.
+- **Review pass (Sep 24):** seven review lenses, each finding checked by two adversarial verifiers;
+  31 real findings fixed, among them the controller dying on rotation, the halftone dots drawn in
+  pixels instead of dp, a dark status bar on the dark stage in light mode, the timer ring reading 0
+  under "Remove animations", test-only launch flags that could wipe a player's data in release, and
+  missing thousands separators on scores.
+- **Not verified:** a real Android phone (audio levels, haptics, keyboard behaviour, launcher masks),
+  a release build through R8 with the upload key, tablets beyond the layout code.
+- Submission checklist: `docs/PLAY-STORE.md`. Build notes: `android/README.md`.
+
+## Google Play (Sep 25)
+- Privacy and support pages published with the Android wording (nsgnoah/ola, commit c2996c7).
+- Upload key created (`android/spinola-upload.jks`, RSA 4096, valid to 2054; passwords in the
+  gitignored `android/keystore.properties`); release bundle signed with it.
+- Store listing copy, icon, feature graphic, eight 9:16 phone screenshots and four tablet-layout
+  screenshots in `android/play/`.
+- Short-screen bug found while making 9:16 screenshots (the question screen crushed its Next
+  button) and fixed for every match screen with `PinnedColumn`.
+- Organization developer account for NSG LLC verified (D-U-N-S 139956326, nsgsolutions.co).
+- **1.0 (1) sent for production review on September 25, 2026**, with no closed test (organization
+  accounts are exempt): 176 countries (all but Morocco), rated ESRB Teen / PEGI 12. Managed
+  publishing is off, so it goes live when approved. Details: `docs/PLAY-STORE.md`.
+- Not yet done: installing from Play on a real Android phone.
 
 ## Next
 1. Play a Game Center match between two devices; fix whatever the first real turn reveals.
