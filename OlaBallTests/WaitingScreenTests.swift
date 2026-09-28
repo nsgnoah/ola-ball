@@ -12,20 +12,20 @@ import UIKit
 @Suite(.serialized)
 struct WaitingScreenTests {
     @Test func theirMove() async throws {
-        let c = MatchController(state: Self.lateMatch(teams: false), transport: OnlineStub(fails: false))
+        let c = MatchController(state: Self.lateMatch(teams: false), transport: OnlineStub(fails: false), history: QuestionHistory())
         try await render(c, "waiting-couple")
         #expect(c.stage == .waiting)
     }
 
     @Test func notSentYet() async throws {
-        let c = MatchController(state: Self.lateMatch(teams: false), transport: OnlineStub(fails: true))
+        let c = MatchController(state: Self.lateMatch(teams: false), transport: OnlineStub(fails: true), history: QuestionHistory())
         try await render(c, "waiting-unsent") { c.retrySubmit() }
         #expect(c.stage == .waiting)
         #expect(c.error != nil)
     }
 
     @Test func teams() async throws {
-        let c = MatchController(state: Self.lateMatch(teams: true), transport: OnlineStub(fails: false))
+        let c = MatchController(state: Self.lateMatch(teams: true), transport: OnlineStub(fails: false), history: QuestionHistory())
         try await render(c, "waiting-teams")
         #expect(c.stage == .waiting)
     }

@@ -9,6 +9,8 @@ import co.nsgsolutions.spinola.model.MatchStatus
 import co.nsgsolutions.spinola.model.Member
 import co.nsgsolutions.spinola.model.Question
 import co.nsgsolutions.spinola.model.World
+import co.nsgsolutions.spinola.services.InMemoryStore
+import co.nsgsolutions.spinola.services.QuestionHistory
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -82,6 +84,8 @@ class MatchController(
     val transport: MatchTransport,
     private val feedback: MatchFeedback,
     private val scope: CoroutineScope,
+    /** What this phone has already shown (the app passes the saved one; tests get a fresh one). */
+    private val history: QuestionHistory = QuestionHistory(InMemoryStore()),
     private val clock: () -> Long = System::currentTimeMillis,
 ) {
     data class Snapshot(
@@ -260,7 +264,7 @@ class MatchController(
                 currentMember = pending.member,
                 roundNumber = pending.round,
                 deck = d,
-                questions = MatchEngine.questions(deck = d, round = pending.round, playerID = pending.member.id, seed = state.seed, excluding = state.usedQuestionIDs),
+                questions = MatchEngine.questions(deck = d, round = pending.round, playerID = pending.member.id, seed = state.seed, excluding = state.usedQuestionIDs, seen = history.order),
                 index = 0,
                 answers = emptyList(),
                 timesMs = emptyList(),
@@ -341,6 +345,7 @@ class MatchController(
         val member = currentMember ?: return
         val result = MatchEngine.score(questions = questions, answers = answers, timesMs = timesMs)
         edit { copy(state = state.record(result, memberID = member.id, round = roundNumber)) }
+        history.record(questions.map { it.id })
         if (state.status == MatchStatus.finished) {
             edit { copy(stage = Stage.Waiting) }   // never leave `Answering` with no question while the submit is in flight
             scope.launch { finishTurn() }

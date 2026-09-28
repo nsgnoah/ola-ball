@@ -36,12 +36,15 @@ enum MatchEngine {
         }
     }
 
-    /// Deterministic question draw: both phones compute the same list from the match seed.
-    static func questions(deck: Deck, round: Int, playerID: String, seed: UInt64, excluding used: Set<String>) -> [Question] {
+    /// Deterministic question draw from the match seed. `seen` is this phone's history, oldest first:
+    /// within each tier, questions it has never shown come first, then the ones it showed longest ago.
+    static func questions(deck: Deck, round: Int, playerID: String, seed: UInt64, excluding used: Set<String>, seen: [String] = []) -> [Question] {
         var rng = SeededRNG(seed: seed &+ UInt64(round) &* 1_000_003 &+ UInt64(truncatingIfNeeded: playerID.stableHash))
+        let age = Dictionary(seen.enumerated().map { ($1, $0) }, uniquingKeysWith: { _, last in last })
         var pools: [Int: [Question]] = [:]
         for t in 1...3 {
-            pools[t] = deck.questions.filter { $0.tier == t && !used.contains($0.id) }.shuffled(using: &rng)
+            let pool = deck.questions.filter { $0.tier == t && !used.contains($0.id) }.shuffled(using: &rng)
+            pools[t] = pool.filter { age[$0.id] == nil } + pool.filter { age[$0.id] != nil }.sorted { age[$0.id]! < age[$1.id]! }
         }
         var out: [Question] = []
         for t in tiers(forRound: round) {

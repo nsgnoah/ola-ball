@@ -128,7 +128,10 @@
         "football-87"
       ],
       "round" : 1,
-      "seed" : 4242
+      "seed" : 4242,
+      "seen" : [
+
+      ]
     },
     {
       "deck" : "football",
@@ -146,7 +149,10 @@
         "football-95"
       ],
       "round" : 2,
-      "seed" : 99
+      "seed" : 99,
+      "seen" : [
+
+      ]
     },
     {
       "deck" : "football",
@@ -164,7 +170,10 @@
         "football-109"
       ],
       "round" : 2,
-      "seed" : 99
+      "seed" : 99,
+      "seen" : [
+
+      ]
     },
     {
       "deck" : "football",
@@ -188,7 +197,10 @@
         "football-102"
       ],
       "round" : 2,
-      "seed" : 99
+      "seed" : 99,
+      "seen" : [
+
+      ]
     },
     {
       "deck" : "skincare",
@@ -206,7 +218,10 @@
         "skincare-31"
       ],
       "round" : 3,
-      "seed" : 777
+      "seed" : 777,
+      "seen" : [
+
+      ]
     },
     {
       "deck" : "skincare",
@@ -224,7 +239,10 @@
         "skincare-35"
       ],
       "round" : 5,
-      "seed" : 1
+      "seed" : 1,
+      "seen" : [
+
+      ]
     },
     {
       "deck" : "skincare",
@@ -319,7 +337,10 @@
         "skincare-30"
       ],
       "round" : 1,
-      "seed" : 12
+      "seed" : 12,
+      "seen" : [
+
+      ]
     },
     {
       "deck" : "football",
@@ -453,7 +474,137 @@
         "football-55"
       ],
       "round" : 4,
-      "seed" : 31
+      "seed" : 31,
+      "seen" : [
+
+      ]
+    },
+    {
+      "deck" : "football",
+      "excluding" : [
+
+      ],
+      "playerID" : "x",
+      "questionIDs" : [
+        "football-2",
+        "football-7",
+        "football-13",
+        "football-16",
+        "football-87",
+        "football-92",
+        "football-116"
+      ],
+      "round" : 2,
+      "seed" : 99,
+      "seen" : [
+        "football-44",
+        "football-43",
+        "football-79",
+        "football-89",
+        "football-82",
+        "football-77",
+        "football-95"
+      ]
+    },
+    {
+      "deck" : "skincare",
+      "excluding" : [
+
+      ],
+      "playerID" : "local-a/0",
+      "questionIDs" : [
+        "skincare-51",
+        "skincare-45",
+        "skincare-81",
+        "skincare-67",
+        "skincare-77",
+        "skincare-72",
+        "skincare-117"
+      ],
+      "round" : 2,
+      "seed" : 5,
+      "seen" : [
+        "skincare-81",
+        "skincare-51",
+        "skincare-67",
+        "skincare-45",
+        "skincare-77",
+        "skincare-72",
+        "skincare-89",
+        "skincare-78",
+        "skincare-4",
+        "skincare-38",
+        "skincare-46",
+        "skincare-86",
+        "skincare-11",
+        "skincare-44",
+        "skincare-69",
+        "skincare-10",
+        "skincare-43",
+        "skincare-49",
+        "skincare-15",
+        "skincare-3",
+        "skincare-71",
+        "skincare-6",
+        "skincare-74",
+        "skincare-14",
+        "skincare-59",
+        "skincare-62",
+        "skincare-23",
+        "skincare-91",
+        "skincare-87",
+        "skincare-80",
+        "skincare-20",
+        "skincare-66",
+        "skincare-64",
+        "skincare-19",
+        "skincare-8",
+        "skincare-53",
+        "skincare-82",
+        "skincare-73",
+        "skincare-7",
+        "skincare-85",
+        "skincare-70",
+        "skincare-50",
+        "skincare-16",
+        "skincare-13",
+        "skincare-24",
+        "skincare-83",
+        "skincare-90",
+        "skincare-1",
+        "skincare-40",
+        "skincare-75",
+        "skincare-12",
+        "skincare-68",
+        "skincare-42",
+        "skincare-48",
+        "skincare-65",
+        "skincare-84",
+        "skincare-21",
+        "skincare-63",
+        "skincare-55",
+        "skincare-92",
+        "skincare-58",
+        "skincare-18",
+        "skincare-76",
+        "skincare-47",
+        "skincare-39",
+        "skincare-17",
+        "skincare-22",
+        "skincare-88",
+        "skincare-5",
+        "skincare-61",
+        "skincare-52",
+        "skincare-41",
+        "skincare-37",
+        "skincare-54",
+        "skincare-57",
+        "skincare-2",
+        "skincare-60",
+        "skincare-79",
+        "skincare-56",
+        "skincare-9"
+      ]
     }
   ],
   "hashes" : [

@@ -18,6 +18,7 @@
 		364B99ACD8B9CEBDBA6023A6 /* HerWorld.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0DEF2A2AEFF014570EE7519 /* HerWorld.swift */; };
 		3B8421765ABD68CE217B02C1 /* RoundRevealView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D400A2356E1140F41DF35565 /* RoundRevealView.swift */; };
 		4461E4A9BA2D34F2EED0E46D /* BookclubExtra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92F5D8FF96E8655AB4FCBD3C /* BookclubExtra.swift */; };
+		5332110A3216BCB38C558919 /* QuestionHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCCDB9F3AAD1737C5BA87E3C /* QuestionHistory.swift */; };
 		53675E29CA6E864D4E3436A5 /* BallsportsExtra.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A4258119A0F69C1E7F9644 /* BallsportsExtra.swift */; };
 		5583DBFECCE914636FC8CAE6 /* SkincareExtra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2007ED8084AD447B519DCC93 /* SkincareExtra.swift */; };
 		58F461118BB141E893F6BB83 /* DeckPickView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEC18DC118B64D620B3C4C41 /* DeckPickView.swift */; };
@@ -121,6 +122,7 @@
 		B16C1482B18BC8BCEF187EFF /* TechExtra.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechExtra.swift; sourceTree = "<group>"; };
 		B19184181F501A49F8670CE2 /* ActionmoviesExtra.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionmoviesExtra.swift; sourceTree = "<group>"; };
 		BC860B85AA69E5E27AA0AEBD /* OlaBall.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OlaBall.entitlements; sourceTree = "<group>"; };
+		BCCDB9F3AAD1737C5BA87E3C /* QuestionHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionHistory.swift; sourceTree = "<group>"; };
 		BEC18DC118B64D620B3C4C41 /* DeckPickView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeckPickView.swift; sourceTree = "<group>"; };
 		BF33E215D9315279DCFAC9A5 /* NerdExtra.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NerdExtra.swift; sourceTree = "<group>"; };
 		C44153EE6927EBB33629DF2C /* Profile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile.swift; sourceTree = "<group>"; };
@@ -232,6 +234,7 @@
 			children = (
 				FF129FB9BE919EA90D155D6F /* GameCenterService.swift */,
 				054E7DDEEDE5959AAB629146 /* LocalMatchStore.swift */,
+				BCCDB9F3AAD1737C5BA87E3C /* QuestionHistory.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -473,6 +476,7 @@
 				10D06D4BD458493D0C0B31A7 /* OlaBallApp.swift in Sources */,
 				D7E3C04DF212C13959FC1C7A /* Profile.swift in Sources */,
 				1C977938880C8FBC694949D9 /* ProfileSetupView.swift in Sources */,
+				5332110A3216BCB38C558919 /* QuestionHistory.swift in Sources */,
 				AEEDEB34ABBC9F0941E1BEFC /* QuestionView.swift in Sources */,
 				5DD20C7228C924AE9DF5A5E3 /* RealityExtra.swift in Sources */,
 				F7820E2762ECD5932425B34D /* RomcomsExtra.swift in Sources */,

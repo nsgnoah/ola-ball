@@ -40,13 +40,19 @@ object MatchEngine {
         else -> "Last word"
     }
 
-    /** Deterministic question draw: both phones compute the same list from the match seed. */
-    fun questions(deck: Deck, round: Int, playerID: String, seed: ULong, excluding: Set<String>): List<Question> {
+    /**
+     * Deterministic question draw from the match seed. [seen] is this phone's history, oldest first:
+     * within each tier, questions it has never shown come first, then the ones it showed longest ago.
+     */
+    fun questions(deck: Deck, round: Int, playerID: String, seed: ULong, excluding: Set<String>, seen: List<String> = emptyList()): List<Question> {
         // Wrapping arithmetic, exactly as Swift's `&+` / `&*` on UInt64.
         val rng = SeededRNG(seed + round.toULong() * 1_000_003uL + playerID.stableHash.toULong())
+        val age = HashMap<String, Int>()
+        seen.forEachIndexed { i, id -> age[id] = i }
         val pools = HashMap<Int, MutableList<Question>>()
         for (t in 1..3) {
-            pools[t] = deck.questions.filter { it.tier == t && it.id !in excluding }.shuffled(rng).toMutableList()
+            val pool = deck.questions.filter { it.tier == t && it.id !in excluding }.shuffled(rng)
+            pools[t] = (pool.filter { it.id !in age } + pool.filter { it.id in age }.sortedBy { age.getValue(it.id) }).toMutableList()
         }
         val out = ArrayList<Question>()
         for (t in tiers(round)) {

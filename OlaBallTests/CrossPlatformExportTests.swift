@@ -33,7 +33,7 @@ struct CrossPlatformExportTests {
         struct Bounded: Codable { let seed: UInt64, upperBound: Int, values: [Int] }
         /// `Array(0..<count).shuffled(using: &rng)`.
         struct Shuffle: Codable { let seed: UInt64, count: Int, order: [Int] }
-        struct Draw: Codable { let deck: String, round: Int, playerID: String, seed: UInt64, excluding: [String], questionIDs: [String] }
+        struct Draw: Codable { let deck: String, round: Int, playerID: String, seed: UInt64, excluding: [String], seen: [String], questionIDs: [String] }
         struct Points: Codable { let correct: Bool, elapsedMs: Int, streak: Int, points: Int }
         struct Score: Codable { let deck: String, round: Int, playerID: String, seed: UInt64, answers: [Int?], timesMs: [Int], score: Int, correct: Int }
         let rng: [RNGStream], hashes: [Hash], bounded: [Bounded], shuffles: [Shuffle], draws: [Draw], points: [Points], scores: [Score]
@@ -99,21 +99,26 @@ struct CrossPlatformExportTests {
         let football = HisWorld.football
         let skincare = HerWorld.skincare
         let first = MatchEngine.questions(deck: football, round: 2, playerID: "x", seed: 99, excluding: [])
-        let cases: [(Deck, Int, String, UInt64, Set<String>)] = [
-            (football, 1, "local-a/0", 4242, []),
-            (football, 2, "x", 99, []),
-            (football, 2, "y", 99, []),
-            (football, 2, "x", 99, Set(first.map(\.id))),
-            (skincare, 3, "local-b/0", 777, []),
-            (skincare, 5, "G:abc/1", 1, []),
+        var rng0 = SeededRNG(seed: 2026)
+        let cases: [(Deck, Int, String, UInt64, Set<String>, [String])] = [
+            (football, 1, "local-a/0", 4242, [], []),
+            (football, 2, "x", 99, [], []),
+            (football, 2, "y", 99, [], []),
+            (football, 2, "x", 99, Set(first.map(\.id)), []),
+            (skincare, 3, "local-b/0", 777, [], []),
+            (skincare, 5, "G:abc/1", 1, [], []),
             // Nearly every rookie and pro question is used up: the draw must fall through to other tiers.
-            (skincare, 1, "local-a/0", 12, Set(skincare.questions.filter { $0.tier < 3 }.dropLast(2).map(\.id))),
+            (skincare, 1, "local-a/0", 12, Set(skincare.questions.filter { $0.tier < 3 }.dropLast(2).map(\.id)), []),
             // The unused pool runs dry: the deck must repeat itself to fill the round.
-            (football, 4, "local-b/0", 31, Set(football.questions.dropLast(3).map(\.id))),
+            (football, 4, "local-b/0", 31, Set(football.questions.dropLast(3).map(\.id)), []),
+            // This phone has seen some of the deck: unseen questions first.
+            (football, 2, "x", 99, [], first.map(\.id)),
+            // Every rookie and pro question seen, in a scrambled order: oldest-seen first.
+            (skincare, 2, "local-a/0", 5, [], skincare.questions.filter { $0.tier < 3 }.map(\.id).shuffled(using: &rng0)),
         ]
-        for (deck, round, pid, seed, excluding) in cases {
-            let qs = MatchEngine.questions(deck: deck, round: round, playerID: pid, seed: seed, excluding: excluding)
-            draws.append(.init(deck: deck.id, round: round, playerID: pid, seed: seed, excluding: excluding.sorted(), questionIDs: qs.map(\.id)))
+        for (deck, round, pid, seed, excluding, seen) in cases {
+            let qs = MatchEngine.questions(deck: deck, round: round, playerID: pid, seed: seed, excluding: excluding, seen: seen)
+            draws.append(.init(deck: deck.id, round: round, playerID: pid, seed: seed, excluding: excluding.sorted(), seen: seen, questionIDs: qs.map(\.id)))
         }
         var points: [Golden.Points] = []
         for (c, ms, streak) in [(false, 100, 0), (true, 0, 1), (true, 500, 1), (true, 7_499, 1), (true, 7_500, 1), (true, 14_000, 1), (true, 15_000, 1), (true, 20_000, 1), (true, 1_000, 2), (true, 1_000, 3), (true, 1_000, 4), (true, 1_000, 9), (true, 3_333, 0),

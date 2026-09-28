@@ -49,10 +49,12 @@ final class MatchController {
     private(set) var streak = 0
     private(set) var runningScore = 0
     private var timer: Timer?
+    private let history: QuestionHistory
 
-    init(state: MatchState, transport: MatchTransport) {
+    init(state: MatchState, transport: MatchTransport, history: QuestionHistory = .shared) {
         self.state = state
         self.transport = transport
+        self.history = history
     }
 
     var me: String { transport.activePlayerID }
@@ -167,7 +169,7 @@ final class MatchController {
         currentMember = pending.member
         roundNumber = pending.round
         deck = d
-        questions = MatchEngine.questions(deck: d, round: pending.round, playerID: pending.member.id, seed: state.seed, excluding: state.usedQuestionIDs)
+        questions = MatchEngine.questions(deck: d, round: pending.round, playerID: pending.member.id, seed: state.seed, excluding: state.usedQuestionIDs, seen: history.order)
         index = 0
         answers = []
         timesMs = []
@@ -236,6 +238,7 @@ final class MatchController {
         guard let member = currentMember else { return }
         let result = MatchEngine.score(questions: questions, answers: answers, timesMs: timesMs)
         state.record(result, forMember: member.id, round: roundNumber)
+        history.record(questions.map(\.id))
         if state.status == .finished {
             stage = .waiting          // never leave `.answering` with no question while the submit is in flight
             Task { await finishTurn() }

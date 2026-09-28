@@ -53,6 +53,25 @@ struct EngineTests {
         #expect(a.map(\.id) != d.map(\.id))
     }
 
+    @Test func drawPrefersQuestionsThisPhoneHasNotSeen() {
+        let deck = HisWorld.football
+        let a = MatchEngine.questions(deck: deck, round: 2, playerID: "x", seed: 99, excluding: [])
+        // Same match seed, but this phone has already shown those seven: none of them come back.
+        let b = MatchEngine.questions(deck: deck, round: 2, playerID: "x", seed: 99, excluding: [], seen: a.map(\.id))
+        #expect(Set(b.map(\.id)).isDisjoint(with: a.map(\.id)))
+        // Everything in the round's tiers seen: the draw cycles through the oldest first.
+        let rookies = deck.questions.filter { $0.tier == 1 }.map(\.id)
+        let c = MatchEngine.questions(deck: deck, round: 1, playerID: "x", seed: 99, excluding: [], seen: rookies + deck.questions.filter { $0.tier > 1 }.map(\.id))
+        #expect(Array(c.prefix(5)).map(\.id) == Array(rookies.prefix(5)))
+    }
+
+    @Test func historyMovesSeenQuestionsToTheNewestEnd() {
+        let h = QuestionHistory()
+        h.record(["a", "b", "c"])
+        h.record(["b", "d"])
+        #expect(h.order == ["a", "c", "b", "d"])
+    }
+
     @Test func scoringRewardsSpeedAndStreaks() {
         #expect(MatchEngine.points(correct: false, elapsedMs: 100, streak: 0) == 0)
         let fast = MatchEngine.points(correct: true, elapsedMs: 500, streak: 1)
@@ -174,7 +193,7 @@ struct ControllerTests {
     @Test func aNewOnlineMatchHandsTheFirstTurnOver() async throws {
         let seed = MatchState(seed: 42, creator: .solo(id: "a", name: "Noah", world: .his))
         let transport = OnlineTransport(state: seed, localID: "a")
-        let c = MatchController(state: seed, transport: transport)
+        let c = MatchController(state: seed, transport: transport, history: QuestionHistory())
 
         c.start(announce: true)
         try await Task.sleep(for: .milliseconds(150))
@@ -223,7 +242,7 @@ struct ControllerTests {
 
     @Test @MainActor func aWholePassAndPlayMatchCompletes() async throws {
         var s = MatchState(seed: 42, creator: .solo(id: "a", name: "Noah", world: .his)); s.join(.solo(id: "b", name: "Sam", world: .hers))
-        let c = MatchController(state: s, transport: MemoryTransport(state: s))
+        let c = MatchController(state: s, transport: MemoryTransport(state: s), history: QuestionHistory())
         _ = try await Self.playOut(c)
         #expect(c.stage == .finished)
         #expect(c.state.status == .finished)
@@ -234,7 +253,7 @@ struct ControllerTests {
     @Test @MainActor func aCouplesMatchCompletesWithHandoffsBetweenMembers() async throws {
         var s = MatchState(seed: 7, creator: .team(id: "a", members: [("Noah", .his), ("Sam", .hers)]), mode: .teams)
         s.join(.team(id: "b", members: [("Alex", .his), ("Jo", .hers)]))
-        let c = MatchController(state: s, transport: MemoryTransport(state: s))
+        let c = MatchController(state: s, transport: MemoryTransport(state: s), history: QuestionHistory())
         _ = try await Self.playOut(c)
         #expect(c.stage == .finished)
         #expect(c.state.winnerID == "a")
@@ -256,7 +275,7 @@ struct ControllerTests {
         let s = MatchState(seed: 11, creator: .team(id: "a", members: [("Noah", .his), ("Sam", .hers)]), mode: .teams)
         let t = MemoryTransport(state: s)
         t.turn = "b"
-        let c = MatchController(state: s, transport: t)
+        let c = MatchController(state: s, transport: t, history: QuestionHistory())
         c.start(announce: true)
         #expect(c.stage == .setupTeam)
         c.joinTeam(members: [("Alex", .his), ("Jo", .hers)])

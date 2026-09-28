@@ -32,7 +32,7 @@ class MatchHost : ViewModel() {
         val initial = store.matches.value[matchID] ?: return null
         // viewModelScope runs on Dispatchers.Main.immediate, the main-thread contract the controller
         // expects, and outlives the composition. Its in-flight saves are not cancelled on release.
-        val controller = MatchController(initial, PassAndPlayTransport(matchID, initial, store), AppFeedback, viewModelScope)
+        val controller = MatchController(initial, PassAndPlayTransport(matchID, initial, store), AppFeedback, viewModelScope, store.history)
         session = Session(matchID, controller)
         return controller
     }

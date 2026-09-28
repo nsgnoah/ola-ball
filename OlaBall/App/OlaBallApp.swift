@@ -12,6 +12,10 @@ struct OlaBallApp: App {
             UserDefaults.standard.removeObject(forKey: "ola.profile.v1")
             UserDefaults.standard.removeObject(forKey: "ola.localMatches.v1")
         }
+        if args.contains("-ui-testing-reset") || args.contains("-ui-testing-seed") {
+            // A fresh history keeps the seeded matches drawing the same questions every run.
+            UserDefaults.standard.removeObject(forKey: QuestionHistory.key)
+        }
         if args.contains("-ui-testing-seed") {
             // A ready-made profile and pass-and-play match, so UI tests can skip the keyboard.
             let profile = Profile(name: "Noah", world: .his)

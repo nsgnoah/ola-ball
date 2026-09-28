@@ -7,6 +7,8 @@ import co.nsgsolutions.spinola.model.MatchState
 import co.nsgsolutions.spinola.model.Profile
 import co.nsgsolutions.spinola.model.World
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.serializer
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.util.UUID
@@ -63,6 +65,32 @@ class ProfileStore(private val store: KeyValueStore, initial: Profile? = null) {
     }
 }
 
+/**
+ * Every question this phone has shown, oldest first, so the next draw can prefer ones nobody here
+ * has seen. Only the answering phone draws a round, so a history that differs per phone can't
+ * split a match. Same key and JSON as iOS.
+ */
+class QuestionHistory(private val store: KeyValueStore) {
+    var order: List<String> = load()
+        private set
+
+    /** Mark questions as just seen: each moves to the newest end. */
+    fun record(ids: List<String>) {
+        val fresh = ids.toSet()
+        order = order.filter { it !in fresh } + ids
+        store.putString(KEY, MatchJson.json.encodeToString(ListSerializer(String.serializer()), order))
+    }
+
+    private fun load(): List<String> {
+        val text = store.getString(KEY) ?: return emptyList()
+        return try { MatchJson.json.decodeFromString(ListSerializer(String.serializer()), text) } catch (_: Exception) { emptyList() }
+    }
+
+    companion object {
+        const val KEY = "ola.seenQuestions.v1"
+    }
+}
+
 /** Pass-and-play matches live on this phone only. */
 class LocalMatchStore(
     private val store: KeyValueStore,
@@ -70,6 +98,9 @@ class LocalMatchStore(
 ) {
     private val _matches = MutableStateFlow<Map<String, MatchState>>(emptyMap())
     val matches: StateFlow<Map<String, MatchState>> = _matches.asStateFlow()   // keyed by a local id
+
+    /** The questions this phone has shown. It lives here because every Android match is a local one. */
+    val history = QuestionHistory(store)
 
     init { load() }
 

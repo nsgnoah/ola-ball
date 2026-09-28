@@ -2,6 +2,8 @@ package co.nsgsolutions.spinola
 
 import co.nsgsolutions.spinola.engine.MatchEngine
 import co.nsgsolutions.spinola.model.MatchState
+import co.nsgsolutions.spinola.services.InMemoryStore
+import co.nsgsolutions.spinola.services.QuestionHistory
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
@@ -15,8 +17,8 @@ class GoldenEngineTests {
     @Test
     fun questionDrawsMatchSwift() {
         for (d in golden.draws) {
-            val qs = MatchEngine.questions(deck = Fixtures.deck(d.deck), round = d.round, playerID = d.playerID, seed = d.seed, excluding = d.excluding.toSet())
-            assertEquals("${d.deck} round ${d.round} player ${d.playerID} seed ${d.seed} excluding ${d.excluding.size}", d.questionIDs, qs.map { it.id })
+            val qs = MatchEngine.questions(deck = Fixtures.deck(d.deck), round = d.round, playerID = d.playerID, seed = d.seed, excluding = d.excluding.toSet(), seen = d.seen)
+            assertEquals("${d.deck} round ${d.round} player ${d.playerID} seed ${d.seed} excluding ${d.excluding.size} seen ${d.seen.size}", d.questionIDs, qs.map { it.id })
         }
     }
 
@@ -62,6 +64,29 @@ class GoldenEngineTests {
         // Two members of one couple on the same deck get different questions.
         val d = MatchEngine.questions(deck = football, round = 2, playerID = "y", seed = 99uL, excluding = emptySet())
         assertNotEquals(a.map { it.id }, d.map { it.id })
+    }
+
+    @Test
+    fun drawPrefersQuestionsThisPhoneHasNotSeen() {
+        val a = MatchEngine.questions(deck = football, round = 2, playerID = "x", seed = 99uL, excluding = emptySet())
+        // Same match seed, but this phone has already shown those seven: none of them come back.
+        val b = MatchEngine.questions(deck = football, round = 2, playerID = "x", seed = 99uL, excluding = emptySet(), seen = a.map { it.id })
+        assertTrue(b.map { it.id }.toSet().intersect(a.map { it.id }.toSet()).isEmpty())
+        // Everything in the round's tiers seen: the draw cycles through the oldest first.
+        val rookies = football.questions.filter { it.tier == 1 }.map { it.id }
+        val c = MatchEngine.questions(deck = football, round = 1, playerID = "x", seed = 99uL, excluding = emptySet(), seen = rookies + football.questions.filter { it.tier > 1 }.map { it.id })
+        assertEquals(rookies.take(5), c.take(5).map { it.id })
+    }
+
+    @Test
+    fun historyMovesSeenQuestionsToTheNewestEnd() {
+        val store = InMemoryStore()
+        val h = QuestionHistory(store)
+        h.record(listOf("a", "b", "c"))
+        h.record(listOf("b", "d"))
+        assertEquals(listOf("a", "c", "b", "d"), h.order)
+        // Saved under the iOS key, and read back by a fresh instance.
+        assertEquals(listOf("a", "c", "b", "d"), QuestionHistory(store).order)
     }
 
     @Test

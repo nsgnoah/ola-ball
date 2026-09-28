@@ -51,7 +51,7 @@ object Fixtures {
 
         /** `Array(0..<count).shuffled(using: &rng)`. */
         @Serializable class Shuffle(val seed: ULong, val count: Int, val order: List<Int>)
-        @Serializable class Draw(val deck: String, val round: Int, val playerID: String, val seed: ULong, val excluding: List<String>, val questionIDs: List<String>)
+        @Serializable class Draw(val deck: String, val round: Int, val playerID: String, val seed: ULong, val excluding: List<String>, val seen: List<String>, val questionIDs: List<String>)
         @Serializable class Points(val correct: Boolean, val elapsedMs: Int, val streak: Int, val points: Int)
         @Serializable class Score(val deck: String, val round: Int, val playerID: String, val seed: ULong, val answers: List<Int?>, val timesMs: List<Int>, val score: Int, val correct: Int)
     }
