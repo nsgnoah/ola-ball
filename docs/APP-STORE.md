@@ -84,7 +84,7 @@ A note on screenshot sizes: the iPhone slot wants **6.5-inch** (1242x2688 or 128
 the 6.9-inch 1320x2868 set. `./scripts/store_shots.sh <udid>` against an iPhone 14 Plus or 13 Pro Max
 simulator produces 1284x2778. The iPad slot takes 2064x2752 directly.
 
-**1.1 (build 5): uploaded and submitted for review on September 27, 2026 at 9:25 PM**, set to release automatically once approved. What's New:
+**1.1 (build 5): uploaded and submitted for review on September 27, 2026 at 9:25 PM**, approved and released automatically on September 28, 2026 (live as 1.1 at 16:50 UTC). What's New:
 
 > 1,500 new questions. Every deck now has 120, from Rookie to Legend, so there's a lot more to argue about.
 >
