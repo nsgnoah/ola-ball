@@ -131,7 +131,7 @@ class MatchStateTests {
         assertEquals("local-b", s.turnPlayerID)
         assertEquals(800_000_000.25, s.createdAt, 0.0)
         assertEquals(800_000_100.0, s.updatedAt, 0.0)
-        assertEquals(listOf(2, 1, 0, null, 0, 3, 1), s.rounds[0].results["local-a/0"]?.answers)
+        assertEquals(listOf(1, 3, 0, null, 0, 1, 3), s.rounds[0].results["local-a/0"]?.answers)
         assertEquals(mapOf("local-a" to 1), s.revealed)
         assertEquals(2, s.rounds.size)
         assertTrue(s.rounds[1].results.isEmpty())

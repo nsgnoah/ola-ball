@@ -41,7 +41,7 @@ enum HisWorld {
         Q(3, "The 1968 'Heidi Game' is famous because NBC did what?", "Cut to a movie before the finish", ["Aired the first instant replay", "Lost its signal at halftime", "Showed the first TV timeout"], "East Coast viewers missed Oakland scoring two touchdowns in nine seconds to win."),
         Q(3, "Lamar Hunt said the name 'Super Bowl' came from what?", "His kids' Super Ball toy", ["A newspaper naming contest", "The shape of the trophy", "A radio host's catchphrase"], "Hunt founded the AFL and owned the Kansas City Chiefs."),
         Q(3, "After a fair catch, an NFL team may try what rare play?", "A field goal with no snap", ["A two-point try", "An onside punt", "A free timeout"], "The defense must line up 10 yards away, so it is nearly impossible to block."),
-    ])
+    ] + footballExtra)
 
     static let ballsports = Deck(id: "ballsports", world: .his, title: "Ball Sports Grab Bag", tagline: "Hoops, baseball, hockey, soccer, golf. One deck, no mercy.", colorHex: "F59E0B", specs: [
         Q(1, "How long is the NBA shot clock?", "24 seconds", ["30 seconds", "45 seconds", "12 seconds"]),
@@ -80,7 +80,7 @@ enum HisWorld {
         Q(3, "Roland Garros, home of the French Open, is named after a what?", "A World War I fighter pilot", ["A French tennis champion", "A former French president", "The stadium's architect"], "Garros was the first person to fly across the Mediterranean, in 1913."),
         Q(3, "In 1988, who won all four tennis majors plus Olympic gold?", "Steffi Graf", ["Martina Navratilova", "Chris Evert", "Monica Seles"], "She beat Gabriela Sabatini for the gold in Seoul."),
         Q(3, "Arnold Palmer's legion of fans was nicknamed what?", "Arnie's Army", ["Palmer's Posse", "The King's Court", "Arnie's Angels"], "The name began with soldiers from nearby Camp Gordon who worked the Masters scoreboards."),
-    ])
+    ] + ballsportsExtra)
 
     static let cars = Deck(id: "cars", world: .his, title: "Cars & Engines", tagline: "Horsepower, torque, and what that light means.", colorHex: "5B6B8C", specs: [
         Q(1, "RPM stands for what?", "Revolutions per minute", ["Rotations per mile", "Rapid power mode", "Rate per mile"]),
@@ -119,7 +119,7 @@ enum HisWorld {
         Q(3, "Carroll Shelby built the Cobra on a roadster from which British maker?", "AC Cars", ["Triumph", "MG", "Lotus"], "Shelby dropped a Ford V8 into the AC Ace, built for a small six."),
         Q(3, "Gearheads doing an 'LS swap' are installing what?", "A GM small-block V8", ["A Ford Coyote V8", "A limited-slip differential", "A lowered suspension"], "The LS family debuted as the LS1 in the 1997 Corvette."),
         Q(3, "The Nürburgring's Nordschleife is nicknamed what?", "The Green Hell", ["The Brickyard", "The Lady in Black", "The Temple of Speed"], "Jackie Stewart coined it after winning there in rain and fog in 1968."),
-    ])
+    ] + carsExtra)
 
     static let grill = Deck(id: "grill", world: .his, title: "Grilling, Beer & Whiskey", tagline: "Low and slow, neat or on the rocks.", colorHex: "E0632A", specs: [
         Q(1, "Scotch must be made where?", "Scotland", ["Ireland", "England", "Wales"]),
@@ -158,7 +158,7 @@ enum HisWorld {
         Q(3, "What makes a porterhouse a porterhouse instead of a T-bone?", "A bigger piece of tenderloin", ["A longer bone", "More marbling", "It's cut from the rib"], "USDA specs require the porterhouse tenderloin to be at least 1.25 inches wide."),
         Q(3, "A brisket's pink smoke ring forms when smoke gases bind with what?", "Myoglobin in the meat", ["Collagen", "Rendered fat", "Sugar in the rub"], "Nitric oxide from the fire binds myoglobin into a pink form that heat can't turn gray."),
         Q(3, "In whiskey making, 'sour mash' means what?", "Adding old mash to a new batch", ["Aging it in used wine casks", "Mashing unripe grain", "Adding citrus to the mash"], "Jim Beam and Jack Daniel's are both made with the sour mash process."),
-    ])
+    ] + grillExtra)
 
     static let nerd = Deck(id: "nerd", world: .his, title: "Games & Superheroes", tagline: "Respawns, Wakanda, and what GG means.", colorHex: "7C4DFF", specs: [
         Q(1, "Which villain snapped his fingers in 'Avengers: Infinity War'?", "Thanos", ["Loki", "Ultron", "Red Skull"]),
@@ -197,7 +197,7 @@ enum HisWorld {
         Q(3, "Who voiced Batman in 'Batman: The Animated Series'?", "Kevin Conroy", ["Mark Hamill", "Adam West", "Michael Keaton"], "Mark Hamill voiced the Joker opposite him."),
         Q(3, "Halo's Master Chief goes by what name and number?", "John-117", ["Kelly-087", "Linda-058", "Jorge-052"], "Steve Downes, a former radio DJ, voiced him in the first 'Halo' in 2001."),
         Q(3, "Nintendo was founded in 1889 to make what?", "Playing cards", ["Paper lanterns", "Sewing machines", "Bicycles"], "Fusajiro Yamauchi started it in Kyoto to make hanafuda, or flower cards."),
-    ])
+    ] + nerdExtra)
 
     static let gear = Deck(id: "gear", world: .his, title: "Tools, Gear & Outdoors", tagline: "Torque wrenches, bowlines, and why the cooler is a Yeti.", colorHex: "5FA31B", specs: [
         Q(1, "A torque wrench is for what?", "Tightening bolts to an exact tightness", ["Cutting pipe", "Measuring angles", "Removing paint"]),
@@ -236,7 +236,7 @@ enum HisWorld {
         Q(3, "In fly fishing, a 'nymph' imitates what?", "A young underwater insect", ["A floating adult insect", "A small baitfish", "A fish egg"], "Nymphs are fished below the surface, often weighted with a bead head."),
         Q(3, "Which of these screws on with a left-hand (reverse) thread?", "A bike's left pedal", ["A garden hose", "A light bulb", "A jar lid"], "Reverse threads keep pedaling from slowly unscrewing it."),
         Q(3, "Which company introduced the first cordless electric drill, in 1961?", "Black & Decker", ["Makita", "Milwaukee", "Craftsman"], "Black & Decker later built the power head for the Apollo 15 moon drill."),
-    ])
+    ] + gearExtra)
 }
 
 enum Decks {

@@ -16,9 +16,9 @@ class GoldenContentTests {
     fun everyDeckIsWellFormed() {
         assertEquals(18, decks.size)
         for (deck in decks) {
-            assertEquals("${deck.id} has ${deck.questions.size} questions", 36, deck.questions.size)
+            assertEquals("${deck.id} has ${deck.questions.size} questions", 120, deck.questions.size)
             for (t in 1..3) {
-                assertEquals("${deck.id} tier $t", 12, deck.questions.count { it.tier == t })
+                assertEquals("${deck.id} tier $t", 40, deck.questions.count { it.tier == t })
             }
             for (q in deck.questions) {
                 assertEquals(q.id, 3, q.wrong.size)
@@ -52,7 +52,7 @@ class GoldenContentTests {
         assertTrue("correct answer should not always be first", decks.flatMap { it.questions }.any { it.correctIndex != 0 })
     }
 
-    /** The seeded shuffle in `Question.options` lands every one of the 648 questions exactly where iOS put it. */
+    /** The seeded shuffle in `Question.options` lands every one of the 2,160 questions exactly where iOS put it. */
     @Test
     fun optionOrderMatchesSwiftForEveryQuestion() {
         val exported = Fixtures.json.decodeFromString(Decks.ContentFile.serializer(), Fixtures.text("decks.json"))
@@ -67,6 +67,6 @@ class GoldenContentTests {
                 checked += 1
             }
         }
-        assertEquals(648, checked)
+        assertEquals(2160, checked)
     }
 }

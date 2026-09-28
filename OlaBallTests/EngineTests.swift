@@ -6,9 +6,9 @@ struct ContentTests {
     @Test func everyDeckIsWellFormed() {
         #expect(Decks.all.count == 18)
         for deck in Decks.all {
-            #expect(deck.questions.count == 36, "\(deck.id) has \(deck.questions.count) questions")
+            #expect(deck.questions.count == 120, "\(deck.id) has \(deck.questions.count) questions")
             for t in 1...3 {
-                #expect(deck.questions.filter { $0.tier == t }.count == 12, "\(deck.id) tier \(t)")
+                #expect(deck.questions.filter { $0.tier == t }.count == 40, "\(deck.id) tier \(t)")
             }
             for q in deck.questions {
                 #expect(q.wrong.count == 3, Comment(rawValue: q.id))

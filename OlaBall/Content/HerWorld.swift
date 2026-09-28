@@ -41,7 +41,7 @@ enum HerWorld {
         Q(3, "On ingredient labels, 'Butyrospermum parkii' is which ingredient?", "Shea butter", ["Cocoa butter", "Mango butter", "Beeswax"], "It comes from the nuts of the African shea tree."),
         Q(3, "Cold cream is credited to which ancient physician?", "Galen", ["Hippocrates", "Avicenna", "Dioscorides"], "His recipe blended rose water, beeswax, and almond or olive oil."),
         Q(3, "Hawaii's 2018 reef law banned sunscreens with oxybenzone and what?", "Octinoxate", ["Homosalate", "Octisalate", "Zinc oxide"], "Hawaii was the first U.S. state with such a ban; it took effect in 2021."),
-    ])
+    ] + skincareExtra)
 
     static let fashion = Deck(id: "fashion", world: .hers, title: "Fashion & Style", tagline: "Houses, hemlines, and the bag everyone knows.", colorHex: "9B5CFF", specs: [
         Q(1, "Which house uses the interlocking 'GG' logo?", "Gucci", ["Guess", "Givenchy", "Gap"]),
@@ -80,7 +80,7 @@ enum HerWorld {
         Q(3, "Madeleine Vionnet is famous for pioneering what?", "The bias-cut dress", ["The wrap dress", "The shoulder pad", "The shirtwaist dress"], "She was the first to cut whole garments on the bias, not just trims."),
         Q(3, "Which is the oldest women's fashion magazine still publishing?", "Harper's Bazaar", ["Vogue", "Elle", "Marie Claire"], "It launched in New York in 1867, 25 years before Vogue."),
         Q(3, "Who founded the Met Gala in 1948?", "Eleanor Lambert", ["Diana Vreeland", "Anna Wintour", "Carmel Snow"], "The publicist also founded the International Best Dressed List."),
-    ])
+    ] + fashionExtra)
 
     static let romcoms = Deck(id: "romcoms", world: .hers, title: "Rom-Coms & Love Stories", tagline: "The lines, the leads, and the letters she never sent.", colorHex: "FF4D6D", specs: [
         Q(1, "In 'Notting Hill,' Julia Roberts plays a what?", "Famous actress", ["Bookshop owner", "Chef", "Lawyer"]),
@@ -119,7 +119,7 @@ enum HerWorld {
         Q(3, "In 'Outlander,' Jamie Fraser's Scottish family estate is called what?", "Lallybroch", ["Castle Leoch", "Craigh na Dun", "Fraser's Ridge"], "Midhope Castle near Edinburgh stands in for Lallybroch on the show."),
         Q(3, "'She's the Man' updates which Shakespeare play?", "Twelfth Night", ["As You Like It", "Much Ado About Nothing", "A Midsummer Night's Dream"], "Viola's new school is Illyria, named for the play's setting."),
         Q(3, "'Before Sunrise' follows two strangers wandering which city overnight?", "Vienna", ["Paris", "Budapest", "Prague"], "Jesse and Céline reunite nine years later in Paris in 'Before Sunset.'"),
-    ])
+    ] + romcomsExtra)
 
     static let reality = Deck(id: "reality", world: .hers, title: "Reality TV", tagline: "Roses, pods, villas, and the tribe that has spoken.", colorHex: "FF7A3D", specs: [
         Q(1, "On 'Survivor,' what is said when someone is voted out?", "The tribe has spoken", ["You're fired", "Please pack your knives", "Sashay away"]),
@@ -158,7 +158,7 @@ enum HerWorld {
         Q(3, "Who finished runner-up to Kelly Clarkson on 'American Idol' season one?", "Justin Guarini", ["Clay Aiken", "Ruben Studdard", "Tamyra Gray"], "The two co-starred in the 2003 movie 'From Justin to Kelly.'"),
         Q(3, "Which 'The Hills' star got her own spin-off, 'The City'?", "Whitney Port", ["Lauren Conrad", "Audrina Patridge", "Heidi Montag"], "It followed her move to New York to work for Diane von Furstenberg."),
         Q(3, "Before Peacock, 'Love Island USA' aired on which network?", "CBS", ["NBC", "Fox", "ABC"], "CBS aired its first three seasons, starting in 2019."),
-    ])
+    ] + realityExtra)
 
     static let divas = Deck(id: "divas", world: .hers, title: "Pop Divas & Their Eras", tagline: "Swifties, the Beyhive, and who wrote what.", colorHex: "D63AE8", specs: [
         Q(1, "Taylor Swift's re-recorded albums carry which label?", "(Taylor's Version)", ["(Remastered)", "(Deluxe)", "(Redux)"]),
@@ -197,7 +197,7 @@ enum HerWorld {
         Q(3, "Sabrina Carpenter played Maya Hart on which Disney Channel show?", "Girl Meets World", ["Liv and Maddie", "Jessie", "Andi Mack"], "The 'Boy Meets World' spin-off ran on Disney Channel from 2014 to 2017."),
         Q(3, "The '1814' in Janet Jackson's 'Rhythm Nation 1814' is the year of what?", "The Star-Spangled Banner", ["The Louisiana Purchase", "The Bill of Rights", "The Emancipation Proclamation"], "Francis Scott Key wrote the anthem in 1814; the album came out in 1989."),
         Q(3, "Which future pop star was a Mouseketeer alongside Britney Spears?", "Christina Aguilera", ["Jessica Simpson", "Mandy Moore", "Hilary Duff"], "Justin Timberlake and Ryan Gosling were in the same 1993-94 cast."),
-    ])
+    ] + divasExtra)
 
     static let weddings = Deck(id: "weddings", world: .hers, title: "Wedding Season", tagline: "Registries, mimosas, and what your rising sign means.", colorHex: "19B8B5", specs: [
         Q(1, "What is a rehearsal dinner?", "Dinner the night before the wedding, after practicing the ceremony", ["The first dinner after the honeymoon", "The engagement dinner", "The reception"]),
@@ -236,5 +236,5 @@ enum HerWorld {
         Q(3, "Aquarius, the 'water bearer,' belongs to which element?", "Air", ["Water", "Earth", "Fire"], "It shares the air element with Gemini and Libra."),
         Q(3, "The Bellini was invented at which Venice bar?", "Harry's Bar", ["Caffè Florian", "Caffè Quadri", "Bar Danieli"], "Giuseppe Cipriani named it for the painter Giovanni Bellini."),
         Q(3, "Before designing wedding gowns, Vera Wang competed in which sport?", "Figure skating", ["Gymnastics", "Tennis", "Diving"], "She skated at the 1968 U.S. Championships, then spent 17 years at Vogue."),
-    ])
+    ] + weddingsExtra)
 }

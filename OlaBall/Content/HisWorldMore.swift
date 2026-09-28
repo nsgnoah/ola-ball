@@ -38,7 +38,7 @@ extension HisWorld {
         Q(3, "In 'Gladiator,' arena crowds know Maximus by what name?", "The Spaniard", ["The Gaul", "The Thracian", "The Celt"], "Joaquin Phoenix played Commodus, the emperor Maximus is out to kill."),
         Q(3, "Who played Jack Ryan in 'The Hunt for Red October' (1990)?", "Alec Baldwin", ["Harrison Ford", "Ben Affleck", "Chris Pine"], "Harrison Ford took over the role two years later in 'Patriot Games.'"),
         Q(3, "In 'Lonesome Dove' (1989), Robert Duvall plays which ex-Ranger?", "Gus McCrae", ["Woodrow Call", "Jake Spoon", "Pea Eye Parker"], "Tommy Lee Jones played his partner Call; the novel won the 1986 Pulitzer."),
-    ])
+    ] + actionmoviesExtra)
 
     static let tech = Deck(id: "tech", world: .his, title: "Tech & Gadgets", tagline: "Routers, chips, and why he needs a third monitor.", colorHex: "0EA5E9", specs: [
         Q(1, "What does 4K refer to on a TV?", "Screen resolution, about 4,000 pixels wide", ["Screen size", "Refresh rate", "Brightness"]),
@@ -77,7 +77,7 @@ extension HisWorld {
         Q(3, "In cybersecurity, a 'zero-day' is what?", "A flaw unknown to its maker", ["A virus set to go off at midnight", "A bug fixed the day it's found", "Malware that deletes itself"], "The name means the vendor has had zero days to fix it."),
         Q(3, "Sony co-developed the compact disc with which company?", "Philips", ["Panasonic", "Toshiba", "Pioneer"], "Philips also introduced the cassette tape, in 1963."),
         Q(3, "Besides Jobs and Wozniak, who was Apple's third co-founder?", "Ronald Wayne", ["Jef Raskin", "John Sculley", "Paul Allen"], "He drew Apple's first logo and withdrew from the company after just 12 days."),
-    ])
+    ] + techExtra)
 
     static let fightnight = Deck(id: "fightnight", world: .his, title: "Fight Night", tagline: "The Octagon, the sweet science, and WrestleMania.", colorHex: "DC2626", specs: [
         Q(1, "Mike Tyson famously bit the ear of which opponent?", "Evander Holyfield", ["Lennox Lewis", "Riddick Bowe", "Buster Douglas"]),
@@ -116,5 +116,5 @@ extension HisWorld {
         Q(3, "Who was boxing's first Black world heavyweight champion?", "Jack Johnson", ["Joe Louis", "Floyd Patterson", "Sonny Liston"], "He took the title from Tommy Burns in Sydney, Australia, in 1908."),
         Q(3, "Griffin vs. Bonnar, 'the fight that saved the UFC,' was the finale of what?", "The Ultimate Fighter", ["UFC 100", "Pride Grand Prix", "Strikeforce on CBS"], "Dana White gave both fighters UFC contracts after the 2005 brawl."),
         Q(3, "Which WWE star went on to win the UFC heavyweight title?", "Brock Lesnar", ["Bobby Lashley", "Dave Bautista", "CM Punk"], "He stopped Randy Couture at UFC 91 in 2008, in just his fourth pro MMA fight."),
-    ])
+    ] + fightnightExtra)
 }

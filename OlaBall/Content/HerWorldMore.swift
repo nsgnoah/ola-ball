@@ -38,7 +38,7 @@ extension HerWorld {
         Q(3, "'Frankenstein' is subtitled 'The Modern' what?", "Prometheus", ["Lazarus", "Icarus", "Pygmalion"], "Mary Shelley started writing it when she was 18."),
         Q(3, "In Kristin Hannah's 'The Nightingale,' the sisters are Vianne and who?", "Isabelle", ["Rachel", "Sophie", "Madeleine"], "Isabelle's Resistance code name, the Nightingale, gives the book its title."),
         Q(3, "Which Austen novel was first published after her death, alongside 'Persuasion'?", "Northanger Abbey", ["Emma", "Mansfield Park", "Sense and Sensibility"], "The two came out together in December 1817, months after Austen died that July."),
-    ])
+    ] + bookclubExtra)
 
     static let wellness = Deck(id: "wellness", world: .hers, title: "Wellness & Self-Care", tagline: "Pilates, matcha, cold plunges, and eight hours of sleep.", colorHex: "3DBF8A", specs: [
         Q(1, "What kind of exercise class is barre inspired by?", "Ballet", ["Boxing", "Rowing", "Gymnastics"]),
@@ -77,7 +77,7 @@ extension HerWorld {
         Q(3, "Zumba was created by a fitness instructor from which country?", "Colombia", ["Brazil", "Cuba", "Puerto Rico"], "Beto Pérez forgot his usual music and taught with salsa and merengue tapes."),
         Q(3, "In Ayurveda, the three doshas are vata, pitta, and what?", "Kapha", ["Ojas", "Prana", "Agni"], "The three are traditionally linked to wind, bile, and phlegm."),
         Q(3, "A Tabata round is 20 seconds of all-out work, then how much rest?", "10 seconds", ["5 seconds", "20 seconds", "40 seconds"], "It's named for Japanese scientist Izumi Tabata; eight rounds take four minutes."),
-    ])
+    ] + wellnessExtra)
 
     static let gossip = Deck(id: "gossip", world: .hers, title: "Celebrity Couples & Gossip", tagline: "Who's dating, who's engaged, and who conscious-uncoupled.", colorHex: "FFB020", specs: [
         Q(1, "Tom Brady's ex-wife is which supermodel?", "Gisele Bündchen", ["Adriana Lima", "Heidi Klum", "Karlie Kloss"]),
@@ -116,5 +116,5 @@ extension HerWorld {
         Q(3, "Serena Williams married the co-founder of which website?", "Reddit", ["Twitter", "Pinterest", "Tumblr"], "They married in New Orleans in 2017."),
         Q(3, "Paul Newman was married for 50 years to which actress?", "Joanne Woodward", ["Elizabeth Taylor", "Natalie Wood", "Lee Remick"], "They met in the 1953 Broadway production of 'Picnic.'"),
         Q(3, "Kelly Ripa met Mark Consuelos on the set of which soap opera?", "All My Children", ["General Hospital", "Days of Our Lives", "One Life to Live"], "They played love interests on the show and eloped in Las Vegas in 1996."),
-    ])
+    ] + gossipExtra)
 }
