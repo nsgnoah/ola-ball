@@ -84,7 +84,7 @@ A note on screenshot sizes: the iPhone slot wants **6.5-inch** (1242x2688 or 128
 the 6.9-inch 1320x2868 set. `./scripts/store_shots.sh <udid>` against an iPhone 14 Plus or 13 Pro Max
 simulator produces 1284x2778. The iPad slot takes 2064x2752 directly.
 
-**September 27, 2026: 1.0 approved for distribution.** Release is automatic on approval, so it goes live on the App Store without another step.
+**September 27, 2026: 1.0 approved for distribution.** It was not in any country, so it showed as removed from sale; availability set to all countries or regions the same day (Pricing and Availability > App Availability).
 
 **September 22, 2026: 2.1 "Information Needed", answered and resubmitted.** Apple asks new developer
 accounts for context before approving: a screen recording from a physical iPhone that starts at launch,
