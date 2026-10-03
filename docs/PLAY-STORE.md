@@ -1,6 +1,14 @@
 # Submitting Spinola to Google Play
 
-**Status, September 25, 2026: version 1.0 (1) is in review for production.** The NSG LLC
+**Status, October 2, 2026: version 1.0 (1) is live on Google Play** at
+[play.google.com/store/apps/details?id=co.nsgsolutions.spinola](https://play.google.com/store/apps/details?id=co.nsgsolutions.spinola),
+rated Teen. IARC's Live Rating Notice arrived the same evening (dated October 3 UTC): IARC Global
+Rating ID `0ccd9fdf-c7ee-8fef-8940-3fa0ece31f42`. Another IARC storefront asking for a Global Rating
+ID or IARC Certificate ID takes that ID; the rating covers updates until a change would alter the
+questionnaire answers. Rating check requests go through
+`https://web.iarcservices.com/Dashboard/Request/0ccd9fdf-c7ee-8fef-8940-3fa0ece31f42`.
+
+Submitted September 25, 2026. The NSG LLC
 organization account is verified (developer account 5710476944949805415). "Spinola: Couples Trivia"
 (package `co.nsgsolutions.spinola`, app 4973204147980836777) went straight to production with no
 closed test, since the 14-day testing rule only applies to personal accounts. The submission
